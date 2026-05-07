@@ -411,19 +411,21 @@ async function renderMarket() {
   const el = document.getElementById('marketContent');
   if (state.category) { await renderProducts(state.category); return; }
 
-  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
-  try {
-    const cats = await api('/categories');
-    const catMap = { 'signa':'🖊','mugs':'☕','photos':'📸','videos':'🎬' };
-    el.innerHTML = `
-      <div class="section-title">Категории</div>
-      <div class="cats">${cats.map(c => `
-        <div class="cat-card" onclick="openCategory('${c.id}')">
-          <div class="cat-icon">${catMap[c.id] || '📦'}</div>
-          <div class="cat-name">${c.name}</div>
-        </div>`).join('')}
-      </div>`;
-  } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div>`; }
+  // Категории захардкожены — не нужен API запрос
+  const cats = [
+    { id: 'signa',  name: '🖊 Сигна'  },
+    { id: 'mugs',   name: '☕ Кружки' },
+    { id: 'photos', name: '📸 Фото'   },
+    { id: 'videos', name: '🎬 Видео'  },
+  ];
+  el.innerHTML = `
+    <div class="section-title">Категории</div>
+    <div class="cats">${cats.map(c => `
+      <div class="cat-card" onclick="openCategory('${c.id}')">
+        <div class="cat-icon">${c.name.split(' ')[0]}</div>
+        <div class="cat-name">${c.name.split(' ').slice(1).join(' ')}</div>
+      </div>`).join('')}
+    </div>`;
 }
 
 async function openCategory(catId) {
