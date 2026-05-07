@@ -803,14 +803,17 @@ function showPageEl(id) {
 
 // ── INIT ──────────────────────────────────────────────────
 async function init() {
-  // Сразу показываем маркет без ожидания авторизации
+  // Debug — покажем что пришло от Telegram
+  console.log('initData length:', tg?.initData?.length || 0);
+  console.log('tgUser:', JSON.stringify(tg?.initDataUnsafe?.user));
+
   renderMarket();
-  // Потом тихо грузим юзера
   try {
     state.user = await api('/me');
     document.getElementById('headerBal').textContent = state.user.balance.toFixed(0) + ' ₽';
+    console.log('Auth OK:', state.user.uid);
   } catch(e) {
-    console.warn('Auth:', e.message);
+    console.warn('Auth failed:', e.message);
   }
 }
 
