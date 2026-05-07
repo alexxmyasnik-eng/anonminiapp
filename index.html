@@ -530,6 +530,13 @@ function backToMarket() {
 // ── ORDERS ───────────────────────────────────────────────
 async function renderOrders() {
   const el = document.getElementById('ordersContent');
+  if (!state.user) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-icon">🔐</div>
+      <div class="empty-text">Открой через Telegram бота чтобы видеть заказы</div>
+    </div>`;
+    return;
+  }
   el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
   try {
     const orders = await api('/orders');
@@ -660,6 +667,8 @@ function stopChatPoll() {
 async function renderWallet() {
   const el  = document.getElementById('walletContent');
   const bal = state.user?.balance ?? 0;
+  const isAuth = !!state.user;
+
   el.innerHTML = `
     <div class="wallet-card">
       <div class="wallet-label">Баланс</div>
@@ -673,9 +682,10 @@ async function renderWallet() {
     </div>
     <button class="btn btn-outline" onclick="customAmount()" style="margin-bottom:10px">✏️ Своя сумма</button>
     <div id="topupInstruction"></div>
+    ${isAuth ? `
     <div class="divider"></div>
     <div class="section-title">Вывод средств</div>
-    <button class="btn btn-outline" onclick="requestWithdraw()">💸 Вывести</button>`;
+    <button class="btn btn-outline" onclick="requestWithdraw()">💸 Вывести</button>` : ''}`;
 }
 
 let selectedAmount = 0;
@@ -702,20 +712,35 @@ function customAmount() {
 async function showTopupInstruction(amount) {
   const el = document.getElementById('topupInstruction');
   el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
-  try {
-    const r = await api(`/topup/init/${amount}`);
-    el.innerHTML = `
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:10px">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Инструкция:</div>
-        <div style="font-size:13px;line-height:1.7">
-          1️⃣ Перейди на <a href="${r.da_link}" target="_blank" style="color:var(--accent2)">DonationAlerts</a><br>
-          2️⃣ В поле «Сообщение» скопируй:<br>
-          <code onclick="copyText('${r.da_comment}')" style="background:var(--surface);border-radius:8px;padding:6px 10px;display:block;margin:8px 0;font-size:13px;cursor:pointer;color:var(--green)">${r.da_comment}</code>
-          3️⃣ Сумма доната: <b>${amount} ₽</b><br><br>
-          💡 Бот зачислит автоматически в течение 15 сек
-        </div>
-      </div>`;
-  } catch(e) { el.innerHTML = `<div style="color:var(--red);font-size:13px">${e.message}</div>`; }
+
+  // Берём ID из Telegram initData напрямую
+  const tgUser = tg?.initDataUnsafe?.user;
+  const uid = tgUser?.id || state.user?.uid;
+
+  if (!uid) {
+    el.innerHTML = `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:10px;font-size:13px;color:var(--muted)">
+      Открой через Telegram бота для пополнения
+    </div>`;
+    return;
+  }
+
+  const da_comment = `Топап ${uid} ${amount}`;
+
+  // Сохраняем топап в БД если авторизованы
+  try { await api(`/topup/init/${amount}`); } catch(e) {}
+
+  el.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Инструкция по пополнению:</div>
+      <div style="font-size:13px;line-height:1.9">
+        1️⃣ Перейди на DonationAlerts:<br>
+        <a href="https://www.donationalerts.com/r/anonpeak" target="_blank" style="color:var(--accent2);font-weight:600">donationalerts.com/r/anonpeak</a><br><br>
+        2️⃣ В поле «Сообщение» скопируй точно:<br>
+        <code onclick="copyText('${da_comment}')" style="background:var(--surface);border-radius:8px;padding:8px 12px;display:block;margin:8px 0;font-size:14px;cursor:pointer;color:var(--green);text-align:center;border:1px solid var(--border)">${da_comment} 📋</code>
+        3️⃣ Сумма доната: <b>${amount} ₽</b><br><br>
+        <span style="color:var(--green)">✅ Бот зачислит автоматически за 15 сек</span>
+      </div>
+    </div>`;
 }
 
 function copyText(text) {
@@ -729,7 +754,13 @@ function requestWithdraw() {
 // ── PROFILE ──────────────────────────────────────────────
 async function renderProfile() {
   const el = document.getElementById('profileContent');
-  if (!state.user) { el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Загрузка...</div></div>'; return; }
+  if (!state.user) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-icon">👤</div>
+      <div class="empty-text">Открой через Telegram бота чтобы увидеть профиль</div>
+    </div>`;
+    return;
+  }
   const u = state.user;
   el.innerHTML = `
     <div style="text-align:center;padding-top:16px">
@@ -747,7 +778,7 @@ async function renderProfile() {
         <div class="stat-label">Заказов</div>
       </div>
     </div>
-    <button class="btn btn-outline" style="margin-bottom:10px" onclick="toast('Редактирование — в боте')">✏️ Редактировать профиль</button>
+    <button class="btn btn-outline" style="margin-bottom:10px" onclick="toast('Редактирование — в боте @AnonPeakbot')">✏️ Редактировать профиль</button>
     <button class="btn btn-outline" onclick="showPage('wallet')">💰 Пополнить баланс</button>`;
 }
 
@@ -772,14 +803,15 @@ function showPageEl(id) {
 
 // ── INIT ──────────────────────────────────────────────────
 async function init() {
+  // Сразу показываем маркет без ожидания авторизации
+  renderMarket();
+  // Потом тихо грузим юзера
   try {
     state.user = await api('/me');
     document.getElementById('headerBal').textContent = state.user.balance.toFixed(0) + ' ₽';
   } catch(e) {
-    console.warn('Auth failed:', e.message);
-    // Всё равно показываем маркет — он публичный
+    console.warn('Auth:', e.message);
   }
-  renderMarket();
 }
 
 // ── ПОДДЕРЖКА ─────────────────────────────────────────────
