@@ -775,8 +775,8 @@ async function init() {
     state.user = await api('/me');
     document.getElementById('headerBal').textContent = state.user.balance.toFixed(0) + ' ₽';
   } catch(e) {
-    // В браузере без initData — показываем интерфейс без данных
-    console.warn('No auth:', e.message);
+    console.warn('Auth failed:', e.message);
+    // Всё равно показываем маркет — он публичный
   }
   renderMarket();
 }
