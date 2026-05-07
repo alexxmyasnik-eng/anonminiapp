@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>AnonPeak</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@300;400;500&display=swap');
+
+  :root {
+    --bg:      #0a0a0f;
+    --surface: #13131a;
+    --card:    #1c1c26;
+    --border:  #2a2a38;
+    --accent:  #7c5cfc;
+    --accent2: #c084fc;
+    --green:   #22d3a0;
+    --red:     #f43f5e;
+    --text:    #f0f0f8;
+    --muted:   #6b6b8a;
+    --tg-color: var(--tg-theme-bg-color, var(--bg));
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Onest', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .header-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800; font-size: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .header-bal {
+    margin-left: auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px; font-weight: 500;
+    color: var(--green);
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 3px; padding: 10px 4px;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 10px; font-family: 'Onest', sans-serif;
+    transition: color .2s;
+  }
+  .nav-btn.active { color: var(--accent2); }
+  .nav-btn svg { width: 22px; height: 22px; }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 16px 16px 80px; animation: fadeUp .25s ease; }
+  .page.active { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: .5px; text-transform: uppercase;
+    color: var(--muted); margin: 20px 0 10px;
+  }
+
+  /* ── CATEGORIES ── */
+  .cats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px;
+    cursor: pointer; transition: all .2s;
+    text-align: center;
+  }
+  .cat-card:active { transform: scale(.96); background: var(--surface); }
+  .cat-card .cat-icon { font-size: 28px; margin-bottom: 6px; }
+  .cat-card .cat-name { font-size: 13px; font-weight: 500; }
+
+  /* ── PRODUCT LIST ── */
+  .products { display: flex; flex-direction: column; gap: 10px; }
+  .product-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; cursor: pointer;
+    display: flex; gap: 12px; align-items: center;
+    transition: all .15s;
+  }
+  .product-card:active { transform: scale(.98); }
+  .product-thumb {
+    width: 56px; height: 56px; border-radius: 10px;
+    background: var(--surface); object-fit: cover; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: var(--muted);
+  }
+  .product-info { flex: 1; min-width: 0; }
+  .product-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .product-seller { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .product-price { font-weight: 700; font-size: 15px; color: var(--green); }
+
+  /* ── PRODUCT DETAIL ── */
+  .detail-media {
+    width: 100%; border-radius: 16px; overflow: hidden;
+    background: var(--card); aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 60px; margin-bottom: 16px;
+  }
+  .detail-media img, .detail-media video { width: 100%; height: 100%; object-fit: cover; }
+  .detail-title { font-family: 'Unbounded', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .detail-seller { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+  .detail-desc { color: #c0c0d8; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+  .detail-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 24px; font-weight: 800;
+    color: var(--green); margin-bottom: 16px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    width: 100%; padding: 15px; border-radius: 14px; border: none;
+    font-family: 'Onest', sans-serif; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+  }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-outline {
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .btn-green { background: var(--green); color: #0a0a0f; }
+
+  /* ── BACK BTN ── */
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: none; color: var(--accent2);
+    font-family: 'Onest', sans-serif; font-size: 14px;
+    cursor: pointer; padding: 0 0 12px; font-weight: 500;
+  }
+
+  /* ── PROFILE ── */
+  .profile-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin: 0 auto 12px; overflow: hidden;
+  }
+  .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .profile-name { text-align: center; font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 700; }
+  .profile-age { text-align: center; color: var(--muted); font-size: 13px; margin: 4px 0 16px; }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; text-align: center;
+  }
+  .stat-val { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent2); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ── WALLET ── */
+  .wallet-card {
+    background: linear-gradient(135deg, #1a1040, #0d1a30);
+    border: 1px solid #2d2060;
+    border-radius: 20px; padding: 24px; margin-bottom: 20px;
+    text-align: center;
+  }
+  .wallet-label { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .wallet-amount { font-family: 'Unbounded', sans-serif; font-size: 36px; font-weight: 800; color: var(--green); }
+  .amounts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .amount-btn {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 12px 4px; font-size: 14px; font-weight: 600;
+    color: var(--text); cursor: pointer; transition: all .15s; font-family: 'Onest', sans-serif;
+  }
+  .amount-btn.selected { border-color: var(--accent); color: var(--accent2); background: rgba(124,92,252,.12); }
+  .amount-btn:active { transform: scale(.96); }
+
+  /* ── ORDERS ── */
+  .order-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer;
+    transition: all .15s;
+  }
+  .order-card:active { transform: scale(.98); }
+  .order-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .order-id { font-family: 'Unbounded', sans-serif; font-size: 12px; color: var(--accent2); }
+  .order-status { font-size: 11px; padding: 3px 8px; border-radius: 8px; }
+  .status-paid { background: rgba(34,211,160,.15); color: var(--green); }
+  .status-done { background: rgba(124,92,252,.15); color: var(--accent2); }
+  .status-pending_payment { background: rgba(244,63,94,.15); color: var(--red); }
+  .order-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .order-meta { font-size: 12px; color: var(--muted); }
+
+  /* ── CHAT ── */
+  .chat-header {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 12px 16px; margin: -16px -16px 12px;
+    position: sticky; top: 57px; z-index: 10;
+  }
+  .chat-title { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 600; }
+  .chat-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .messages { display: flex; flex-direction: column; gap: 6px; padding-bottom: 70px; }
+  .msg { max-width: 78%; padding: 10px 13px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+  .msg-out { background: linear-gradient(135deg, var(--accent), #5a3fd4); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-in { background: var(--card); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg-time { font-size: 10px; opacity: .6; margin-top: 3px; text-align: right; }
+  .chat-input-wrap {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(10,10,15,.95); backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .chat-input {
+    flex: 1; background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 24px; padding: 10px 16px; color: var(--text);
+    font-family: 'Onest', sans-serif; font-size: 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .send-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: transform .15s;
+  }
+  .send-btn:active { transform: scale(.92); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px);
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 18px; font-size: 13px; font-weight: 500;
+    z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── LOADER ── */
+  .loader { text-align: center; padding: 40px; color: var(--muted); }
+  .spinner {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    animation: spin .7s linear infinite; margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── EMPTY ── */
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-text { font-size: 14px; }
+
+  /* ── CHIPS ── */
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; transition: all .15s;
+    background: var(--card); border: 1.5px solid var(--border); color: var(--muted);
+  }
+  .chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,92,252,.12); }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .gap8 { height: 8px; }
+  .gap12 { height: 12px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">ANONPEAK</div>
+  <button onclick="openSearch()" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </button>
+  <button onclick="openSupport()" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </button>
+  <div class="header-bal" id="headerBal">0 ₽</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ PAGE: MARKET ══ -->
+<div class="page active" id="page-market">
+  <div id="marketContent"><div class="loader"><div class="spinner"></div></div></div>
+</div>
+
+<!-- ══ PAGE: ORDERS ══ -->
+<div class="page" id="page-orders">
+  <div id="ordersContent"><div class="loader"><div class="spinner"></div></div></div>
+</div>
+
+<!-- ══ PAGE: WALLET ══ -->
+<div class="page" id="page-wallet">
+  <div id="walletContent"><div class="loader"><div class="spinner"></div></div></div>
+</div>
+
+<!-- ══ PAGE: PROFILE ══ -->
+<div class="page" id="page-profile">
+  <div id="profileContent"><div class="loader"><div class="spinner"></div></div></div>
+</div>
+
+<!-- ══ PAGE: CHAT ══ (динамически) -->
+<div class="page" id="page-chat"></div>
+
+<!-- ══ PAGE: PRODUCT ══ (динамически) -->
+<div class="page" id="page-product"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('market')" id="nav-market">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Маркет
+  </button>
+  <button class="nav-btn" onclick="openSell()" id="nav-sell">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Продать
+  </button>
+  <button class="nav-btn" onclick="showPage('orders')" id="nav-orders">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Заказы
+  </button>
+  <button class="nav-btn" onclick="showPage('wallet')" id="nav-wallet">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    Кошелёк
+  </button>
+  <button class="nav-btn" onclick="showPage('profile')" id="nav-profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Профиль
+  </button>
+</nav>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const API = 'YOUR_RAILWAY_API_URL'; // заменить на Railway URL типа https://anonpeak.up.railway.app
+const tg  = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const initData = tg?.initData || '';
+const headers  = { 'Content-Type': 'application/json', 'x-init-data': initData };
+
+// ── STATE ────────────────────────────────────────────────
+let state = { page: 'market', category: null, product: null, order: null, user: null };
+let chatPollInterval = null;
+
+// ── API ──────────────────────────────────────────────────
+async function api(path, method = 'GET', body = null) {
+  try {
+    const opts = { method, headers };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(API + path, opts);
+    if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.detail || r.status); }
+    return await r.json();
+  } catch(e) { throw e; }
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function toast(msg, ms = 2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), ms);
+}
+
+// ── NAV ───────────────────────────────────────────────────
+function showPage(name) {
+  if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  state.page = name;
+  if (name === 'market' && !state.category) renderMarket();
+  if (name === 'orders') renderOrders();
+  if (name === 'wallet') renderWallet();
+  if (name === 'profile') renderProfile();
+}
+
+// ── MARKET ───────────────────────────────────────────────
+async function renderMarket() {
+  const el = document.getElementById('marketContent');
+  if (state.category) { await renderProducts(state.category); return; }
+
+  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  try {
+    const cats = await api('/categories');
+    const catMap = { 'signa':'🖊','mugs':'☕','photos':'📸','videos':'🎬' };
+    el.innerHTML = `
+      <div class="section-title">Категории</div>
+      <div class="cats">${cats.map(c => `
+        <div class="cat-card" onclick="openCategory('${c.id}')">
+          <div class="cat-icon">${catMap[c.id] || '📦'}</div>
+          <div class="cat-name">${c.name}</div>
+        </div>`).join('')}
+      </div>`;
+  } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div>`; }
+}
+
+async function openCategory(catId) {
+  state.category = catId;
+  await renderProducts(catId);
+}
+
+async function renderProducts(catId) {
+  const el = document.getElementById('marketContent');
+  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  const catNames = { 'signa':'🖊 Сигна','mugs':'☕ Кружки','photos':'📸 Фото','videos':'🎬 Видео' };
+  try {
+    const prods = await api(`/products/${catId}`);
+    el.innerHTML = `
+      <button class="back-btn" onclick="state.category=null; renderMarket()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        ${catNames[catId] || catId}
+      </button>
+      <div class="products">${prods.length ? prods.map(p => `
+        <div class="product-card" onclick="openProduct(${p.id})">
+          <div class="product-thumb">${p.media_type === 'photo' ? `<img src="${getFileUrl(p.media_id)}" onerror="this.parentNode.textContent='📦'">` : '📦'}</div>
+          <div class="product-info">
+            <div class="product-title">${esc(p.title)}</div>
+            <div class="product-seller">@${esc(p.seller_nick)} ⭐ ${p.seller_rating.toFixed(1)}</div>
+            <div class="product-price">${p.price} ₽</div>
+          </div>
+        </div>`).join('') : '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">В этой категории пока нет товаров</div></div>'}
+      </div>`;
+  } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div>`; }
+}
+
+async function openProduct(id) {
+  const page = document.getElementById('page-product');
+  page.innerHTML = '<div style="padding:20px"><div class="loader"><div class="spinner"></div></div></div>';
+  showPageEl('page-product');
+
+  try {
+    const p = await api(`/product/${id}`);
+    const mediaHtml = p.media_type === 'photo'
+      ? `<img src="${getFileUrl(p.media_id)}" style="width:100%;height:100%;object-fit:cover">`
+      : p.media_type === 'video'
+      ? `<video src="${getFileUrl(p.media_id)}" controls style="width:100%;height:100%;object-fit:cover"></video>`
+      : `<span>${'📦'}</span>`;
+
+    const isMine = state.user && p.seller_id === state.user.uid;
+
+    page.innerHTML = `
+      <div style="padding:16px 16px 90px">
+        <button class="back-btn" onclick="backToMarket()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg> Назад
+        </button>
+        <div class="detail-media">${mediaHtml}</div>
+        <div class="detail-title">${esc(p.title)}</div>
+        <div class="detail-seller">👤 ${esc(p.seller_nick)} · ⭐ ${p.seller_rating.toFixed(1)} (${p.seller_reviews} отзывов)</div>
+        <div class="detail-desc">${esc(p.description || '')}</div>
+        <div class="detail-price">${p.price} ₽</div>
+        ${isMine
+          ? `<div class="btn btn-outline" style="text-align:center;padding:15px;border-radius:14px">Это ваш товар</div>`
+          : `<button class="btn btn-primary" onclick="buyProduct(${p.id}, ${p.price})">Купить — ${p.price} ₽</button>`
+        }
+      </div>`;
+  } catch(e) {
+    page.innerHTML = `<div style="padding:20px"><div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div></div>`;
+  }
+}
+
+async function buyProduct(id, price) {
+  if (!state.user) return;
+  if (state.user.balance < price) {
+    tg?.showPopup({ message: `На балансе ${state.user.balance} ₽, нужно ${price} ₽`, buttons: [
+      { id: 'topup', type: 'default', text: 'Пополнить баланс' },
+      { id: 'cancel', type: 'cancel' }
+    ]}, (btn) => { if (btn === 'topup') showPage('wallet'); });
+    return;
+  }
+  tg?.showPopup({ message: `Купить за ${price} ₽?`, buttons: [
+    { id: 'ok', type: 'default', text: 'Купить' },
+    { id: 'cancel', type: 'cancel' }
+  ]}, async (btn) => {
+    if (btn !== 'ok') return;
+    try {
+      const r = await api('/buy', 'POST', { product_id: id });
+      if (r.ok) {
+        toast('✅ Куплено!');
+        state.user.balance -= price;
+        document.getElementById('headerBal').textContent = state.user.balance.toFixed(0) + ' ₽';
+        setTimeout(() => { showPage('orders'); }, 1000);
+      } else if (r.reason === 'insufficient') {
+        toast('❌ Недостаточно средств');
+        showPage('wallet');
+      }
+    } catch(e) { toast('❌ ' + e.message); }
+  });
+}
+
+function backToMarket() {
+  showPageEl('page-market');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-market').classList.add('active');
+}
+
+// ── ORDERS ───────────────────────────────────────────────
+async function renderOrders() {
+  const el = document.getElementById('ordersContent');
+  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  try {
+    const orders = await api('/orders');
+    if (!orders.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Нет заказов</div></div>';
+      return;
+    }
+    const statusLabel = { paid:'Оплачен', done:'Завершён', pending_payment:'Ожидает оплаты', seller_confirmed:'Выдан', cancelled:'Отменён' };
+    el.innerHTML = `<div class="section-title">Мои заказы</div>` + orders.map(o => `
+      <div class="order-card" onclick="openChat(${o.id})">
+        <div class="order-head">
+          <div class="order-id">${o.short_id}</div>
+          <div class="order-status status-${o.status}">${statusLabel[o.status] || o.status}</div>
+        </div>
+        <div class="order-title">${esc(o.product_title)}</div>
+        <div class="order-meta">${o.role === 'buyer' ? '🛒 Покупатель' : '🏪 Продавец'} · ${esc(o.partner_nick)} · ${o.amount} ₽</div>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div>`; }
+}
+
+// ── CHAT ─────────────────────────────────────────────────
+async function openChat(orderId) {
+  const page = document.getElementById('page-chat');
+  page.innerHTML = '<div style="padding:20px"><div class="loader"><div class="spinner"></div></div></div>';
+  showPageEl('page-chat');
+
+  try {
+    const [order] = (await api('/orders')).filter(o => o.id === orderId);
+    await renderChatPage(page, order);
+    if (chatPollInterval) clearInterval(chatPollInterval);
+    chatPollInterval = setInterval(() => refreshMessages(orderId), 4000);
+  } catch(e) {
+    page.innerHTML = `<div style="padding:20px"><div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div></div>`;
+  }
+}
+
+async function renderChatPage(page, order) {
+  const msgs = await api(`/orders/${order.id}/messages`);
+  const uid  = state.user?.uid;
+  const statusLabel = { paid:'Оплачен', done:'Завершён', pending_payment:'Ожидает оплаты', seller_confirmed:'Выдан' };
+  const canConfirm  = order.role === 'buyer' && ['paid','seller_confirmed'].includes(order.status);
+
+  page.innerHTML = `
+    <div style="padding:0 0 80px">
+      <div class="chat-header">
+        <button class="back-btn" onclick="stopChatPoll(); showPage('orders')" style="padding:0 0 0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          Назад
+        </button>
+        <div class="chat-title">🛒 ${esc(order.product_title)}  <span style="color:var(--accent2);font-size:11px">${order.short_id}</span></div>
+        <div class="chat-subtitle">${order.role === 'buyer' ? '🛒 Вы покупатель' : '🏪 Вы продавец'} · ${esc(order.partner_nick)} · ${statusLabel[order.status] || order.status}</div>
+      </div>
+      <div class="messages" id="chatMessages" style="padding:16px">
+        ${msgs.length ? msgs.map(m => `
+          <div>
+            <div class="msg ${m.sender_id === uid ? 'msg-out' : 'msg-in'}">
+              ${m.text ? esc(m.text) : (m.media_type === 'photo' ? '📸 Фото' : '🎬 Видео')}
+              <div class="msg-time">${m.created_at ? m.created_at.slice(11,16) : ''}</div>
+            </div>
+          </div>`).join('') : '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px">Начни переписку 👋</div>'}
+      </div>
+      ${canConfirm ? `<div style="padding:0 16px 10px"><button class="btn btn-green" onclick="confirmOrder(${order.id})">✅ Получил — закрыть заказ</button></div>` : ''}
+    </div>
+    <div class="chat-input-wrap" ${order.status === 'done' ? 'style="display:none"' : ''}>
+      <input class="chat-input" id="chatInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendMsg(${order.id})">
+      <button class="send-btn" onclick="sendMsg(${order.id})">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>`;
+
+  scrollChatToBottom();
+}
+
+async function refreshMessages(orderId) {
+  try {
+    const msgs = await api(`/orders/${orderId}/messages`);
+    const uid  = state.user?.uid;
+    const el   = document.getElementById('chatMessages');
+    if (!el) return;
+    const wasAtBottom = el.scrollHeight - el.scrollTop - el.offsetHeight < 60;
+    el.innerHTML = msgs.length ? msgs.map(m => `
+      <div><div class="msg ${m.sender_id === uid ? 'msg-out' : 'msg-in'}">
+        ${m.text ? esc(m.text) : (m.media_type === 'photo' ? '📸 Фото' : '🎬 Видео')}
+        <div class="msg-time">${m.created_at ? m.created_at.slice(11,16) : ''}</div>
+      </div></div>`).join('')
+      : '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px">Начни переписку 👋</div>';
+    if (wasAtBottom) scrollChatToBottom();
+  } catch(e) {}
+}
+
+async function sendMsg(orderId) {
+  const input = document.getElementById('chatInput');
+  const text  = input?.value?.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    await api(`/orders/${orderId}/messages`, 'POST', { text });
+    await refreshMessages(orderId);
+    scrollChatToBottom();
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+async function confirmOrder(orderId) {
+  tg?.showPopup({ message: 'Подтвердить получение товара?', buttons: [
+    { id: 'ok', type: 'default', text: 'Подтвердить' },
+    { id: 'cancel', type: 'cancel' }
+  ]}, async (btn) => {
+    if (btn !== 'ok') return;
+    try {
+      await api('/confirm_order', 'POST', { order_id: orderId });
+      toast('✅ Заказ завершён!');
+      stopChatPoll();
+      showPage('orders');
+    } catch(e) { toast('❌ ' + e.message); }
+  });
+}
+
+function scrollChatToBottom() {
+  const el = document.getElementById('chatMessages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function stopChatPoll() {
+  if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+}
+
+// ── WALLET ───────────────────────────────────────────────
+async function renderWallet() {
+  const el  = document.getElementById('walletContent');
+  const bal = state.user?.balance ?? 0;
+  el.innerHTML = `
+    <div class="wallet-card">
+      <div class="wallet-label">Баланс</div>
+      <div class="wallet-amount">${bal.toFixed(0)} ₽</div>
+    </div>
+    <div class="section-title">Пополнить баланс</div>
+    <div class="amounts-grid" id="amountsGrid">
+      ${[100,250,500,1000,2500,5000].map(a =>
+        `<button class="amount-btn" data-amount="${a}" onclick="selectAmount(${a})">${a} ₽</button>`
+      ).join('')}
+    </div>
+    <button class="btn btn-outline" onclick="customAmount()" style="margin-bottom:10px">✏️ Своя сумма</button>
+    <div id="topupInstruction"></div>
+    <div class="divider"></div>
+    <div class="section-title">Вывод средств</div>
+    <button class="btn btn-outline" onclick="requestWithdraw()">💸 Вывести</button>`;
+}
+
+let selectedAmount = 0;
+
+function selectAmount(a) {
+  selectedAmount = a;
+  document.querySelectorAll('.amount-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.amount) === a);
+  });
+  showTopupInstruction(a);
+}
+
+function customAmount() {
+  tg?.showPopup({ message: 'Введи сумму пополнения (мин. 10 ₽)', buttons: [
+    { id: 'ok', type: 'default', text: 'Ввести' }, { id: 'cancel', type: 'cancel' }
+  ]}, (btn) => {
+    if (btn !== 'ok') return;
+    // fallback — prompt не работает в TG, используем альтернативу
+    const a = parseInt(prompt('Сумма (₽):') || '0');
+    if (a >= 10) { selectedAmount = a; showTopupInstruction(a); }
+  });
+}
+
+async function showTopupInstruction(amount) {
+  const el = document.getElementById('topupInstruction');
+  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  try {
+    const r = await api(`/topup/init/${amount}`);
+    el.innerHTML = `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:10px">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Инструкция:</div>
+        <div style="font-size:13px;line-height:1.7">
+          1️⃣ Перейди на <a href="${r.da_link}" target="_blank" style="color:var(--accent2)">DonationAlerts</a><br>
+          2️⃣ В поле «Сообщение» скопируй:<br>
+          <code onclick="copyText('${r.da_comment}')" style="background:var(--surface);border-radius:8px;padding:6px 10px;display:block;margin:8px 0;font-size:13px;cursor:pointer;color:var(--green)">${r.da_comment}</code>
+          3️⃣ Сумма доната: <b>${amount} ₽</b><br><br>
+          💡 Бот зачислит автоматически в течение 15 сек
+        </div>
+      </div>`;
+  } catch(e) { el.innerHTML = `<div style="color:var(--red);font-size:13px">${e.message}</div>`; }
+}
+
+function copyText(text) {
+  navigator.clipboard?.writeText(text).then(() => toast('✅ Скопировано'));
+}
+
+function requestWithdraw() {
+  toast('💸 Для вывода напиши в поддержку боту');
+}
+
+// ── PROFILE ──────────────────────────────────────────────
+async function renderProfile() {
+  const el = document.getElementById('profileContent');
+  if (!state.user) { el.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Загрузка...</div></div>'; return; }
+  const u = state.user;
+  el.innerHTML = `
+    <div style="text-align:center;padding-top:16px">
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name">${esc(u.nickname || 'Без ника')}</div>
+      <div class="profile-age">${u.age ? u.age + ' лет' : ''}</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-val">${u.balance.toFixed(0)} ₽</div>
+        <div class="stat-label">Баланс</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">0</div>
+        <div class="stat-label">Заказов</div>
+      </div>
+    </div>
+    <button class="btn btn-outline" style="margin-bottom:10px" onclick="toast('Редактирование — в боте')">✏️ Редактировать профиль</button>
+    <button class="btn btn-outline" onclick="showPage('wallet')">💰 Пополнить баланс</button>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getFileUrl(fileId) {
+  // Telegram file_id нельзя использовать напрямую в img src
+  // Нужен эндпоинт /file/{file_id} на бэкенде — пока показываем заглушку
+  return `${API}/file/${fileId}`;
+}
+
+function showPageEl(id) {
+  if (chatPollInterval && id !== 'page-chat') { clearInterval(chatPollInterval); chatPollInterval = null; }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+async function init() {
+  try {
+    state.user = await api('/me');
+    document.getElementById('headerBal').textContent = state.user.balance.toFixed(0) + ' ₽';
+  } catch(e) {
+    // В браузере без initData — показываем интерфейс без данных
+    console.warn('No auth:', e.message);
+  }
+  renderMarket();
+}
+
+// ── ПОДДЕРЖКА ─────────────────────────────────────────────
+async function openSupport() {
+  tg?.showPopup({
+    title: '🆘 Поддержка',
+    message: 'Опиши проблему — сообщение придёт администратору',
+    buttons: [
+      { id: 'send', type: 'default', text: 'Написать' },
+      { id: 'cancel', type: 'cancel' }
+    ]
+  }, async (btn) => {
+    if (btn !== 'send') return;
+    // TG не поддерживает input в popup — открываем чат бота
+    tg?.openTelegramLink('https://t.me/AnonPeakBot?start=support');
+  });
+}
+
+// ── ПРОДАТЬ ТОВАР ─────────────────────────────────────────
+function openSell() {
+  // Продажа идёт через бота — редирект
+  tg?.openTelegramLink('https://t.me/AnonPeakBot?start=sell');
+  toast('Открываю бота для публикации товара...');
+}
+
+// ── УВЕДОМЛЕНИЯ ───────────────────────────────────────────
+async function checkNotifications() {
+  try {
+    const orders = await api('/orders');
+    // Считаем заказы с новыми сообщениями
+    const activeOrders = orders.filter(o => o.status === 'paid' || o.status === 'seller_confirmed');
+    const navOrders = document.getElementById('nav-orders');
+    if (navOrders && activeOrders.length > 0) {
+      navOrders.style.color = 'var(--accent2)';
+    }
+  } catch(e) {}
+}
+
+// Проверяем уведомления каждые 30 сек
+setInterval(checkNotifications, 30000);
+
+// ── ПОИСК ────────────────────────────────────────────────
+let searchQuery = '';
+
+function openSearch() {
+  const query = prompt('Поиск товаров:');
+  if (!query) return;
+  searchQuery = query.toLowerCase();
+  searchProducts(searchQuery);
+}
+
+async function searchProducts(query) {
+  const el = document.getElementById('marketContent');
+  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+
+  try {
+    const cats = ['signa', 'mugs', 'photos', 'videos'];
+    let allProducts = [];
+    for (const cat of cats) {
+      const prods = await api(`/products/${cat}`);
+      allProducts = allProducts.concat(prods);
+    }
+    const filtered = allProducts.filter(p =>
+      p.title.toLowerCase().includes(query) ||
+      (p.description || '').toLowerCase().includes(query)
+    );
+
+    el.innerHTML = `
+      <button class="back-btn" onclick="state.category=null; renderMarket()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Результаты: «${esc(query)}»
+      </button>
+      <div class="products">${filtered.length ? filtered.map(p => `
+        <div class="product-card" onclick="openProduct(${p.id})">
+          <div class="product-thumb">📦</div>
+          <div class="product-info">
+            <div class="product-title">${esc(p.title)}</div>
+            <div class="product-seller">@${esc(p.seller_nick)}</div>
+            <div class="product-price">${p.price} ₽</div>
+          </div>
+        </div>`).join('')
+        : '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Ничего не найдено</div></div>'}
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${e.message}</div></div>`;
+  }
+}
+
+// ── КНОПКА ПРОДАТЬ в маркете ──────────────────────────────
+const origRenderMarket = renderMarket;
+
+// ── ОБНОВЛЕНИЕ БАЛАНСА ────────────────────────────────────
+async function refreshBalance() {
+  try {
+    const me = await api('/me');
+    state.user = me;
+    document.getElementById('headerBal').textContent = me.balance.toFixed(0) + ' ₽';
+    // Если мы на кошельке — обновляем
+    if (state.page === 'wallet') renderWallet();
+    if (state.page === 'profile') renderProfile();
+  } catch(e) {}
+}
+setInterval(refreshBalance, 60000);
+
+// ── ОБРАБОТКА КНОПКИ НАЗАД (Android) ─────────────────────
+tg?.BackButton?.onClick(() => {
+  if (state.page === 'chat' || state.page === 'product') {
+    stopChatPoll();
+    showPage('market');
+    return;
+  }
+  if (state.category) {
+    state.category = null;
+    renderMarket();
+    return;
+  }
+  tg?.BackButton?.hide();
+});
+
+// Показываем BackButton когда не на главной
+const _origShowPage = showPage;
+window.showPage = function(name) {
+  _origShowPage(name);
+  if (name !== 'market') {
+    tg?.BackButton?.show();
+  } else {
+    tg?.BackButton?.hide();
+  }
+};
+</script>
+</body>
+</html>
