@@ -359,7 +359,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const API = 'https://anonpeak-production.up.railway.app'; // заменить на Railway URL типа https://anonpeak.up.railway.app
+const API = 'https://anonpeak-production.up.railway.app';
 const tg  = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
@@ -373,12 +373,16 @@ let chatPollInterval = null;
 // ── API ──────────────────────────────────────────────────
 async function api(path, method = 'GET', body = null) {
   try {
-    const opts = { method, headers };
+    const h = { 'Content-Type': 'application/json' };
+    const id = tg?.initData;
+    if (id) h['x-init-data'] = id;
+    const opts = { method, headers: h };
     if (body) opts.body = JSON.stringify(body);
     const r = await fetch(API + path, opts);
     if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.detail || r.status); }
     return await r.json();
   } catch(e) { throw e; }
+}
 }
 
 // ── TOAST ─────────────────────────────────────────────────
