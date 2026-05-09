@@ -223,12 +223,12 @@ async function api(path, method='GET', body=null) {
     const r = await fetch(API+path, opts);
     if (!r.ok) {
       const e = await r.json().catch(()=>({}));
-      throw new Error(e.detail || 'Ошибка '+r.status);
+      throw new Error(e.detail || 'HTTP '+r.status);
     }
     return r.json();
   } catch(e) {
-    if (e.name==='TypeError') throw new Error('Нет соединения с сервером');
-    throw e;
+    // Показываем реальную ошибку вместо общего сообщения
+    throw new Error(e.message || 'Неизвестная ошибка');
   }
 }
 
@@ -668,7 +668,8 @@ async function renderProfile() {
       </div>
       <button class="btn btn-pr" onclick="goEditProfile()">✏️ Редактировать профиль</button>
       <button class="btn btn-ol" onclick="goPage('wallet')">💰 Пополнить баланс</button>
-      <button class="btn btn-ol" onclick="goPage('support')">🆘 Поддержка</button>`;
+      <button class="btn btn-ol" onclick="goPage('support')">🆘 Поддержка</button>
+      <button class="btn btn-ol" style="margin-top:8px;font-size:12px;opacity:.6" onclick="testApi()">🔧 Тест соединения</button>`;
   } catch(e) { document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
 }
 
@@ -792,6 +793,39 @@ window.goPage = function(name) {
   }
   origGoPage(name);
 };
+
+async function testApi() {
+  const steps = [];
+  // Тест 1: health
+  try {
+    const r = await fetch(API+'/health');
+    steps.push('✅ GET /health: '+r.status);
+  } catch(e) { steps.push('❌ GET /health: '+e.message); }
+
+  // Тест 2: me с заголовком
+  try {
+    const u = uid();
+    steps.push('👤 uid: '+(u||'НЕТ (не Telegram)'));
+    const r = await fetch(API+'/me', {
+      headers: {'Content-Type':'application/json', 'x-tg-user-id': String(u||'0')}
+    });
+    const d = await r.json();
+    steps.push('✅ GET /me: '+r.status+' nick='+d.nickname);
+  } catch(e) { steps.push('❌ GET /me: '+e.message); }
+
+  // Тест 3: POST support
+  try {
+    const u = uid();
+    const r = await fetch(API+'/support', {
+      method:'POST',
+      headers: {'Content-Type':'application/json', 'x-tg-user-id': String(u||'0')},
+      body: JSON.stringify({message:'test'})
+    });
+    steps.push('✅ POST /support: '+r.status);
+  } catch(e) { steps.push('❌ POST /support: '+e.message); }
+
+  alert(steps.join('\n'));
+}
 
 // ── INIT ──────────────────────────────────────────────────
 async function init() {
