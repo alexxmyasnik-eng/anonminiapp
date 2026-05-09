@@ -215,13 +215,22 @@ function toast(msg, ms=2500) {
 
 async function api(path, method='GET', body=null) {
   const u = uid();
-  // Передаём uid через query параметр — не через заголовок
-  // Это обходит CORS preflight который блокирует кастомные заголовки в Telegram
   const sep = path.includes('?') ? '&' : '?';
   const url = API + path + (u ? sep+'uid='+u : '');
-  const h = {'Content-Type':'application/json'};
-  const opts = {method, headers:h};
-  if (body) opts.body = JSON.stringify(body);
+  
+  let opts;
+  if (method === 'GET' || !body) {
+    opts = {method};
+  } else {
+    // Используем text/plain чтобы избежать CORS preflight
+    // API декодирует его как JSON
+    opts = {
+      method,
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(body)
+    };
+  }
+  
   try {
     const r = await fetch(url, opts);
     if (!r.ok) {
@@ -813,16 +822,16 @@ async function testApi() {
     steps.push('✅ GET /me: '+r.status+' nick='+d.nickname);
   } catch(e) { steps.push('❌ GET /me: '+e.message); }
 
-  // Тест 3: POST support через query param
+  // Тест 3: POST support через text/plain (без preflight)
   try {
     const u = uid();
     const r = await fetch(API+'/support?uid='+u, {
       method:'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {'Content-Type':'text/plain'},
       body: JSON.stringify({message:'test connection'})
     });
     const d = await r.json().catch(()=>({}));
-    steps.push('✅ POST /support: '+r.status);
+    steps.push((r.ok?'✅':'❌')+' POST /support: '+r.status+' '+JSON.stringify(d));
   } catch(e) { steps.push('❌ POST /support: '+e.message); }
 
   alert(steps.join('\n'));
