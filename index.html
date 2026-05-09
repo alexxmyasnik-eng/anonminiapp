@@ -215,31 +215,29 @@ function toast(msg, ms=2500) {
 
 async function api(path, method='GET', body=null) {
   const u = uid();
-  const sep = path.includes('?') ? '&' : '?';
-  const url = API + path + (u ? sep+'uid='+u : '');
-  
-  let opts;
-  if (method === 'GET' || !body) {
-    opts = {method};
-  } else {
-    // Используем text/plain чтобы избежать CORS preflight
-    // API декодирует его как JSON
-    opts = {
-      method,
-      headers: {'Content-Type': 'text/plain'},
-      body: JSON.stringify(body)
-    };
+  // Передаём ВСЁ через GET параметры — Telegram не блокирует GET запросы
+  // POST с любым body/header блокируется Telegram WebView
+  let url = API + path;
+  const params = new URLSearchParams();
+  if (u) params.set('uid', String(u));
+  if (body) {
+    // Каждое поле body как отдельный параметр
+    for (const [k, v] of Object.entries(body)) {
+      params.set(k, String(v));
+    }
   }
+  const paramStr = params.toString();
+  if (paramStr) url += (url.includes('?') ? '&' : '?') + paramStr;
   
   try {
-    const r = await fetch(url, opts);
+    const r = await fetch(url); // всегда GET, без options
     if (!r.ok) {
       const e = await r.json().catch(()=>({}));
       throw new Error(e.detail || 'HTTP '+r.status);
     }
     return r.json();
   } catch(e) {
-    throw new Error(e.message || 'Неизвестная ошибка');
+    throw new Error(e.message || 'Ошибка соединения');
   }
 }
 
@@ -326,7 +324,7 @@ async function doBuy(id, price) {
   const bal = S.user?.balance??0;
   if (bal<price) { toast('❌ Недостаточно средств'); setTimeout(()=>goPage('wallet'),800); return; }
   try {
-    const r = await api('/buy','POST',{product_id:id});
+    const r = await api('/buy',null,{product_id:id});
     if (r.ok) {
       playSound();
       toast(`✅ Куплено! ${r.short_id}`);
@@ -396,7 +394,7 @@ async function doSell() {
     setTimeout(()=>goPage('wallet'),800); return;
   }
   try {
-    const r = await api('/products/create','POST',{title,description:desc||'',price,category:cat,is_premium:S.isPremium});
+    const r = await api('/products/create',null,{title,description:desc||'',price,category:cat,is_premium:S.isPremium});
     if (r.ok) {
       toast(`✅ Опубликовано! Получите: ${r.seller_gets} ₽`);
       if (S.isPremium && S.user) { S.user.balance-=PREMIUM_PRICE; document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽'; }
@@ -501,13 +499,13 @@ async function doSendMsg(orderId) {
   const text=inp?.value?.trim();
   if (!text) return;
   inp.value='';
-  try { await api(`/orders/${orderId}/messages`,'POST',{text}); await refreshChat(orderId); scrollChat(); }
+  try { await api(`/send_msg`,null,{order_id:orderId,text}); await refreshChat(orderId); scrollChat(); }
   catch(e) { toast('❌ '+e.message); }
 }
 
 async function doConfirm(orderId) {
   try {
-    await api('/confirm_order','POST',{order_id:orderId});
+    await api('/confirm_order',null,{order_id:orderId});
     toast('✅ Заказ завершён!');
     clearInterval(S.chatInterval); S.chatInterval=null;
     goPage('msgs');
@@ -563,7 +561,7 @@ async function confirmTopup() {
   const btn=document.getElementById('confirm-topup');
   if (btn) { btn.disabled=true; btn.textContent='Создаём платёж...'; }
   try {
-    const r=await api('/topup/create','POST',{amount:selAmount});
+    const r=await api('/topup/create',null,{amount:selAmount});
     showTopupPage(r);
   } catch(e) {
     toast('❌ '+e.message);
@@ -649,7 +647,7 @@ async function doWithdraw() {
   if (amount>bal) { toast(`❌ Недостаточно средств. Баланс: ${bal.toFixed(0)} ₽`); return; }
   if (!username||!username.startsWith('@')||username.length<2) { toast('⚠️ Укажи @username'); return; }
   try {
-    const r=await api('/withdraw','POST',{amount,username});
+    const r=await api('/withdraw',null,{amount,username});
     if (r.ok) {
       toast(`✅ Заявка создана! ${r.stars} ⭐`);
       if (S.user) { S.user.balance-=amount; document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽'; }
@@ -716,7 +714,7 @@ async function saveProfile() {
   if (!nick||nick.length>30) { toast('⚠️ Никнейм от 1 до 30 символов'); return; }
   if (!age||age<1||age>120) { toast('⚠️ Укажи реальный возраст'); return; }
   try {
-    await api('/me/update','POST',{nickname:nick,age,gender:S.gender||''});
+    await api('/me/update',null,{nickname:nick,age,gender:S.gender||''});
     toast('✅ Профиль обновлён!');
     if (S.user) { S.user.nickname=nick; S.user.age=age; S.user.gender=S.gender; }
     goPage('profile');
@@ -737,7 +735,7 @@ async function sendSupport() {
   if (!text) { toast('⚠️ Напиши сообщение'); return; }
   if (!uid()) { toast('⚠️ Нужен Telegram'); return; }
   try {
-    await api('/support','POST',{message:text});
+    await api('/support',null,{message:text});
     toast('✅ Сообщение отправлено!');
     document.getElementById('sup-text').value='';
     setTimeout(()=>goPage('profile'),800);
@@ -822,17 +820,13 @@ async function testApi() {
     steps.push('✅ GET /me: '+r.status+' nick='+d.nickname);
   } catch(e) { steps.push('❌ GET /me: '+e.message); }
 
-  // Тест 3: POST support через text/plain (без preflight)
+  // Тест 3: support через GET параметры
   try {
     const u = uid();
-    const r = await fetch(API+'/support?uid='+u, {
-      method:'POST',
-      headers: {'Content-Type':'text/plain'},
-      body: JSON.stringify({message:'test connection'})
-    });
+    const r = await fetch(API+'/support?uid='+u+'&message=test+connection');
     const d = await r.json().catch(()=>({}));
-    steps.push((r.ok?'✅':'❌')+' POST /support: '+r.status+' '+JSON.stringify(d));
-  } catch(e) { steps.push('❌ POST /support: '+e.message); }
+    steps.push((r.ok?'✅':'❌')+' GET /support: '+r.status+' '+JSON.stringify(d).slice(0,50));
+  } catch(e) { steps.push('❌ GET /support: '+e.message); }
 
   alert(steps.join('\n'));
 }
