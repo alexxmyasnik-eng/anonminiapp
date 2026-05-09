@@ -214,20 +214,22 @@ function toast(msg, ms=2500) {
 }
 
 async function api(path, method='GET', body=null) {
-  const h = {'Content-Type':'application/json'};
   const u = uid();
-  if (u) h['x-tg-user-id'] = String(u);
+  // Передаём uid через query параметр — не через заголовок
+  // Это обходит CORS preflight который блокирует кастомные заголовки в Telegram
+  const sep = path.includes('?') ? '&' : '?';
+  const url = API + path + (u ? sep+'uid='+u : '');
+  const h = {'Content-Type':'application/json'};
   const opts = {method, headers:h};
   if (body) opts.body = JSON.stringify(body);
   try {
-    const r = await fetch(API+path, opts);
+    const r = await fetch(url, opts);
     if (!r.ok) {
       const e = await r.json().catch(()=>({}));
       throw new Error(e.detail || 'HTTP '+r.status);
     }
     return r.json();
   } catch(e) {
-    // Показываем реальную ошибку вместо общего сообщения
     throw new Error(e.message || 'Неизвестная ошибка');
   }
 }
@@ -802,25 +804,24 @@ async function testApi() {
     steps.push('✅ GET /health: '+r.status);
   } catch(e) { steps.push('❌ GET /health: '+e.message); }
 
-  // Тест 2: me с заголовком
+  // Тест 2: me через query param
   try {
     const u = uid();
     steps.push('👤 uid: '+(u||'НЕТ (не Telegram)'));
-    const r = await fetch(API+'/me', {
-      headers: {'Content-Type':'application/json', 'x-tg-user-id': String(u||'0')}
-    });
+    const r = await fetch(API+'/me?uid='+u);
     const d = await r.json();
     steps.push('✅ GET /me: '+r.status+' nick='+d.nickname);
   } catch(e) { steps.push('❌ GET /me: '+e.message); }
 
-  // Тест 3: POST support
+  // Тест 3: POST support через query param
   try {
     const u = uid();
-    const r = await fetch(API+'/support', {
+    const r = await fetch(API+'/support?uid='+u, {
       method:'POST',
-      headers: {'Content-Type':'application/json', 'x-tg-user-id': String(u||'0')},
-      body: JSON.stringify({message:'test'})
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message:'test connection'})
     });
+    const d = await r.json().catch(()=>({}));
     steps.push('✅ POST /support: '+r.status);
   } catch(e) { steps.push('❌ POST /support: '+e.message); }
 
