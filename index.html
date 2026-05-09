@@ -811,21 +811,21 @@ async function testApi() {
     steps.push('✅ GET /health: '+r.status);
   } catch(e) { steps.push('❌ GET /health: '+e.message); }
 
-  // Тест 2: me через query param
+  // Тест 2: me
   try {
     const u = uid();
     steps.push('👤 uid: '+(u||'НЕТ (не Telegram)'));
     const r = await fetch(API+'/me?uid='+u);
     const d = await r.json();
-    steps.push('✅ GET /me: '+r.status+' nick='+d.nickname);
+    steps.push((r.ok?'✅':'❌')+' GET /me: '+r.status+' nick='+d.nickname);
   } catch(e) { steps.push('❌ GET /me: '+e.message); }
 
-  // Тест 3: support через GET параметры
+  // Тест 3: support через GET
   try {
     const u = uid();
-    const r = await fetch(API+'/support?uid='+u+'&message=test+connection');
+    const r = await fetch(API+'/support?uid='+u+'&message=test');
     const d = await r.json().catch(()=>({}));
-    steps.push((r.ok?'✅':'❌')+' GET /support: '+r.status+' '+JSON.stringify(d).slice(0,50));
+    steps.push((r.ok?'✅':'❌')+' GET /support: '+r.status+' '+JSON.stringify(d).slice(0,60));
   } catch(e) { steps.push('❌ GET /support: '+e.message); }
 
   alert(steps.join('\n'));
