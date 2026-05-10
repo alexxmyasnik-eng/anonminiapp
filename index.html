@@ -408,15 +408,36 @@ async function doSell() {
 }
 
 // ── MSGS ──────────────────────────────────────────────────
+// Текущая вкладка в сообщениях: 'orders' или 'global'
+let msgsTab = 'global';
+
 async function renderMsgs() {
-  if (!uid()) { document.getElementById('pg-msgs').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>'; return; }
-  document.getElementById('pg-msgs').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  if (!uid()) {
+    document.getElementById('pg-msgs').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';
+    return;
+  }
+  document.getElementById('pg-msgs').innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="amt-btn${msgsTab==='global'?' sel':''}" style="flex:1;padding:10px" onclick="msgsTab='global';renderMsgs()">💬 Общий чат</button>
+      <button class="amt-btn${msgsTab==='orders'?' sel':''}" style="flex:1;padding:10px" onclick="msgsTab='orders';renderMsgs()">📦 Заказы</button>
+    </div>
+    <div id="msgs-content"><div class="loader"><div class="spin"></div></div></div>`;
+
+  if (msgsTab === 'global') {
+    await renderGlobalChat();
+  } else {
+    await renderOrders2();
+  }
+}
+
+async function renderOrders2() {
+  const el = document.getElementById('msgs-content');
   try {
     const orders = await api('/orders');
     const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан',cancelled:'Отменён'};
     const bc={paid:'b-paid',done:'b-done',pending_payment:'b-pend',seller_confirmed:'b-paid',cancelled:'b-canc'};
-    document.getElementById('pg-msgs').innerHTML = orders.length
-      ? `<div class="st">Переписки</div>`+orders.map(o=>`
+    el.innerHTML = orders.length
+      ? orders.map(o=>`
           <div class="ord" onclick="openChat(${o.id})">
             ${o.unread>0?`<div class="ord-unread">${o.unread}</div>`:''}
             <div class="ord-head">
@@ -426,8 +447,133 @@ async function renderMsgs() {
             <div style="font-size:14px;font-weight:600;margin-bottom:3px">${esc(o.product_title)}</div>
             <div style="font-size:12px;color:var(--tx3)">${o.role==='buyer'?'🛒':'🏪'} ${esc(o.partner_nick)} · ${o.amount} ₽</div>
           </div>`).join('')
-      : '<div class="empty"><div class="empty-i">💬</div>Переписок пока нет</div>';
-  } catch(e) { document.getElementById('pg-msgs').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+      : '<div class="empty"><div class="empty-i">📦</div>Заказов пока нет</div>';
+  } catch(e) { el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+}
+
+let gcInterval = null;
+let blockedUsers = JSON.parse(localStorage.getItem('blocked')||'[]');
+
+async function renderGlobalChat() {
+  const el = document.getElementById('msgs-content');
+  try {
+    const msgs = await api('/chat/messages');
+    const myId = uid();
+    el.innerHTML = `
+      <div id="gc-msgs" style="display:flex;flex-direction:column;gap:6px;margin-bottom:60px">
+        ${msgs.length ? msgs.map(m => {
+          if (blockedUsers.includes(m.user_id)) return '';
+          const isMe = m.user_id === myId;
+          return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
+            ${!isMe?`<div style="font-size:11px;color:var(--ac2);margin-bottom:2px;padding:0 4px">${esc(m.nickname)}</div>`:''}
+            <div class="msg ${isMe?'msg-o':'msg-i'}" style="position:relative" oncontextmenu="showMsgMenu(event,${m.id},${m.user_id},'${esc(m.nickname)}');return false">
+              ${esc(m.message)}
+              <div class="msg-t">${(m.created_at||'').slice(11,16)}</div>
+            </div>
+          </div>`;
+        }).join('') : '<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">Будь первым — напиши что-нибудь! 👋</div>'}
+      </div>
+      <div style="position:fixed;bottom:56px;left:0;right:0;padding:8px 16px;background:rgba(8,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--br);display:flex;gap:8px;z-index:40">
+        <input class="cinput" id="gc-input" placeholder="Написать в чат..." onkeydown="if(event.key==='Enter')gcSend()">
+        <button class="csend" onclick="gcSend()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>`;
+    // Скролл вниз
+    const gcMsgs = document.getElementById('gc-msgs');
+    if (gcMsgs) gcMsgs.scrollTop = gcMsgs.scrollHeight;
+  } catch(e) { el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+
+  if (gcInterval) clearInterval(gcInterval);
+  gcInterval = setInterval(refreshGlobalChat, 5000);
+}
+
+async function refreshGlobalChat() {
+  if (msgsTab !== 'global' || S.page !== 'msgs') {
+    clearInterval(gcInterval); gcInterval=null; return;
+  }
+  try {
+    const msgs = await api('/chat/messages');
+    const myId = uid();
+    const el = document.getElementById('gc-msgs');
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.offsetHeight < 80;
+    const newHtml = msgs.length ? msgs.map(m => {
+      if (blockedUsers.includes(m.user_id)) return '';
+      const isMe = m.user_id === myId;
+      return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
+        ${!isMe?`<div style="font-size:11px;color:var(--ac2);margin-bottom:2px;padding:0 4px">${esc(m.nickname)}</div>`:''}
+        <div class="msg ${isMe?'msg-o':'msg-i'}" oncontextmenu="showMsgMenu(event,${m.id},${m.user_id},'${esc(m.nickname)}');return false">
+          ${esc(m.message)}
+          <div class="msg-t">${(m.created_at||'').slice(11,16)}</div>
+        </div>
+      </div>`;
+    }).join('') : '';
+    if (el.innerHTML !== newHtml) {
+      el.innerHTML = newHtml;
+      if (atBottom) el.scrollTop = el.scrollHeight;
+    }
+  } catch(e) {}
+}
+
+async function gcSend() {
+  const inp = document.getElementById('gc-input');
+  const text = inp?.value?.trim();
+  if (!text) return;
+  inp.value = '';
+  try {
+    await api('/chat/send', null, {message: text});
+    await refreshGlobalChat();
+    const el = document.getElementById('gc-msgs');
+    if (el) el.scrollTop = el.scrollHeight;
+  } catch(e) { toast('❌ '+e.message); }
+}
+
+// Контекстное меню при долгом нажатии на сообщение
+function showMsgMenu(e, msgId, msgUserId, msgNick) {
+  e.preventDefault();
+  const myId = uid();
+  const isMe = msgUserId === myId;
+  const isBlocked = blockedUsers.includes(msgUserId);
+
+  const items = [];
+  if (isMe) items.push({text:'🗑 Удалить', fn:`gcDelete(${msgId})`});
+  if (!isMe && !isBlocked) items.push({text:`🚫 Заблокировать ${msgNick}`, fn:`gcBlock(${msgUserId})`});
+  if (!isMe && isBlocked) items.push({text:`✅ Разблокировать ${msgNick}`, fn:`gcUnblock(${msgUserId})`});
+  if (!isMe) items.push({text:`👤 Профиль ${msgNick}`, fn:`toast('Профиль: ${msgNick}')`});
+
+  // Показываем как toast-меню
+  const menu = document.createElement('div');
+  menu.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--br2);border-radius:16px;padding:8px;z-index:999;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.5)';
+  menu.innerHTML = items.map(i=>`<button onclick="${i.fn};this.parentNode.remove()" style="display:block;width:100%;background:none;border:none;color:var(--tx);font-family:Manrope,sans-serif;font-size:14px;padding:12px 16px;text-align:left;cursor:pointer;border-radius:10px">${i.text}</button>`).join('');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:998';
+  overlay.onclick = () => { menu.remove(); overlay.remove(); };
+  document.body.appendChild(overlay);
+  document.body.appendChild(menu);
+}
+
+async function gcDelete(msgId) {
+  try {
+    await api('/chat/delete', null, {msg_id: msgId});
+    await refreshGlobalChat();
+  } catch(e) { toast('❌ '+e.message); }
+}
+
+function gcBlock(userId) {
+  if (!blockedUsers.includes(userId)) {
+    blockedUsers.push(userId);
+    localStorage.setItem('blocked', JSON.stringify(blockedUsers));
+    toast('🚫 Пользователь заблокирован');
+    refreshGlobalChat();
+  }
+}
+
+function gcUnblock(userId) {
+  blockedUsers = blockedUsers.filter(id => id !== userId);
+  localStorage.setItem('blocked', JSON.stringify(blockedUsers));
+  toast('✅ Пользователь разблокирован');
+  refreshGlobalChat();
 }
 
 // ── CHAT ──────────────────────────────────────────────────
@@ -677,8 +823,7 @@ async function renderProfile() {
       </div>
       <button class="btn btn-pr" onclick="goEditProfile()">✏️ Редактировать профиль</button>
       <button class="btn btn-ol" onclick="goPage('wallet')">💰 Пополнить баланс</button>
-      <button class="btn btn-ol" onclick="goPage('support')">🆘 Поддержка</button>
-      <button class="btn btn-ol" style="margin-top:8px;font-size:12px;opacity:.6" onclick="testApi()">🔧 Тест соединения</button>`;
+      <button class="btn btn-ol" onclick="goPage('support')">🆘 Поддержка</button>`;
   } catch(e) { document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
 }
 
@@ -803,33 +948,6 @@ window.goPage = function(name) {
   origGoPage(name);
 };
 
-async function testApi() {
-  const steps = [];
-  // Тест 1: health
-  try {
-    const r = await fetch(API+'/health');
-    steps.push('✅ GET /health: '+r.status);
-  } catch(e) { steps.push('❌ GET /health: '+e.message); }
-
-  // Тест 2: me
-  try {
-    const u = uid();
-    steps.push('👤 uid: '+(u||'НЕТ (не Telegram)'));
-    const r = await fetch(API+'/me?uid='+u);
-    const d = await r.json();
-    steps.push((r.ok?'✅':'❌')+' GET /me: '+r.status+' nick='+d.nickname);
-  } catch(e) { steps.push('❌ GET /me: '+e.message); }
-
-  // Тест 3: support через GET
-  try {
-    const u = uid();
-    const r = await fetch(API+'/support?uid='+u+'&message=test');
-    const d = await r.json().catch(()=>({}));
-    steps.push((r.ok?'✅':'❌')+' GET /support: '+r.status+' '+JSON.stringify(d).slice(0,60));
-  } catch(e) { steps.push('❌ GET /support: '+e.message); }
-
-  alert(steps.join('\n'));
-}
 
 // ── INIT ──────────────────────────────────────────────────
 async function init() {
