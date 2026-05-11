@@ -10,43 +10,28 @@
 :root{--bg:#08080f;--s1:#0f0f1a;--s2:#161625;--s3:#1e1e30;--br:#252538;--br2:#2f2f48;--ac:#7b5cf0;--ac2:#a78bfa;--gr:#10b981;--gr2:#34d399;--rd:#f43f5e;--yl:#f59e0b;--tx:#f1f0ff;--tx2:#a9a8c9;--tx3:#6b6a8a}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+/* HEADER */
 .hdr{position:sticky;top:0;z-index:50;background:rgba(8,8,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:10px 16px;gap:10px}
 .hdr-logo{font-family:'Unbounded',sans-serif;font-weight:800;font-size:17px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hdr-bal{margin-left:auto;background:var(--s3);border:1px solid var(--br);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--gr2);cursor:pointer}
 .hdr-ico{background:none;border:none;color:var(--tx3);cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:8px}
+/* NAV */
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(8,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--br);display:flex;padding-bottom:env(safe-area-inset-bottom)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;background:none;border:none;color:var(--tx3);font-family:'Manrope',sans-serif;font-size:10px;cursor:pointer;transition:color .2s;position:relative}
 .nb.on{color:var(--ac2)}
 .nb svg{width:20px;height:20px}
 .nb-badge{position:absolute;top:4px;right:calc(50% - 14px);background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;display:none}
 .nb-badge.on{display:block}
+/* PAGES */
 .pg{display:none;padding:16px 16px 80px}
 .pg.on{display:block;animation:fu .18s ease}
 @keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+/* FULL SCREEN */
+.fullpg{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column;overflow-y:auto}
+.fullpg.on{display:flex}
+/* COMMON */
 .st{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);margin:20px 0 10px}
 .st:first-child{margin-top:0}
-/* MARKET */
-.cats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:20px 16px;cursor:pointer;transition:all .15s;text-align:center}
-.cat:active{transform:scale(.96)}
-.cat-i{font-size:30px;margin-bottom:8px}
-.cat-n{font-size:13px;font-weight:600}
-.prods{display:flex;flex-direction:column;gap:8px}
-.prod{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:14px;cursor:pointer;display:flex;gap:12px;transition:all .12s;position:relative}
-.prod.premium{border-color:var(--yl);background:linear-gradient(135deg,rgba(245,158,11,.05),var(--s2))}
-.prod:active{transform:scale(.98)}
-.prem-badge{position:absolute;top:10px;right:10px;background:var(--yl);color:#000;font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px}
-.prod-thumb{width:54px;height:54px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.prod-t{font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prod-s{font-size:11px;color:var(--tx3);margin-bottom:4px}
-.prod-p{font-weight:700;font-size:15px;color:var(--gr2)}
-/* DETAIL */
-.det-media{width:100%;aspect-ratio:1;border-radius:20px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:16px}
-.det-t{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
-.det-s{color:var(--tx3);font-size:13px;margin-bottom:8px}
-.det-d{color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px}
-.det-p{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px}
-/* BTNS */
+.back{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--ac2);font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;cursor:pointer;padding:0 0 14px}
 .btn{width:100%;padding:15px;border-radius:16px;border:none;font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .12s;margin-bottom:10px;display:block;text-align:center}
 .btn:last-child{margin-bottom:0}
 .btn:active{transform:scale(.97)}
@@ -55,95 +40,131 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .btn-gr{background:var(--gr);color:#fff}
 .btn-ol{background:transparent;border:1.5px solid var(--br2);color:var(--tx)}
 .btn-yl{background:var(--yl);color:#000}
-.back{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--ac2);font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;cursor:pointer;padding:0 0 14px}
-/* MSGS LIST */
+/* MARKET */
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s}
+.cat:active{transform:scale(.96)}
+.cat-i{font-size:30px;margin-bottom:8px}
+.cat-n{font-size:13px;font-weight:600}
+.prods{display:flex;flex-direction:column;gap:8px}
+.prod{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:14px;cursor:pointer;display:flex;gap:12px;transition:all .12s;position:relative}
+.prod.premium{border-color:var(--yl);background:linear-gradient(135deg,rgba(245,158,11,.05),var(--s2))}
+.prod:active{transform:scale(.98)}
+.prem-badge{position:absolute;top:10px;right:10px;background:var(--yl);color:#000;font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px}
+.prod-thumb{width:54px;height:54px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
+.prod-thumb img{width:100%;height:100%;object-fit:cover}
+/* PROFILE */
+.prof-header{text-align:center;padding:20px 0 10px}
+.prof-ava{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 12px;overflow:hidden;position:relative;cursor:pointer}
+.prof-ava img{width:100%;height:100%;object-fit:cover}
+.prof-name{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700}
+.prof-sub{color:var(--tx3);font-size:13px;margin:4px 0 0}
+/* WALLET NEW DESIGN */
+.wal-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.wal-card{background:var(--s2);border:1px solid var(--br);border-radius:18px;padding:16px;position:relative}
+.wal-card-label{font-size:11px;color:var(--tx3);font-weight:600;display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.wal-card-info{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--tx3);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;flex-shrink:0}
+.wal-card-amount{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2)}
+.wal-card-copy{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--tx3);cursor:pointer;padding:4px}
+.wal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.wal-action{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;cursor:pointer;text-align:center;transition:all .15s;font-weight:700;font-size:13px;font-family:'Manrope',sans-serif;color:var(--tx)}
+.wal-action:active{transform:scale(.97)}
+.wal-action.primary{background:rgba(123,92,240,.15);border-color:var(--ac);color:var(--ac2)}
+.wal-history-label{font-size:11px;color:var(--rd);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:center;padding:20px;background:var(--s2);border-radius:14px;border:1px dashed var(--br2)}
+/* STATS */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:14px;text-align:center}
+.stat-v{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;color:var(--ac2)}
+.stat-l{font-size:11px;color:var(--tx3);margin-top:3px}
+/* MSGS */
 .conv-list{display:flex;flex-direction:column}
-.conv-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--br);cursor:pointer;transition:background .12s}
-.conv-item:active{background:var(--s2);margin:0 -16px;padding:12px 16px;border-radius:0}
-.conv-ava{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;position:relative}
+.conv-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--br);cursor:pointer;transition:all .12s}
+.conv-item:active{opacity:.7}
+.conv-ava{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
+.conv-ava img{width:100%;height:100%;object-fit:cover}
 .conv-ava.support{background:linear-gradient(135deg,#0ea5e9,#6366f1)}
-.conv-ava.globalchat{background:linear-gradient(135deg,var(--gr),var(--ac))}
-.conv-online{position:absolute;bottom:2px;right:2px;width:10px;height:10px;background:var(--gr);border-radius:50%;border:2px solid var(--bg)}
+.conv-ava.gc{background:linear-gradient(135deg,var(--gr),var(--ac))}
 .conv-body{flex:1;min-width:0}
-.conv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
-.conv-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
-.conv-time{font-size:11px;color:var(--tx3);flex-shrink:0}
-.conv-preview{font-size:13px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
-.conv-unread{background:var(--ac);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;flex-shrink:0;margin-left:auto}
+.conv-head{display:flex;justify-content:space-between;margin-bottom:3px}
+.conv-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65%}
+.conv-time{font-size:11px;color:var(--tx3)}
+.conv-preview{font-size:13px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-unread{background:var(--ac);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0;margin-left:6px}
 /* CHAT */
-.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 57px - env(safe-area-inset-bottom));padding:0}
+.chat-container{display:flex;flex-direction:column;height:100%;overflow:hidden}
 .chat-hdr{background:var(--s2);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.chat-hdr-ava{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.chat-hdr-info{flex:1}
+.chat-hdr-ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;overflow:hidden}
+.chat-hdr-ava img{width:100%;height:100%;object-fit:cover}
 .chat-hdr-name{font-weight:700;font-size:14px}
 .chat-hdr-sub{font-size:11px;color:var(--tx3)}
-/* ORDER CARD in chat */
-.order-card-chat{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin:8px 16px;cursor:pointer}
-.order-card-chat-head{display:flex;align-items:center;gap:10px}
-.order-card-chat-icon{font-size:24px}
-.order-card-chat-title{font-weight:600;font-size:13px}
-.order-card-chat-sub{font-size:11px;color:var(--tx3);margin-top:2px}
-.order-card-chat-price{font-weight:700;font-size:14px;color:var(--gr2);margin-top:6px}
-/* MSGS AREA */
-.msgs-wrap{flex:1;overflow-y:auto;padding:8px 16px;display:flex;flex-direction:column;gap:6px;padding-bottom:4px}
+.msgs-area{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:6px;padding-bottom:8px}
 .msg{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
 .msg-o{background:linear-gradient(135deg,var(--ac),#5a3fd4);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
 .msg-i{background:var(--s3);color:var(--tx);align-self:flex-start;border-bottom-left-radius:4px}
 .msg-nick{font-size:11px;color:var(--ac2);margin-bottom:2px;padding:0 4px;align-self:flex-start}
+.msg-admin{font-size:11px;color:var(--yl);margin-bottom:2px;padding:0 4px;align-self:flex-start}
 .msg-t{font-size:10px;opacity:.6;margin-top:3px;text-align:right}
-/* INPUT */
 .chat-input-bar{background:rgba(8,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--br);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;flex-shrink:0}
 .cinput{flex:1;background:var(--s3);border:1.5px solid var(--br);border-radius:24px;padding:10px 16px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;outline:none}
 .cinput:focus{border-color:var(--ac)}
 .csend{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .csend:active{transform:scale(.9)}
-/* SELL */
+/* ORDER CARD IN CHAT */
+.ord-card-chat{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin:8px 0}
+/* FORM */
 .field{margin-bottom:14px}
 .field label{display:block;font-size:11px;color:var(--tx3);font-weight:700;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
-.field input,.field textarea,.field select{width:100%;background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.field input,.field textarea,.field select{width:100%;background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;outline:none;-webkit-appearance:none;transition:border-color .2s}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--ac)}
 .field textarea{resize:none;height:80px}
 .field select option{background:var(--s2)}
-.prem-toggle{background:var(--s2);border:1.5px solid var(--br);border-radius:16px;padding:16px;margin-bottom:14px;cursor:pointer;transition:all .15s}
-.prem-toggle.on{border-color:var(--yl);background:rgba(245,158,11,.08)}
-/* WALLET */
-.w-card{background:linear-gradient(135deg,#140e2a,#0a1525);border:1px solid #2a1f50;border-radius:20px;padding:24px;text-align:center;margin-bottom:20px}
-.w-label{font-size:11px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.w-amt{font-family:'Unbounded',sans-serif;font-size:38px;font-weight:800;color:var(--gr2)}
+/* PREM TOGGLE */
+.prem-card{background:var(--s2);border:1.5px solid var(--br);border-radius:16px;padding:16px;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.prem-card.on{border-color:var(--yl);background:rgba(245,158,11,.08)}
+.prem-card:active{transform:scale(.98)}
+/* SELL TYPE SELECT */
+.sell-type-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.sell-type-card{background:var(--s2);border:2px solid var(--br);border-radius:18px;padding:18px 14px;cursor:pointer;text-align:center;transition:all .15s}
+.sell-type-card:active{transform:scale(.97)}
+.sell-type-card.on{border-color:var(--ac)}
+.sell-type-card.on.prem{border-color:var(--yl)}
+.sell-type-icon{font-size:28px;margin-bottom:8px}
+.sell-type-name{font-weight:700;font-size:14px;margin-bottom:4px}
+.sell-type-desc{font-size:11px;color:var(--tx3);line-height:1.5}
+.sell-type-price{font-size:12px;font-weight:700;margin-top:8px}
+/* WALLET TOPUP */
 .amts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .amt-btn{background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:13px 4px;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer;transition:all .12s;font-family:'Manrope',sans-serif}
 .amt-btn.sel{border-color:var(--ac);color:var(--ac2);background:rgba(123,92,240,.15)}
-.amt-btn:active{transform:scale(.95)}
-.pay-code{background:var(--s1);border:2px solid var(--gr);border-radius:12px;padding:16px;text-align:center;cursor:pointer;margin:12px 0;font-size:18px;font-weight:800;color:var(--gr2);letter-spacing:2px;font-family:'Unbounded',sans-serif}
-.custom-row{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.custom-row{display:flex;gap:8px;margin-bottom:14px}
 .cinp-sm{flex:1;background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;outline:none;-webkit-appearance:none}
 .cinp-sm:focus{border-color:var(--ac)}
-/* PROFILE */
-.ava{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px}
-.p-name{text-align:center;font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700}
-.p-sub{text-align:center;color:var(--tx3);font-size:13px;margin:4px 0 20px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.stat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:14px;text-align:center}
-.stat-v{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;color:var(--ac2)}
-.stat-l{font-size:11px;color:var(--tx3);margin-top:3px}
+.pay-code{background:var(--s1);border:2px solid var(--gr);border-radius:12px;padding:16px;text-align:center;cursor:pointer;margin:12px 0;font-size:18px;font-weight:800;color:var(--gr2);letter-spacing:2px;font-family:'Unbounded',sans-serif}
+/* MISC */
 .g-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .g-btn{background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:12px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;text-align:center;transition:all .15s}
 .g-btn.sel{border-color:var(--ac);color:var(--ac2);background:rgba(123,92,240,.1)}
-/* MISC */
+.info-box{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:var(--tx2);line-height:1.7}
+.w-calc{background:linear-gradient(135deg,#0a1525,#140e2a);border:1px solid #2a1f50;border-radius:16px;padding:16px;margin-bottom:14px;text-align:center}
+.w-stars{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--yl);margin:8px 0}
+.hr{height:1px;background:var(--br);margin:16px 0}
+/* TOAST */
 .toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:85vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* POPUP */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.popup-box{background:var(--s2);border:1px solid var(--br2);border-radius:24px;padding:28px 24px;max-width:320px;width:100%;text-align:center}
+.popup-title{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;margin-bottom:10px}
+.popup-text{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:20px}
+/* LOADER */
 .loader{text-align:center;padding:50px;color:var(--tx3)}
 .spin{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--br2);border-top-color:var(--ac);animation:sp .7s linear infinite;margin:0 auto 10px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .empty{text-align:center;padding:50px 20px;color:var(--tx3)}
 .empty-i{font-size:40px;margin-bottom:10px}
-.hr{height:1px;background:var(--br);margin:16px 0}
-.info-box{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:14px;font-size:13px;color:var(--tx2);line-height:1.7}
-.w-calc{background:linear-gradient(135deg,#0a1525,#140e2a);border:1px solid #2a1f50;border-radius:16px;padding:16px;margin-bottom:14px;text-align:center}
-.w-stars{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--yl);margin:8px 0}
-/* CONTEXT MENU */
-.ctx-menu{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--br2);border-radius:16px;padding:8px;z-index:999;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-.ctx-overlay{position:fixed;inset:0;z-index:998}
+/* CTX MENU */
+.ctx-overlay{position:fixed;inset:0;z-index:300}
+.ctx-menu{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--br2);border-radius:16px;padding:8px;z-index:301;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .ctx-btn{display:block;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;padding:12px 16px;text-align:left;cursor:pointer;border-radius:10px;font-weight:500}
 .ctx-btn:active{background:var(--s2)}
 .ctx-btn.danger{color:var(--rd)}
@@ -154,8 +175,10 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="hdr">
   <div class="hdr-logo">ANONPEAK</div>
   <button class="hdr-ico" onclick="goSearch()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
-  <button class="hdr-ico" onclick="openSupport()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg></button>
-  <div class="hdr-bal" id="hBal" onclick="goPage('wallet')">0 ₽</div>
+  <button class="hdr-ico" id="hdr-settings" onclick="goSettings()" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <div style="background:var(--s3);border:1px solid var(--br);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--gr2);cursor:pointer" id="hBal" onclick="goPage('wallet')">0 ₽</div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -165,13 +188,16 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="pg" id="pg-msgs"></div>
 <div class="pg" id="pg-wallet"></div>
 <div class="pg" id="pg-profile"></div>
-<div class="pg" id="pg-product"></div>
-<div class="pg" id="pg-editprofile"></div>
-<div class="pg" id="pg-topup"></div>
-<div class="pg" id="pg-withdraw"></div>
-<div class="pg" id="pg-search"></div>
-<!-- FULL-SCREEN CHAT (no nav) -->
-<div id="pg-chat" style="display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column"></div>
+
+<!-- FULL SCREEN PAGES -->
+<div class="fullpg" id="fp-chat"><div class="chat-container" id="chat-inner"></div></div>
+<div class="fullpg" id="fp-product"><div id="product-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-settings"><div id="settings-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-userprofile"><div id="userprofile-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-topup"><div id="topup-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-withdraw"><div id="withdraw-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-search"><div id="search-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-selltype"><div id="selltype-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
 
 <nav class="nav">
   <button class="nb on" id="nb-market" onclick="goPage('market')">
@@ -195,60 +221,60 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <audio id="snd" preload="auto"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
 
 <script>
-const API = 'https://anonpeak-production.up.railway.app';
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+const API='https://anonpeak-production.up.railway.app';
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+const S={page:'market',user:null,cat:null,chatInterval:null,gcInterval:null,gender:'',selAmt:0,isPrem:false,sellData:null};
+const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
+const uid=()=>tg?.initDataUnsafe?.user?.id||null;
+const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=100;
+let blockedUsers=[];try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
 
-const S = { page:'market', user:null, cat:null, chatInterval:null, gcInterval:null, gender:'', selAmt:0, isPrem:false };
-const esc = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
-const uid = () => tg?.initDataUnsafe?.user?.id || null;
-const SELL_C=0.16, WD_C=0.05, STAR_R=1.4, PREM_P=9, MIN_P=15, MIN_WD=100;
-let blockedUsers = [];
-try { blockedUsers = JSON.parse(localStorage.getItem('blocked')||'[]'); } catch(e) {}
+function playSound(){try{document.getElementById('snd')?.play();}catch(e){}}
+function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),ms);}
 
-function playSound() { try { document.getElementById('snd')?.play(); } catch(e) {} }
-function toast(msg, ms=2500) {
-  const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('on');
-  setTimeout(()=>el.classList.remove('on'),ms);
-}
-
-async function api(path, body=null) {
-  const u=uid();
-  const params=new URLSearchParams();
-  if (u) params.set('uid',String(u));
-  if (body) for (const [k,v] of Object.entries(body)) if (v!==null&&v!==undefined) params.set(k,String(v));
+async function api(path,body=null){
+  const u=uid();const params=new URLSearchParams();
+  if(u) params.set('uid',String(u));
+  if(body) for(const[k,v]of Object.entries(body)) if(v!==null&&v!==undefined) params.set(k,String(v));
   const url=API+path+(params.toString()?'?'+params.toString():'');
-  try {
+  try{
     const r=await fetch(url);
-    if (!r.ok) { const e=await r.json().catch(()=>({})); throw new Error(e.detail||'HTTP '+r.status); }
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status);}
     return r.json();
-  } catch(e) { throw new Error(e.message||'Ошибка соединения'); }
+  }catch(e){throw new Error(e.message||'Ошибка соединения');}
 }
 
-// ── NAV ──────────────────────────────────────────────────
-function goPage(name) {
-  if (S.gcInterval) { clearInterval(S.gcInterval); S.gcInterval=null; }
-  if (S.chatInterval) { clearInterval(S.chatInterval); S.chatInterval=null; }
+// ── POPUP ─────────────────────────────────────────────────
+function showPopup(title,text){
+  const el=document.createElement('div');el.className='popup-overlay';
+  el.innerHTML=`<div class="popup-box"><div class="popup-title">${esc(title)}</div><div class="popup-text">${esc(text)}</div><button class="btn btn-pr" onclick="this.closest('.popup-overlay').remove()">Понятно</button></div>`;
+  el.addEventListener('click',e=>{if(e.target===el)el.remove();});
+  document.body.appendChild(el);
+}
+
+// ── NAV ───────────────────────────────────────────────────
+function closeAllFull(){document.querySelectorAll('.fullpg').forEach(p=>p.classList.remove('on'));}
+function goPage(name){
+  if(S.chatInterval){clearInterval(S.chatInterval);S.chatInterval=null;}
+  if(S.gcInterval){clearInterval(S.gcInterval);S.gcInterval=null;}
+  closeAllFull();
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+name)?.classList.add('on');
   document.getElementById('nb-'+name)?.classList.add('on');
-  document.getElementById('pg-chat').style.display='none';
+  // Show settings gear only on profile
+  const gear=document.getElementById('hdr-settings');
+  if(gear) gear.style.display=name==='profile'?'flex':'none';
   S.page=name;
   ({market:renderMarket,sell:renderSell,msgs:renderMsgs,wallet:renderWallet,profile:renderProfile}[name]||function(){})();
 }
+function showFull(id){closeAllFull();document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.getElementById('fp-'+id)?.classList.add('on');S.page=id;}
+function backToPage(name){closeAllFull();goPage(name);}
 
-function showFullPage(id) {
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.getElementById('pg-chat').style.display='none';
-  if (id==='chat') { document.getElementById('pg-chat').style.display='flex'; }
-  else { document.getElementById('pg-'+id)?.classList.add('on'); }
-  S.page=id;
-}
-
-// ── MARKET ───────────────────────────────────────────────
-function renderMarket() {
-  if (S.cat) { renderProducts(S.cat); return; }
+// ── MARKET ────────────────────────────────────────────────
+function renderMarket(){
+  if(S.cat){renderProducts(S.cat);return;}
   document.getElementById('pg-market').innerHTML=`
     <div class="st">Категории</div>
     <div class="cats">
@@ -258,73 +284,83 @@ function renderMarket() {
       <div class="cat" onclick="openCat('videos')"><div class="cat-i">🎬</div><div class="cat-n">Видео</div></div>
     </div>`;
 }
-
-async function openCat(c) { S.cat=c; await renderProducts(c); }
-
-async function renderProducts(catId) {
+async function openCat(c){S.cat=c;await renderProducts(c);}
+async function renderProducts(catId){
   const names={signa:'🖊 Сигна',mugs:'☕ Кружки',photos:'📸 Фото',videos:'🎬 Видео'};
   const el=document.getElementById('pg-market');
   el.innerHTML=`<button class="back" onclick="S.cat=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${names[catId]}</button><div class="loader"><div class="spin"></div></div>`;
-  try {
+  try{
     const prods=await api('/products/'+catId);
     el.querySelector('.loader').outerHTML=prods.length
       ?`<div class="prods">${prods.map(p=>`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
           ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
-          <div class="prod-thumb">📦</div>
+          <div class="prod-thumb">${p.seller_avatar?`<img src="${esc(p.seller_avatar)}">`:'📦'}</div>
           <div style="flex:1;min-width:0">
-            <div class="prod-t">${esc(p.title)}</div>
-            <div class="prod-s">@${esc(p.seller_nick)} · ⭐${p.seller_rating}</div>
-            <div class="prod-p">${p.price} ₽</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">@${esc(p.seller_nick)} · ⭐${p.seller_rating}</div>
+            <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price} ₽</div>
           </div>
         </div>`).join('')}</div>`
       :'<div class="empty"><div class="empty-i">📭</div>Товаров пока нет</div>';
-  } catch(e) { el.querySelector('.loader').outerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+  }catch(e){el.querySelector('.loader').outerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
-
-async function openProduct(id) {
-  document.getElementById('pg-product').innerHTML='<div class="loader"><div class="spin"></div></div>';
-  showFullPage('product');
-  try {
-    const p=await api('/product/'+id);
-    const isMine=uid()&&p.seller_id===uid();
-    document.getElementById('pg-product').innerHTML=`
-      <div style="padding:16px 16px 80px">
-        <button class="back" onclick="showFullPage('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-        <div class="det-media">📦</div>
-        <div class="det-t">${esc(p.title)}</div>
-        <div class="det-s">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов)</div>
-        <div class="det-d">${esc(p.description||'Описание не указано')}</div>
-        <div class="det-p">${p.price} ₽</div>
-        ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`
-          :`<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`}
-      </div>`;
-  } catch(e) { document.getElementById('pg-product').innerHTML=`<div style="padding:16px"><div class="empty"><div class="empty-i">⚠️</div>${e.message}</div></div>`; }
+async function openProduct(id){
+  document.getElementById('product-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('product');
+  try{
+    const p=await api('/product/'+id);const isMine=uid()&&p.seller_id===uid();
+    document.getElementById('product-inner').innerHTML=`
+      <button class="back" onclick="backToPage('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div style="width:100%;aspect-ratio:1;border-radius:20px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:16px">📦</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px">${esc(p.title)}</div>
+      <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов)</div>
+      <div style="color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px">${esc(p.description||'Без описания')}</div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price} ₽</div>
+      ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`}`;
+  }catch(e){document.getElementById('product-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
-
-async function doBuy(id,price) {
-  if (!uid()) { toast('⚠️ Нужен Telegram'); return; }
-  if ((S.user?.balance??0)<price) { toast('❌ Недостаточно средств'); setTimeout(()=>goPage('wallet'),800); return; }
-  try {
+async function doBuy(id,price){
+  if(!uid()){toast('⚠️ Нужен Telegram');return;}
+  if((S.user?.balance??0)<price){toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);return;}
+  try{
     const r=await api('/buy',{product_id:id});
-    if (r.ok) {
-      playSound(); toast('✅ Куплено! '+r.short_id);
-      if (S.user) { S.user.balance-=price; document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽'; }
-      setTimeout(()=>goPage('msgs'),1000);
-    } else { toast('❌ Недостаточно средств'); setTimeout(()=>goPage('wallet'),800); }
-  } catch(e) { toast('❌ '+e.message); }
+    if(r.ok){playSound();toast('✅ Куплено! '+r.short_id);if(S.user){S.user.balance-=price;document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}setTimeout(()=>goPage('msgs'),1000);}
+    else{toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);}
+  }catch(e){toast('❌ '+e.message);}
+}
+
+// ── USER PROFILE ──────────────────────────────────────────
+async function openUserProfile(userId){
+  document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('userprofile');
+  try{
+    const u=await api('/user/'+userId);
+    const gl=u.gender==='male'?'👨 Мужской':u.gender==='female'?'👩 Женский':'';
+    const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
+    document.getElementById('userprofile-inner').innerHTML=`
+      <button class="back" onclick="history.back();closeAllFull();"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="prof-header">
+        <div class="prof-ava">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤'}</div>
+        <div class="prof-name">${esc(u.nickname)}</div>
+        ${sub?`<div class="prof-sub">${sub}</div>`:''}
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-v">⭐ ${u.rating}</div><div class="stat-l">Рейтинг</div></div>
+        <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
+      </div>`;
+  }catch(e){document.getElementById('userprofile-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 
 // ── SELL ─────────────────────────────────────────────────
-function renderSell() {
-  if (!uid()) { document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>'; return; }
-  S.isPrem=false;
+function renderSell(){
+  if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
+  S.isPrem=false;S.sellData=null;
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Новый товар</div>
     <div class="field"><label>Название</label><input id="s-title" placeholder="Что продаёшь?" maxlength="100"></div>
     <div class="field"><label>Описание</label><textarea id="s-desc" placeholder="Подробнее..."></textarea></div>
-    <div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽" oninput="updGets()"></div>
-    <div id="gets-info" style="font-size:13px;color:var(--gr2);margin-bottom:14px;font-weight:600;text-align:center;display:none"></div>
+    <div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>
     <div class="field"><label>Категория</label>
       <select id="s-cat">
         <option value="">Выбери категорию</option>
@@ -334,259 +370,217 @@ function renderSell() {
         <option value="videos">🎬 Видео</option>
       </select>
     </div>
-    <div class="prem-toggle" id="prem-tog" onclick="togPrem()">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-weight:700;font-size:14px">⭐ Премиум — в топе</div>
-        <div style="font-size:13px;color:var(--yl);font-weight:700">−9 ₽</div>
-      </div>
-      <div style="font-size:12px;color:var(--tx3);margin-top:6px">Твой товар выше всех обычных</div>
-    </div>
-    <button class="btn btn-pr" onclick="doSell()">📦 Опубликовать</button>`;
+    <button class="btn btn-pr" onclick="goSellType()">Далее →</button>`;
 }
 
-function updGets() {
-  const price=parseFloat(document.getElementById('s-price')?.value||'0');
-  const el=document.getElementById('gets-info');
-  if (!el) return;
-  if (price>=15) { el.textContent=`Вы получите: ${(price*(1-SELL_C)).toFixed(0)} ₽`; el.style.display='block'; }
-  else el.style.display='none';
-}
-
-function togPrem() {
-  S.isPrem=!S.isPrem;
-  document.getElementById('prem-tog')?.classList.toggle('on',S.isPrem);
-}
-
-async function doSell() {
+function goSellType(){
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
   const price=parseFloat(document.getElementById('s-price')?.value||'0');
   const cat=document.getElementById('s-cat')?.value;
-  if (!title) { toast('⚠️ Введи название'); return; }
-  if (!price||price<15) { toast('⚠️ Мин. цена 15 ₽'); return; }
-  if (!cat) { toast('⚠️ Выбери категорию'); return; }
-  if (S.isPrem&&(S.user?.balance??0)<PREM_P) { toast(`❌ Нужно ${PREM_P} ₽ для топа`); setTimeout(()=>goPage('wallet'),800); return; }
-  try {
-    const r=await api('/products/create',{title,description:desc||'',price,category:cat,is_premium:S.isPrem});
-    if (r.ok) {
-      toast(`✅ Опубликовано! Получите: ${r.seller_gets} ₽`);
-      ['s-title','s-desc','s-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-      if (document.getElementById('s-cat')) document.getElementById('s-cat').value='';
-      S.isPrem=false; document.getElementById('prem-tog')?.classList.remove('on');
-      document.getElementById('gets-info').style.display='none';
+  if(!title){toast('⚠️ Введи название');return;}
+  if(!price||price<15){toast('⚠️ Мин. цена 15 ₽');return;}
+  if(!cat){toast('⚠️ Выбери категорию');return;}
+  S.sellData={title,desc:desc||'',price,cat};
+  const gets=(price*(1-SELL_C)).toFixed(0);
+  document.getElementById('selltype-inner').innerHTML=`
+    <div style="padding:16px 16px 80px">
+      <button class="back" onclick="backToPage('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="st">Тип размещения</div>
+      <div class="sell-type-wrap">
+        <div class="sell-type-card on" id="stype-normal" onclick="selSellType('normal')">
+          <div class="sell-type-icon">📦</div>
+          <div class="sell-type-name">Обычный</div>
+          <div class="sell-type-desc">Показывается среди других товаров. Новые — выше старых.</div>
+          <div class="sell-type-price" style="color:var(--gr2)">Бесплатно</div>
+        </div>
+        <div class="sell-type-card prem" id="stype-prem" onclick="selSellType('prem')">
+          <div class="sell-type-icon">⭐</div>
+          <div class="sell-type-name">Премиум</div>
+          <div class="sell-type-desc">Всегда выше обычных товаров. Больше просмотров и продаж.</div>
+          <div class="sell-type-price" style="color:var(--yl)">−${PREM_P} ₽ с баланса</div>
+        </div>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--tx2);line-height:1.7">
+        💰 Вы получите: <b style="color:var(--gr2)">${gets} ₽</b> после продажи
+      </div>
+      <button class="btn btn-pr" onclick="doSell()">📦 Опубликовать</button>
+    </div>`;
+  showFull('selltype');
+}
+
+let sellTypeSelected='normal';
+function selSellType(t){
+  sellTypeSelected=t;
+  document.getElementById('stype-normal').classList.toggle('on',t==='normal');
+  document.getElementById('stype-prem').classList.toggle('on',t==='prem');
+}
+
+async function doSell(){
+  if(!S.sellData){toast('⚠️ Заполни форму');backToPage('sell');return;}
+  const isPrem=sellTypeSelected==='prem';
+  if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
+  try{
+    const r=await api('/products/create',{title:S.sellData.title,description:S.sellData.desc,price:S.sellData.price,category:S.sellData.cat,is_premium:isPrem});
+    if(r.ok){
+      toast('✅ Опубликовано!');
+      if(isPrem&&S.user){S.user.balance-=PREM_P;document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}
+      S.sellData=null;sellTypeSelected='normal';
+      setTimeout(()=>goPage('market'),800);
     }
-  } catch(e) { toast('❌ '+e.message); }
+  }catch(e){toast('❌ '+e.message);}
 }
 
 // ── MSGS ─────────────────────────────────────────────────
 let msgsInterval=null;
-
-async function renderMsgs() {
-  if (!uid()) { document.getElementById('pg-msgs').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>'; return; }
+async function renderMsgs(){
+  if(!uid()){document.getElementById('pg-msgs').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
   document.getElementById('pg-msgs').innerHTML='<div class="loader"><div class="spin"></div></div>';
   await loadMsgsList();
-  if (msgsInterval) clearInterval(msgsInterval);
-  msgsInterval=setInterval(loadMsgsList,10000);
+  if(msgsInterval)clearInterval(msgsInterval);
+  msgsInterval=setInterval(()=>{if(S.page==='msgs')loadMsgsList();else clearInterval(msgsInterval);},10000);
 }
-
-async function loadMsgsList() {
-  if (S.page!=='msgs') { clearInterval(msgsInterval); return; }
-  try {
-    const [orders, gcMsgs] = await Promise.all([api('/orders'), api('/chat/messages')]);
-    const myId=uid();
-    let totalUnread=0;
+async function loadMsgsList(){
+  try{
+    const[orders,gcMsgs]=await Promise.all([api('/orders'),api('/chat/messages')]);
+    const myId=uid();let totalUnread=0;
     orders.forEach(o=>totalUnread+=(o.unread||0));
-
-    // Закреплённые чаты
-    const pinnedHtml = `
-      <div style="padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid var(--br)">
+    const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
+    document.getElementById('pg-msgs').innerHTML=`
+      <div class="st" style="margin-top:0">Сообщения</div>
+      <div class="conv-list">
         <div class="conv-item" onclick="openGlobalChat()">
-          <div class="conv-ava globalchat">💬</div>
+          <div class="conv-ava gc">💬</div>
           <div class="conv-body">
-            <div class="conv-head"><div class="conv-name">Общий чат</div><div class="conv-time">${gcMsgs.length?gcMsgs[gcMsgs.length-1].created_at?.slice(11,16):''}</div></div>
-            <div class="conv-preview">${gcMsgs.length?esc(gcMsgs[gcMsgs.length-1].nickname)+': '+esc(gcMsgs[gcMsgs.length-1].message?.slice(0,30)):'Начни общение!'}</div>
+            <div class="conv-head"><div class="conv-name">Общий чат</div><div class="conv-time">${lastGc?(lastGc.created_at||'').slice(11,16):''}</div></div>
+            <div class="conv-preview">${lastGc?esc(lastGc.nickname)+': '+esc(lastGc.message?.slice(0,30)):'Начни общение!'}</div>
           </div>
         </div>
-        <div class="conv-item" onclick="openSupport()">
+        <div class="conv-item" onclick="openSupportChat()">
           <div class="conv-ava support">🎧</div>
           <div class="conv-body">
             <div class="conv-head"><div class="conv-name">Поддержка</div><div class="conv-time"></div></div>
             <div class="conv-preview">Напиши если есть вопросы</div>
           </div>
         </div>
-      </div>`;
-
-    const ordersHtml = orders.length ? orders.map(o=>{
-      const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
-      const isBuyer=o.buyer_id===myId;
-      return `<div class="conv-item" onclick="openOrderChat(${o.id})">
-        <div class="conv-ava">${isBuyer?'🛒':'🏪'}</div>
-        <div class="conv-body">
-          <div class="conv-head">
-            <div class="conv-name">${esc(o.partner_nick)}</div>
-            <div style="display:flex;align-items:center;gap:6px">
-              ${o.unread>0?`<span class="conv-unread">${o.unread}</span>`:''}
+        <div style="height:8px"></div>
+        ${orders.length?orders.map(o=>{
+          const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
+          return`<div class="conv-item" onclick="openOrderChat(${o.id})">
+            <div class="conv-ava">${o.role==='buyer'?'🛒':'🏪'}</div>
+            <div class="conv-body">
+              <div class="conv-head">
+                <div class="conv-name">${esc(o.partner_nick)}</div>
+                <div style="display:flex;align-items:center;gap:4px">
+                  ${o.unread>0?`<span class="conv-unread">${o.unread}</span>`:''}
+                </div>
+              </div>
+              <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
-          </div>
-          <div class="conv-preview">
-            <span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span>
-            · ${esc(o.product_title?.slice(0,25))} · ${o.amount} ₽
-          </div>
-        </div>
+          </div>`;}).join(''):'<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">Заказов пока нет</div>'}
       </div>`;
-    }).join('') : '<div class="empty" style="padding:20px"><div class="empty-i">📦</div>Заказов пока нет</div>';
-
-    document.getElementById('pg-msgs').innerHTML=`
-      <div class="st" style="margin-top:0">Сообщения</div>
-      <div class="conv-list">${pinnedHtml}${ordersHtml}</div>`;
-
-    // Бейдж
     const badge=document.getElementById('badge-msgs');
-    if (badge) { if (totalUnread>0) { badge.textContent=totalUnread>9?'9+':totalUnread; badge.classList.add('on'); } else badge.classList.remove('on'); }
-  } catch(e) { document.getElementById('pg-msgs').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+    if(badge){if(totalUnread>0){badge.textContent=totalUnread>9?'9+':totalUnread;badge.classList.add('on');}else badge.classList.remove('on');}
+  }catch(e){document.getElementById('pg-msgs').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 
 // ── ORDER CHAT ────────────────────────────────────────────
-async function openOrderChat(orderId) {
-  const chat=document.getElementById('pg-chat');
-  chat.innerHTML='<div class="loader" style="flex:1;display:flex;align-items:center;justify-content:center"><div><div class="spin"></div></div></div>';
-  showFullPage('chat');
-  try {
-    const orders=await api('/orders');
-    const order=orders.find(o=>o.id===orderId);
-    if (!order) throw new Error('Заказ не найден');
+async function openOrderChat(orderId){
+  document.getElementById('chat-inner').innerHTML='<div class="loader" style="flex:1;display:flex;align-items:center;justify-content:center"><div><div class="spin"></div></div></div>';
+  showFull('chat');
+  try{
+    const orders=await api('/orders');const order=orders.find(o=>o.id===orderId);
+    if(!order)throw new Error('Заказ не найден');
     await buildOrderChat(order);
-    if (S.chatInterval) clearInterval(S.chatInterval);
+    if(S.chatInterval)clearInterval(S.chatInterval);
     S.chatInterval=setInterval(()=>refreshOrderMsgs(orderId),4000);
-  } catch(e) { chat.innerHTML=`<div style="padding:16px"><div class="empty"><div class="empty-i">⚠️</div>${e.message}</div></div>`; }
+  }catch(e){document.getElementById('chat-inner').innerHTML=`<div style="padding:16px"><div class="empty"><div class="empty-i">⚠️</div>${e.message}</div></div>`;}
 }
-
-async function buildOrderChat(order) {
-  const chat=document.getElementById('pg-chat');
+async function buildOrderChat(order){
   const msgs=await api('/orders/'+order.id+'/messages');
   const myId=uid();
   const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
   const canConfirm=order.role==='buyer'&&['paid','seller_confirmed'].includes(order.status);
-
-  chat.innerHTML=`
+  document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="closeChat()" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">${order.role==='buyer'?'🛒':'🏪'}</div>
-      <div class="chat-hdr-info">
-        <div class="chat-hdr-name">${esc(order.partner_nick)}</div>
-        <div class="chat-hdr-sub">${sl[order.status]||order.status} · ${order.amount} ₽</div>
-      </div>
+      <div style="flex:1"><div class="chat-hdr-name">${esc(order.partner_nick)}</div><div class="chat-hdr-sub">${sl[order.status]||order.status} · ${order.amount} ₽</div></div>
     </div>
-    <div class="msgs-wrap" id="cmsgs">
-      <div class="order-card-chat" onclick="toast('Заказ: ${esc(order.short_id)}')">
-        <div class="order-card-chat-head">
-          <div class="order-card-chat-icon">📦</div>
-          <div>
-            <div class="order-card-chat-title">${esc(order.product_title)}</div>
-            <div class="order-card-chat-sub">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div>
-          </div>
+    <div class="msgs-area" id="cmsgs">
+      <div class="ord-card-chat" onclick="toast('Заказ ${esc(order.short_id)}')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:22px">📦</span>
+          <div><div style="font-weight:600;font-size:13px">${esc(order.product_title)}</div><div style="font-size:11px;color:var(--tx3)">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div></div>
         </div>
-        <div class="order-card-chat-price">${order.amount} ₽ · ${sl[order.status]||order.status}</div>
+        <div style="font-weight:700;font-size:14px;color:var(--gr2)">${order.amount} ₽ · ${sl[order.status]||order.status}</div>
       </div>
-      ${msgs.map(m=>`
-        <div style="display:flex;flex-direction:column;align-items:${m.sender_id===myId?'flex-end':'flex-start'}">
-          <div class="msg ${m.sender_id===myId?'msg-o':'msg-i'}">${esc(m.text||'📎')}
-            <div class="msg-t">${(m.created_at||'').slice(11,16)}</div>
-          </div>
-        </div>`).join('')}
-      ${msgs.length===0?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>':''}
+      ${msgs.map(m=>`<div style="display:flex;flex-direction:column;align-items:${m.sender_id===myId?'flex-end':'flex-start'}">
+        <div class="msg ${m.sender_id===myId?'msg-o':'msg-i'}">${esc(m.text||'📎')}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
+      </div>`).join('')}
+      ${!msgs.length?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>':''}
     </div>
-    ${canConfirm?`<div style="padding:8px 16px"><button class="btn btn-gr" onclick="doConfirm(${order.id})">✅ Получил товар — закрыть заказ</button></div>`:''}
-    ${order.status!=='done'?`
-    <div class="chat-input-bar">
+    ${canConfirm?`<div style="padding:8px 16px;flex-shrink:0"><button class="btn btn-gr" onclick="doConfirm(${order.id})">✅ Получил товар — закрыть заказ</button></div>`:''}
+    ${order.status!=='done'?`<div class="chat-input-bar">
       <input class="cinput" id="cinput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendOrderMsg(${order.id})">
       <button class="csend" onclick="sendOrderMsg(${order.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>`:'<div style="height:env(safe-area-inset-bottom)"></div>'}`;
   scrollChat('cmsgs');
 }
-
-async function refreshOrderMsgs(orderId) {
-  if (S.page!=='chat') { clearInterval(S.chatInterval); S.chatInterval=null; return; }
-  try {
-    const msgs=await api('/orders/'+orderId+'/messages');
-    const myId=uid(); const el=document.getElementById('cmsgs');
-    if (!el) return;
-    // Убираем карточку заказа при обновлении
-    const orderCard=el.querySelector('.order-card-chat');
+async function refreshOrderMsgs(orderId){
+  if(S.page!=='chat'){clearInterval(S.chatInterval);S.chatInterval=null;return;}
+  try{
+    const msgs=await api('/orders/'+orderId+'/messages');const myId=uid();
+    const el=document.getElementById('cmsgs');if(!el)return;
     const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
-    const prevCount=el.querySelectorAll('.msg').length;
-    // Перерисовываем только сообщения (после карточки)
-    const msgsHtml=msgs.map(m=>`
-      <div style="display:flex;flex-direction:column;align-items:${m.sender_id===myId?'flex-end':'flex-start'}">
-        <div class="msg ${m.sender_id===myId?'msg-o':'msg-i'}">${esc(m.text||'📎')}
-          <div class="msg-t">${(m.created_at||'').slice(11,16)}</div>
-        </div>
-      </div>`).join('') || '<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
-    // Убираем старые сообщения, оставляем карточку
-    Array.from(el.children).forEach(c=>{ if (!c.classList.contains('order-card-chat')) c.remove(); });
-    el.insertAdjacentHTML('beforeend', msgsHtml);
-    if (msgs.length>prevCount) { playSound(); }
-    if (atBot) scrollChat('cmsgs');
-  } catch(e) {}
+    const card=el.querySelector('.ord-card-chat');
+    const prev=el.querySelectorAll('.msg').length;
+    Array.from(el.children).forEach(c=>{if(!c.classList.contains('ord-card-chat'))c.remove();});
+    const html=msgs.map(m=>`<div style="display:flex;flex-direction:column;align-items:${m.sender_id===myId?'flex-end':'flex-start'}">
+      <div class="msg ${m.sender_id===myId?'msg-o':'msg-i'}">${esc(m.text||'📎')}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
+    </div>`).join('')||'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
+    el.insertAdjacentHTML('beforeend',html);
+    if(msgs.length>prev)playSound();
+    if(atBot)scrollChat('cmsgs');
+  }catch(e){}
 }
-
-async function sendOrderMsg(orderId) {
-  const inp=document.getElementById('cinput'); const text=inp?.value?.trim();
-  if (!text) return; inp.value='';
-  try { await api('/send_msg',{order_id:orderId,text}); await refreshOrderMsgs(orderId); scrollChat('cmsgs'); }
-  catch(e) { toast('❌ '+e.message); }
+async function sendOrderMsg(orderId){
+  const inp=document.getElementById('cinput');const text=inp?.value?.trim();
+  if(!text)return;inp.value='';
+  try{await api('/send_msg',{order_id:orderId,text});await refreshOrderMsgs(orderId);scrollChat('cmsgs');}
+  catch(e){toast('❌ '+e.message);}
 }
-
-async function doConfirm(orderId) {
-  try {
-    await api('/confirm_order',{order_id:orderId});
-    toast('✅ Заказ завершён!');
-    clearInterval(S.chatInterval); S.chatInterval=null;
-    closeChat();
-  } catch(e) { toast('❌ '+e.message); }
+async function doConfirm(orderId){
+  try{await api('/confirm_order',{order_id:orderId});toast('✅ Заказ завершён!');clearInterval(S.chatInterval);S.chatInterval=null;closeChat();}
+  catch(e){toast('❌ '+e.message);}
 }
-
-function closeChat() {
-  if (S.chatInterval) { clearInterval(S.chatInterval); S.chatInterval=null; }
-  if (S.gcInterval) { clearInterval(S.gcInterval); S.gcInterval=null; }
-  goPage('msgs');
-}
-
-function scrollChat(id) { const el=document.getElementById(id); if(el) el.scrollTop=el.scrollHeight; }
+function closeChat(){if(S.chatInterval){clearInterval(S.chatInterval);S.chatInterval=null;}if(S.gcInterval){clearInterval(S.gcInterval);S.gcInterval=null;}goPage('msgs');}
+function scrollChat(id){const el=document.getElementById(id);if(el)el.scrollTop=el.scrollHeight;}
 
 // ── GLOBAL CHAT ───────────────────────────────────────────
-async function openGlobalChat() {
-  const chat=document.getElementById('pg-chat');
-  chat.innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
-  showFullPage('chat');
+let gcPrev=0;
+async function openGlobalChat(){
+  document.getElementById('chat-inner').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
+  showFull('chat');
   await buildGlobalChat();
-  if (S.gcInterval) clearInterval(S.gcInterval);
+  if(S.gcInterval)clearInterval(S.gcInterval);
   S.gcInterval=setInterval(refreshGlobalChat,5000);
 }
-
-async function buildGlobalChat() {
-  const chat=document.getElementById('pg-chat');
-  const msgs=await api('/chat/messages');
-  const myId=uid();
-  chat.innerHTML=`
+async function buildGlobalChat(){
+  const msgs=await api('/chat/messages');const myId=uid();gcPrev=msgs.length;
+  document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="closeChat()" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava" style="background:linear-gradient(135deg,var(--gr),var(--ac))">💬</div>
-      <div class="chat-hdr-info">
-        <div class="chat-hdr-name">Общий чат</div>
-        <div class="chat-hdr-sub">Все пользователи AnonPeak</div>
-      </div>
+      <div style="flex:1"><div class="chat-hdr-name">Общий чат</div><div class="chat-hdr-sub">Все пользователи AnonPeak</div></div>
     </div>
-    <div class="msgs-wrap" id="gcmsgs">
+    <div class="msgs-area" id="gcmsgs">
       ${msgs.length?msgs.filter(m=>!blockedUsers.includes(m.user_id)).map(m=>{
         const isMe=m.user_id===myId;
-        return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
-          ${!isMe?`<div class="msg-nick">${esc(m.nickname)}</div>`:''}
-          <div class="msg ${isMe?'msg-o':'msg-i'}" onclick="showCtx(${m.id},${m.user_id},'${esc(m.nickname)}',${isMe})">${esc(m.message)}
-            <div class="msg-t">${(m.created_at||'').slice(11,16)}</div>
-          </div>
-        </div>`;
-      }).join(''):'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>'}
+        return`<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
+          ${!isMe?`<div class="msg-nick" style="cursor:pointer" onclick="openUserProfile(${m.user_id})">${esc(m.nickname)}</div>`:''}
+          <div class="msg ${isMe?'msg-o':'msg-i'}" onclick="showCtx(${m.id},${m.user_id},'${esc(m.nickname)}',${isMe})">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
+        </div>`;}).join(''):'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>'}
     </div>
     <div class="chat-input-bar">
       <input class="cinput" id="gc-inp" placeholder="Написать..." onkeydown="if(event.key==='Enter')gcSend()">
@@ -594,130 +588,161 @@ async function buildGlobalChat() {
     </div>`;
   scrollChat('gcmsgs');
 }
-
-let gcPrevCount=0;
-async function refreshGlobalChat() {
-  if (S.page!=='chat') { clearInterval(S.gcInterval); S.gcInterval=null; return; }
-  try {
-    const msgs=await api('/chat/messages'); const myId=uid();
-    const el=document.getElementById('gcmsgs'); if (!el) return;
+async function refreshGlobalChat(){
+  if(S.page!=='chat'){clearInterval(S.gcInterval);S.gcInterval=null;return;}
+  try{
+    const msgs=await api('/chat/messages');const myId=uid();
+    const el=document.getElementById('gcmsgs');if(!el)return;
     const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
-    if (msgs.length>gcPrevCount) { playSound(); gcPrevCount=msgs.length; }
+    if(msgs.length>gcPrev)playSound();gcPrev=msgs.length;
     el.innerHTML=msgs.length?msgs.filter(m=>!blockedUsers.includes(m.user_id)).map(m=>{
       const isMe=m.user_id===myId;
-      return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
-        ${!isMe?`<div class="msg-nick">${esc(m.nickname)}</div>`:''}
-        <div class="msg ${isMe?'msg-o':'msg-i'}" onclick="showCtx(${m.id},${m.user_id},'${esc(m.nickname)}',${isMe})">${esc(m.message)}
-          <div class="msg-t">${(m.created_at||'').slice(11,16)}</div>
-        </div>
-      </div>`;
-    }).join(''):'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>';
-    if (atBot) scrollChat('gcmsgs');
-  } catch(e) {}
+      return`<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
+        ${!isMe?`<div class="msg-nick" style="cursor:pointer" onclick="openUserProfile(${m.user_id})">${esc(m.nickname)}</div>`:''}
+        <div class="msg ${isMe?'msg-o':'msg-i'}" onclick="showCtx(${m.id},${m.user_id},'${esc(m.nickname)}',${isMe})">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
+      </div>`;}).join(''):'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>';
+    if(atBot)scrollChat('gcmsgs');
+  }catch(e){}
 }
-
-async function gcSend() {
-  const inp=document.getElementById('gc-inp'); const text=inp?.value?.trim();
-  if (!text) return; inp.value='';
-  try { await api('/chat/send',{message:text}); await refreshGlobalChat(); scrollChat('gcmsgs'); }
-  catch(e) { toast('❌ '+e.message); }
+async function gcSend(){
+  const inp=document.getElementById('gc-inp');const text=inp?.value?.trim();
+  if(!text)return;inp.value='';
+  try{await api('/chat/send',{message:text});await refreshGlobalChat();scrollChat('gcmsgs');}
+  catch(e){toast('❌ '+e.message);}
 }
-
-function showCtx(msgId, userId, nick, isMe) {
-  const overlay=document.createElement('div'); overlay.className='ctx-overlay';
-  const menu=document.createElement('div'); menu.className='ctx-menu';
+function showCtx(msgId,userId,nick,isMe){
+  const ov=document.createElement('div');ov.className='ctx-overlay';
+  const m=document.createElement('div');m.className='ctx-menu';
   const items=[];
-  if (isMe) items.push({text:'🗑 Удалить сообщение',cls:'danger',fn:()=>gcDelete(msgId)});
+  if(isMe)items.push({t:'🗑 Удалить',cls:'danger',fn:()=>gcDelete(msgId)});
   const isBlocked=blockedUsers.includes(userId);
-  if (!isMe && !isBlocked) items.push({text:`🚫 Заблокировать ${nick}`,cls:'danger',fn:()=>gcBlock(userId,nick)});
-  if (!isMe && isBlocked) items.push({text:`✅ Разблокировать ${nick}`,cls:'',fn:()=>gcUnblock(userId,nick)});
-  if (!isMe) items.push({text:`👤 ${nick}`,cls:'',fn:()=>toast('Профиль: '+nick)});
-  items.push({text:'Отмена',cls:'',fn:()=>{}});
-  menu.innerHTML=items.map(i=>`<button class="ctx-btn ${i.cls||''}">${i.text}</button>`).join('');
-  menu.querySelectorAll('.ctx-btn').forEach((btn,i)=>{btn.onclick=()=>{items[i].fn();overlay.remove();menu.remove();};});
-  overlay.onclick=()=>{overlay.remove();menu.remove();};
-  document.body.appendChild(overlay); document.body.appendChild(menu);
+  if(!isMe)items.push({t:`👤 Профиль ${nick}`,cls:'',fn:()=>openUserProfile(userId)});
+  if(!isMe&&!isBlocked)items.push({t:`🚫 Заблокировать`,cls:'danger',fn:()=>gcBlock(userId,nick)});
+  if(!isMe&&isBlocked)items.push({t:`✅ Разблокировать`,cls:'',fn:()=>gcUnblock(userId,nick)});
+  items.push({t:'Отмена',cls:'',fn:()=>{}});
+  m.innerHTML=items.map(i=>`<button class="ctx-btn ${i.cls||''}">${i.t}</button>`).join('');
+  m.querySelectorAll('.ctx-btn').forEach((btn,i)=>{btn.onclick=()=>{items[i].fn();ov.remove();m.remove();};});
+  ov.onclick=()=>{ov.remove();m.remove();};
+  document.body.appendChild(ov);document.body.appendChild(m);
 }
+async function gcDelete(msgId){try{await api('/chat/delete',{msg_id:msgId});await refreshGlobalChat();}catch(e){toast('❌ '+e.message);}}
+function gcBlock(u,n){if(!blockedUsers.includes(u)){blockedUsers.push(u);try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}toast('🚫 '+n+' заблокирован');refreshGlobalChat();}}
+function gcUnblock(u,n){blockedUsers=blockedUsers.filter(id=>id!==u);try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}toast('✅ '+n+' разблокирован');refreshGlobalChat();}
 
-async function gcDelete(msgId) {
-  try { await api('/chat/delete',{msg_id:msgId}); await refreshGlobalChat(); } catch(e) { toast('❌ '+e.message); }
+// ── SUPPORT CHAT ──────────────────────────────────────────
+let supInterval=null;
+async function openSupportChat(){
+  document.getElementById('chat-inner').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
+  showFull('chat');
+  await buildSupportChat();
+  if(supInterval)clearInterval(supInterval);
+  supInterval=setInterval(refreshSupportChat,5000);
 }
-function gcBlock(userId,nick) {
-  if (!blockedUsers.includes(userId)) { blockedUsers.push(userId); try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){} toast('🚫 '+nick+' заблокирован'); refreshGlobalChat(); }
-}
-function gcUnblock(userId,nick) {
-  blockedUsers=blockedUsers.filter(id=>id!==userId); try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){} toast('✅ '+nick+' разблокирован'); refreshGlobalChat();
-}
-
-// ── SUPPORT ───────────────────────────────────────────────
-function openSupport() {
-  const el=document.getElementById('pg-search');
-  el.innerHTML=`
-    <div style="padding:16px 16px 80px">
-      <button class="back" onclick="goPage('msgs')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="st">Поддержка</div>
-      <div style="font-size:14px;color:var(--tx2);margin-bottom:16px;line-height:1.6">Опиши проблему — ответим как можно скорее</div>
-      <div class="field"><label>Сообщение</label><textarea id="sup-text" placeholder="Что случилось?" style="height:120px"></textarea></div>
-      <button class="btn btn-pr" onclick="sendSupport()">📨 Отправить</button>
+async function buildSupportChat(){
+  if(!uid()){document.getElementById('chat-inner').innerHTML='<div style="padding:16px"><div class="empty"><div class="empty-i">🔐</div>Нужен Telegram</div></div>';return;}
+  const msgs=await api('/support/messages');
+  document.getElementById('chat-inner').innerHTML=`
+    <div class="chat-hdr">
+      <button onclick="clearInterval(supInterval);supInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="chat-hdr-ava support">🎧</div>
+      <div style="flex:1"><div class="chat-hdr-name">Поддержка</div><div class="chat-hdr-sub">Обычно отвечаем быстро</div></div>
+    </div>
+    <div class="msgs-area" id="supmsgs">
+      ${!msgs.length?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Напиши нам — мы поможем! 👋</div>':''}
+      ${msgs.map(m=>{
+        const isAdmin=m.from_admin;
+        return`<div style="display:flex;flex-direction:column;align-items:${isAdmin?'flex-start':'flex-end'}">
+          ${isAdmin?'<div class="msg-admin">🎧 Поддержка</div>':''}
+          <div class="msg ${isAdmin?'msg-i':'msg-o'}">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
+        </div>`;}).join('')}
+    </div>
+    <div class="chat-input-bar">
+      <input class="cinput" id="sup-inp" placeholder="Написать в поддержку..." onkeydown="if(event.key==='Enter')supSend()">
+      <button class="csend" onclick="supSend()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>`;
-  showFullPage('search');
+  scrollChat('supmsgs');
+}
+async function refreshSupportChat(){
+  if(S.page!=='chat'){clearInterval(supInterval);supInterval=null;return;}
+  try{
+    const msgs=await api('/support/messages');
+    const el=document.getElementById('supmsgs');if(!el)return;
+    const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
+    el.innerHTML=!msgs.length?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Напиши нам — мы поможем! 👋</div>':
+      msgs.map(m=>{const isAdmin=m.from_admin;return`<div style="display:flex;flex-direction:column;align-items:${isAdmin?'flex-start':'flex-end'}">
+        ${isAdmin?'<div class="msg-admin">🎧 Поддержка</div>':''}
+        <div class="msg ${isAdmin?'msg-i':'msg-o'}">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
+      </div>`;}).join('');
+    if(atBot)scrollChat('supmsgs');
+  }catch(e){}
+}
+async function supSend(){
+  const inp=document.getElementById('sup-inp');const text=inp?.value?.trim();
+  if(!text)return;inp.value='';
+  try{await api('/support/send',{message:text});await refreshSupportChat();scrollChat('supmsgs');}
+  catch(e){toast('❌ '+e.message);}
 }
 
-async function sendSupport() {
-  const text=document.getElementById('sup-text')?.value?.trim();
-  if (!text) { toast('⚠️ Напиши сообщение'); return; }
-  if (!uid()) { toast('⚠️ Нужен Telegram'); return; }
-  try { await api('/support',{message:text}); toast('✅ Отправлено!'); document.getElementById('sup-text').value=''; setTimeout(()=>goPage('msgs'),800); }
-  catch(e) { toast('❌ '+e.message); }
-}
-
-// ── WALLET ───────────────────────────────────────────────
-function renderWallet() {
-  const bal=S.user?.balance??0;
+// ── WALLET ────────────────────────────────────────────────
+function renderWallet(){
+  const bal=S.user?.balance??0;const earn=S.user?.earn_balance??0;
   document.getElementById('pg-wallet').innerHTML=`
-    <div class="w-card">
-      <div class="w-label">Баланс</div>
-      <div class="w-amt">${bal.toFixed(0)} ₽</div>
+    <div class="wal-cards">
+      <div class="wal-card">
+        <div class="wal-card-label">Баланс <div class="wal-card-info" onclick="showPopup('Доступный баланс','Вы можете тратить этот баланс на покупки товаров и продвижение своих товаров')">!</div></div>
+        <div class="wal-card-amount">${bal.toFixed(0)} ₽</div>
+      </div>
+      <div class="wal-card">
+        <div class="wal-card-label">К выводу <div class="wal-card-info" onclick="showPopup('Баланс для вывода','Вы можете вывести только те деньги, которые заработали на продаже товаров. Нельзя выводить баланс, если вы пополнили его через платёжную систему')">!</div></div>
+        <div class="wal-card-amount" style="color:var(--yl)">${earn.toFixed(0)} ₽</div>
+      </div>
     </div>
-    <div class="st">Пополнить</div>
-    <div class="amts">${[100,250,500,1000,2500,5000].map(a=>`<button class="amt-btn" data-a="${a}" onclick="selAmt(${a})">${a} ₽</button>`).join('')}</div>
-    <div class="custom-row">
-      <input class="cinp-sm" id="custom-amt" type="number" inputmode="numeric" placeholder="Своя сумма (от 10 ₽)" min="10">
-      <button class="btn btn-ol" style="width:auto;padding:12px 16px;margin:0;flex-shrink:0" onclick="applyCustom()">OK</button>
+    <div class="wal-actions">
+      <div class="wal-action primary" onclick="goTopup()">ПОПОЛНИТЬ</div>
+      <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
-    <button class="btn btn-pr" id="confirm-topup" onclick="confirmTopup()" disabled style="opacity:.4">Выбери сумму</button>
-    <div class="hr"></div>
-    <div class="st">Вывод в Stars ⭐</div>
-    <div class="info-box">Комиссия 5% · Курс 1.4 ₽ = 1 ⭐ · Мин. 100 ₽</div>
-    <button class="btn btn-ol" onclick="goWithdraw()">💸 Вывести средства</button>`;
+    <div class="wal-history-label">ТУТ ИСТОРИЯ ОПЕРАЦИЙ БУДЕТ</div>`;
 }
 
-function selAmt(a) {
+function goTopup(){
+  document.getElementById('topup-inner').innerHTML=`
+    <div style="padding:16px 16px 80px">
+      <button class="back" onclick="backToPage('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
+      <div class="st">Пополнить баланс</div>
+      <div class="amts">${[100,250,500,1000,2500,5000].map(a=>`<button class="amt-btn" data-a="${a}" onclick="selAmt(${a})">${a} ₽</button>`).join('')}</div>
+      <div class="custom-row">
+        <input class="cinp-sm" id="custom-amt" type="number" inputmode="numeric" placeholder="Своя сумма (от 10 ₽)" min="10">
+        <button class="btn btn-ol" style="width:auto;padding:12px 16px;margin:0;flex-shrink:0" onclick="applyCustom()">OK</button>
+      </div>
+      <button class="btn btn-pr" id="confirm-topup" onclick="confirmTopup()" disabled style="opacity:.4">Выбери сумму</button>
+    </div>`;
+  showFull('topup');
+}
+
+function selAmt(a){
   S.selAmt=a;
   document.querySelectorAll('.amt-btn').forEach(b=>b.classList.toggle('sel',parseInt(b.dataset.a)===a));
-  if (document.getElementById('custom-amt')) document.getElementById('custom-amt').value='';
+  if(document.getElementById('custom-amt'))document.getElementById('custom-amt').value='';
   const btn=document.getElementById('confirm-topup');
-  if (btn) { btn.disabled=false; btn.style.opacity='1'; btn.textContent=`Перейти к оплате ${a} ₽ →`; }
+  if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${a} ₽ →`;}
 }
-
-function applyCustom() {
+function applyCustom(){
   const val=parseInt(document.getElementById('custom-amt')?.value||'0');
-  if (!val||val<10) { toast('⚠️ Минимум 10 ₽'); return; }
-  S.selAmt=val; document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('sel'));
+  if(!val||val<10){toast('⚠️ Минимум 10 ₽');return;}
+  S.selAmt=val;document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('sel'));
   const btn=document.getElementById('confirm-topup');
-  if (btn) { btn.disabled=false; btn.style.opacity='1'; btn.textContent=`Перейти к оплате ${val} ₽ →`; }
+  if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${val} ₽ →`;}
 }
-
-async function confirmTopup() {
-  if (!S.selAmt||S.selAmt<10) { toast('⚠️ Выбери сумму'); return; }
-  if (!uid()) { toast('⚠️ Нужен Telegram'); return; }
+async function confirmTopup(){
+  if(!S.selAmt||S.selAmt<10){toast('⚠️ Выбери сумму');return;}
+  if(!uid()){toast('⚠️ Нужен Telegram');return;}
   const btn=document.getElementById('confirm-topup');
-  if (btn) { btn.disabled=true; btn.textContent='Создаём...'; }
-  try {
+  if(btn){btn.disabled=true;btn.textContent='Создаём...';}
+  try{
     const r=await api('/topup/create',{amount:S.selAmt});
-    document.getElementById('pg-topup').innerHTML=`
+    document.getElementById('topup-inner').innerHTML=`
       <div style="padding:16px 16px 80px">
-        <button class="back" onclick="goPage('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
+        <button class="back" onclick="goTopup()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
         <div class="st">Оплата ${r.amount} ₽</div>
         <div style="background:var(--s2);border:1px solid var(--br);border-radius:20px;padding:20px">
           <div style="font-size:13px;color:var(--tx3);margin-bottom:8px">1️⃣ Открой DonationAlerts и задонать <b style="color:var(--gr2)">${r.amount} ₽</b></div>
@@ -727,30 +752,23 @@ async function confirmTopup() {
           <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
         </div>
       </div>`;
-    showFullPage('topup');
-  } catch(e) {
-    toast('❌ '+e.message);
-    if (btn) { btn.disabled=false; btn.style.opacity='1'; btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`; }
-  }
+  }catch(e){toast('❌ '+e.message);if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`;}}
 }
-
-function copyCode(text) {
-  navigator.clipboard?.writeText(text).then(()=>toast('✅ Скопировано!')).catch(()=>{
-    const ta=document.createElement('textarea'); ta.value=text; ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.focus(); ta.select();
-    try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}
-    document.body.removeChild(ta);
+function copyCode(t){
+  navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);
   });
 }
 
-function goWithdraw() {
-  const bal=S.user?.balance??0;
-  document.getElementById('pg-withdraw').innerHTML=`
+function goWithdraw(){
+  const earn=S.user?.earn_balance??0;
+  document.getElementById('withdraw-inner').innerHTML=`
     <div style="padding:16px 16px 80px">
-      <button class="back" onclick="goPage('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
+      <button class="back" onclick="backToPage('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
       <div class="st">Вывод в Telegram Stars</div>
-      <div class="info-box">Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>100 ₽</b><br>⚠️ После указания @username не меняй его</div>
-      <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 100 ₽" max="${bal}" oninput="updWdCalc()"></div>
+      <div class="info-box">Доступно к выводу: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>100 ₽</b><br>⚠️ После указания @username не меняй его</div>
+      <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 100 ₽" max="${earn}" oninput="updWdCalc()"></div>
       <div class="w-calc" id="w-calc" style="display:none">
         <div style="font-size:12px;color:var(--tx3);margin-bottom:4px">Вы получите</div>
         <div class="w-stars" id="w-stars">0 ⭐</div>
@@ -759,64 +777,85 @@ function goWithdraw() {
       <div class="field"><label>Ваш @username</label><input id="w-user" placeholder="@username" oninput="if(!this.value.startsWith('@'))this.value='@'+this.value.replace('@','')"></div>
       <button class="btn btn-pr" onclick="doWithdraw()">💸 Вывести</button>
     </div>`;
-  showFullPage('withdraw');
+  showFull('withdraw');
 }
-
-function updWdCalc() {
+function updWdCalc(){
   const a=parseFloat(document.getElementById('w-amt')?.value||'0');
-  const el=document.getElementById('w-calc'); if (!el) return;
-  if (a>=100) {
-    const after=a*(1-WD_C); const stars=Math.ceil(after/STAR_R);
-    el.style.display='block';
-    document.getElementById('w-stars').textContent=stars+' ⭐';
-    document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;
-  } else el.style.display='none';
+  const el=document.getElementById('w-calc');if(!el)return;
+  if(a>=100){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
+  else el.style.display='none';
 }
-
-async function doWithdraw() {
+async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');
   const username=document.getElementById('w-user')?.value?.trim();
-  const bal=S.user?.balance??0;
-  if (!amount||amount<100) { toast('⚠️ Минимум 100 ₽'); return; }
-  if (amount>bal) { toast(`❌ Баланс: ${bal.toFixed(0)} ₽`); return; }
-  if (!username||!username.startsWith('@')) { toast('⚠️ Укажи @username'); return; }
-  try {
-    const r=await api('/withdraw',{amount,username});
-    if (r.ok) { toast(`✅ Заявка! ${r.stars} ⭐`); if (S.user){S.user.balance-=amount;document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';} setTimeout(()=>goPage('wallet'),1000); }
-  } catch(e) { toast('❌ '+e.message); }
+  const earn=S.user?.earn_balance??0;
+  if(!amount||amount<100){toast('⚠️ Минимум 100 ₽');return;}
+  if(amount>earn){toast(`❌ Доступно для вывода: ${earn.toFixed(0)} ₽`);return;}
+  if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.earn_balance-=amount;S.user.balance-=amount;}setTimeout(()=>backToPage('wallet'),1000);}}
+  catch(e){toast('❌ '+e.message);}
 }
 
-// ── PROFILE ──────────────────────────────────────────────
-async function renderProfile() {
-  if (!uid()) { document.getElementById('pg-profile').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>'; return; }
+// ── PROFILE ───────────────────────────────────────────────
+async function renderProfile(){
+  document.getElementById('hdr-settings').style.display='flex';
+  if(!uid()){document.getElementById('pg-profile').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
   document.getElementById('pg-profile').innerHTML='<div class="loader"><div class="spin"></div></div>';
-  try {
+  try{
     S.user=await api('/me');
     document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';
     const gl=S.user.gender==='male'?'👨 Мужской':S.user.gender==='female'?'👩 Женский':'';
     const sub=[S.user.age?S.user.age+' лет':'',gl].filter(Boolean).join(' · ')||'Профиль не заполнен';
     document.getElementById('pg-profile').innerHTML=`
-      <div style="text-align:center;padding-top:10px">
-        <div class="ava">👤</div>
-        <div class="p-name">${esc(S.user.nickname||'Аноним')}</div>
-        <div class="p-sub">${sub}</div>
+      <div class="prof-header">
+        <div class="prof-ava" onclick="pickAvatar()">${S.user.avatar_url?`<img src="${esc(S.user.avatar_url)}">`:'👤'}<div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div></div>
+        <div class="prof-name">${esc(S.user.nickname||'Аноним')}</div>
+        <div class="prof-sub">${sub}</div>
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">${S.user.balance.toFixed(0)} ₽</div><div class="stat-l">Баланс</div></div>
         <div class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
-      <button class="btn btn-pr" onclick="goEditProfile()">✏️ Редактировать профиль</button>
-      <button class="btn btn-ol" onclick="goPage('wallet')">💰 Пополнить баланс</button>
-      <button class="btn btn-ol" onclick="openSupport()">🆘 Поддержка</button>`;
-  } catch(e) { document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+      <button class="btn btn-pr" onclick="goSettings()">⚙️ Настройки профиля</button>
+      <button class="btn btn-ol" onclick="goPage('wallet')">💰 Кошелёк</button>
+      <button class="btn btn-ol" onclick="openSupportChat()">🆘 Поддержка</button>`;
+  }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 
-function goEditProfile() {
-  const u=S.user||{}; S.gender=u.gender||'';
-  document.getElementById('pg-editprofile').innerHTML=`
+// Выбор аватарки из галереи
+function pickAvatar(){
+  const input=document.createElement('input');input.type='file';input.accept='image/*';
+  input.onchange=async(e)=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=async(ev)=>{
+      const dataUrl=ev.target.result;
+      // Сохраняем как data URL (base64) — простой вариант без сервера
+      try{
+        await api('/me/set_avatar',{avatar_url:dataUrl.slice(0,500)});
+        // Локально обновляем
+        if(S.user) S.user.avatar_url=dataUrl;
+        const ava=document.querySelector('.prof-ava');
+        if(ava) ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div>`;
+        toast('✅ Аватарка обновлена!');
+      }catch(err){toast('❌ '+err.message);}
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+function goSettings(){
+  const u=S.user||{};S.gender=u.gender||'';
+  document.getElementById('settings-inner').innerHTML=`
     <div style="padding:16px 16px 80px">
-      <button class="back" onclick="goPage('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>
-      <div class="st">Редактировать</div>
+      <button class="back" onclick="backToPage('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>
+      <div class="st">Настройки профиля</div>
+      <div style="text-align:center;margin-bottom:20px">
+        <div class="prof-ava" style="cursor:pointer" onclick="pickAvatarSettings()">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤'}<div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div></div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:8px">Нажми чтобы изменить фото</div>
+      </div>
       <div class="field"><label>Никнейм</label><input id="ep-nick" value="${esc(u.nickname||'')}" placeholder="Твой ник" maxlength="30"></div>
       <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?" min="1" max="120"></div>
       <div class="field"><label>Пол</label></div>
@@ -825,74 +864,93 @@ function goEditProfile() {
         <button class="g-btn ${S.gender==='female'?'sel':''}" id="g-female" onclick="selGender('female')">👩 Женский</button>
       </div>
       <button class="btn btn-pr" onclick="saveProfile()">💾 Сохранить</button>
-      <button class="btn btn-ol" onclick="goPage('profile')">Отмена</button>
+      <button class="btn btn-ol" onclick="backToPage('profile')">Отмена</button>
     </div>`;
-  showFullPage('editprofile');
+  showFull('settings');
 }
 
-function selGender(g) { S.gender=g; document.getElementById('g-male').classList.toggle('sel',g==='male'); document.getElementById('g-female').classList.toggle('sel',g==='female'); }
+function pickAvatarSettings(){
+  const input=document.createElement('input');input.type='file';input.accept='image/*';
+  input.onchange=(e)=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      const dataUrl=ev.target.result;
+      if(S.user) S.user.avatar_url=dataUrl;
+      const ava=document.querySelector('#settings-inner .prof-ava');
+      if(ava) ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div>`;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
 
-async function saveProfile() {
+function selGender(g){S.gender=g;document.getElementById('g-male').classList.toggle('sel',g==='male');document.getElementById('g-female').classList.toggle('sel',g==='female');}
+
+async function saveProfile(){
   const nick=document.getElementById('ep-nick')?.value?.trim();
   const age=parseInt(document.getElementById('ep-age')?.value||'0');
-  if (!nick||nick.length>30) { toast('⚠️ Никнейм 1-30 символов'); return; }
-  if (!age||age<1||age>120) { toast('⚠️ Укажи возраст'); return; }
-  try { await api('/me/update',{nickname:nick,age,gender:S.gender||''}); toast('✅ Сохранено!'); if(S.user){S.user.nickname=nick;S.user.age=age;S.user.gender=S.gender;} goPage('profile'); }
-  catch(e) { toast('❌ '+e.message); }
+  if(!nick||nick.length>30){toast('⚠️ Никнейм 1-30 символов');return;}
+  if(!age||age<1||age>120){toast('⚠️ Укажи возраст');return;}
+  try{
+    await api('/me/update',{nickname:nick,age,gender:S.gender||''});
+    // Сохраняем аватарку если была выбрана
+    if(S.user?.avatar_url&&S.user.avatar_url.startsWith('data:')){
+      try{await api('/me/set_avatar',{avatar_url:S.user.avatar_url.slice(0,500)});}catch(e){}
+    }
+    toast('✅ Сохранено!');if(S.user){S.user.nickname=nick;S.user.age=age;S.user.gender=S.gender;}
+    backToPage('profile');
+  }catch(e){toast('❌ '+e.message);}
 }
 
 // ── SEARCH ───────────────────────────────────────────────
-function goSearch() {
-  showFullPage('search');
-  document.getElementById('pg-search').innerHTML=`
+function goSearch(){
+  document.getElementById('search-inner').innerHTML=`
     <div style="padding:16px 16px 80px">
-      <button class="back" onclick="S.cat=null;goPage('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="field"><label>Поиск</label><input id="srch" placeholder="Название товара..." autofocus oninput="doSearch(this.value)"></div>
+      <button class="back" onclick="backToPage('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="field"><label>Поиск товаров</label><input id="srch" placeholder="Название..." autofocus oninput="doSearch(this.value)"></div>
       <div id="srch-res"><div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div></div>
     </div>`;
+  showFull('search');
   setTimeout(()=>document.getElementById('srch')?.focus(),100);
 }
-
 let srchT=null;
-async function doSearch(q) {
-  clearTimeout(srchT); const el=document.getElementById('srch-res');
-  if (!q||q.length<2) { if(el) el.innerHTML='<div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div>'; return; }
+async function doSearch(q){
+  clearTimeout(srchT);const el=document.getElementById('srch-res');
+  if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div>';return;}
   srchT=setTimeout(async()=>{
-    if(el) el.innerHTML='<div class="loader"><div class="spin"></div></div>';
-    try {
-      let all=[];
-      for (const c of ['signa','mugs','photos','videos']) { const p=await api('/products/'+c); all=all.concat(p); }
+    if(el)el.innerHTML='<div class="loader"><div class="spin"></div></div>';
+    try{
+      let all=[];for(const c of['signa','mugs','photos','videos']){const p=await api('/products/'+c);all=all.concat(p);}
       const found=all.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
-      if(el) el.innerHTML=found.length
-        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div class="prod-t">${esc(p.title)}</div><div class="prod-s">@${esc(p.seller_nick)}</div><div class="prod-p">${p.price} ₽</div></div></div>`).join('')}</div>`
+      if(el)el.innerHTML=found.length
+        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
         :'<div class="empty"><div class="empty-i">🔍</div>Ничего не найдено</div>';
-    } catch(e) { if(el) el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`; }
+    }catch(e){if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
   },400);
 }
 
-// ── UNREAD BADGE ─────────────────────────────────────────
+// ── UNREAD CHECK ─────────────────────────────────────────
 let prevUnread=0;
-async function checkUnread() {
-  if (!uid()) return;
-  try {
-    const orders=await api('/orders');
-    const total=orders.reduce((s,o)=>s+(o.unread||0),0);
+async function checkUnread(){
+  if(!uid())return;
+  try{
+    const orders=await api('/orders');const total=orders.reduce((s,o)=>s+(o.unread||0),0);
     const badge=document.getElementById('badge-msgs');
-    if (badge) { if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on'); }
-    if (total>prevUnread&&S.page!=='chat'&&S.page!=='msgs') playSound();
+    if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
+    if(total>prevUnread&&S.page!=='chat'&&S.page!=='msgs')playSound();
     prevUnread=total;
-  } catch(e) {}
+  }catch(e){}
 }
 
 // ── INIT ─────────────────────────────────────────────────
-async function init() {
+async function init(){
   renderMarket();
-  if (uid()) {
-    try { S.user=await api('/me'); document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽'; } catch(e) {}
+  if(uid()){
+    try{S.user=await api('/me');document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}catch(e){}
   }
-  setInterval(async()=>{ if(!uid())return; try{S.user=await api('/me');document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}catch(e){} },60000);
-  setInterval(checkUnread,15000);
-  checkUnread();
+  setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}catch(e){}},60000);
+  setInterval(checkUnread,15000);checkUnread();
 }
 init();
 </script>
