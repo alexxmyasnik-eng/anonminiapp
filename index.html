@@ -10,25 +10,20 @@
 :root{--bg:#08080f;--s1:#0f0f1a;--s2:#161625;--s3:#1e1e30;--br:#252538;--br2:#2f2f48;--ac:#7b5cf0;--ac2:#a78bfa;--gr:#10b981;--gr2:#34d399;--rd:#f43f5e;--yl:#f59e0b;--tx:#f1f0ff;--tx2:#a9a8c9;--tx3:#6b6a8a}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
-/* HEADER */
-.hdr{position:sticky;top:0;z-index:50;background:rgba(8,8,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:10px 16px;gap:10px}
+.hdr{position:sticky;top:0;z-index:50;background:rgba(8,8,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:10px 16px;gap:10px;height:57px}
 .hdr-logo{font-family:'Unbounded',sans-serif;font-weight:800;font-size:17px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hdr-ico{background:none;border:none;color:var(--tx3);cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:8px}
-/* NAV */
+.hdr-ico{background:none;border:none;color:var(--tx3);cursor:pointer;padding:6px;display:flex;align-items:center;border-radius:8px;margin-left:auto}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(8,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--br);display:flex;padding-bottom:env(safe-area-inset-bottom)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;background:none;border:none;color:var(--tx3);font-family:'Manrope',sans-serif;font-size:10px;cursor:pointer;transition:color .2s;position:relative}
 .nb.on{color:var(--ac2)}
 .nb svg{width:20px;height:20px}
 .nb-badge{position:absolute;top:4px;right:calc(50% - 14px);background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;display:none}
 .nb-badge.on{display:block}
-/* PAGES */
 .pg{display:none;padding:16px 16px 80px}
 .pg.on{display:block;animation:fu .18s ease}
 @keyframes fu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-/* FULL SCREEN */
-.fullpg{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column;overflow-y:auto}
+.fullpg{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column}
 .fullpg.on{display:flex}
-/* COMMON */
 .st{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--tx3);margin:20px 0 10px}
 .st:first-child{margin-top:0}
 .back{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--ac2);font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;cursor:pointer;padding:0 0 14px}
@@ -40,6 +35,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .btn-gr{background:var(--gr);color:#fff}
 .btn-ol{background:transparent;border:1.5px solid var(--br2);color:var(--tx)}
 .btn-yl{background:var(--yl);color:#000}
+.btn-rd{background:var(--rd);color:#fff}
 /* MARKET */
 .cats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:20px 16px;cursor:pointer;text-align:center;transition:all .15s}
@@ -54,23 +50,28 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .prod-thumb{width:54px;height:54px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
 .prod-thumb img{width:100%;height:100%;object-fit:cover}
 /* PROFILE */
-.prof-header{text-align:center;padding:20px 0 10px}
-.prof-ava{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 12px;overflow:hidden;position:relative;cursor:pointer}
-.prof-ava img{width:100%;height:100%;object-fit:cover}
+.prof-header{text-align:center;padding:10px 0 16px}
+.prof-ava{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;overflow:hidden;position:relative}
+.prof-ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.prof-ava-edit{position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
 .prof-name{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700}
 .prof-sub{color:var(--tx3);font-size:13px;margin:4px 0 0}
-/* WALLET NEW DESIGN */
+/* SETUP PROFILE */
+.setup-card{background:var(--s2);border:1.5px solid var(--ac);border-radius:20px;padding:24px;text-align:center;margin-bottom:20px}
+.setup-icon{font-size:48px;margin-bottom:12px}
+.setup-title{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px}
+.setup-desc{font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:20px}
+/* WALLET */
 .wal-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .wal-card{background:var(--s2);border:1px solid var(--br);border-radius:18px;padding:16px;position:relative}
 .wal-card-label{font-size:11px;color:var(--tx3);font-weight:600;display:flex;align-items:center;gap:4px;margin-bottom:8px}
-.wal-card-info{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--tx3);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;flex-shrink:0}
-.wal-card-amount{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2)}
-.wal-card-copy{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--tx3);cursor:pointer;padding:4px}
+.wal-info-btn{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--tx3);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;flex-shrink:0;background:none;color:var(--tx3)}
+.wal-amount{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2)}
 .wal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 .wal-action{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;cursor:pointer;text-align:center;transition:all .15s;font-weight:700;font-size:13px;font-family:'Manrope',sans-serif;color:var(--tx)}
 .wal-action:active{transform:scale(.97)}
-.wal-action.primary{background:rgba(123,92,240,.15);border-color:var(--ac);color:var(--ac2)}
-.wal-history-label{font-size:11px;color:var(--rd);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:center;padding:20px;background:var(--s2);border-radius:14px;border:1px dashed var(--br2)}
+.wal-action.p{background:rgba(123,92,240,.15);border-color:var(--ac);color:var(--ac2)}
+.wal-history{font-size:11px;color:var(--rd);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:center;padding:20px;background:var(--s2);border-radius:14px;border:1px dashed var(--br2)}
 /* STATS */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .stat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:14px;text-align:center}
@@ -82,7 +83,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .conv-item:active{opacity:.7}
 .conv-ava{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
 .conv-ava img{width:100%;height:100%;object-fit:cover}
-.conv-ava.support{background:linear-gradient(135deg,#0ea5e9,#6366f1)}
+.conv-ava.sup{background:linear-gradient(135deg,#0ea5e9,#6366f1)}
 .conv-ava.gc{background:linear-gradient(135deg,var(--gr),var(--ac))}
 .conv-body{flex:1;min-width:0}
 .conv-head{display:flex;justify-content:space-between;margin-bottom:3px}
@@ -91,25 +92,31 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .conv-preview{font-size:13px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .conv-unread{background:var(--ac);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0;margin-left:6px}
 /* CHAT */
-.chat-container{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.chat-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden}
 .chat-hdr{background:var(--s2);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .chat-hdr-ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;overflow:hidden}
 .chat-hdr-ava img{width:100%;height:100%;object-fit:cover}
-.chat-hdr-name{font-weight:700;font-size:14px}
-.chat-hdr-sub{font-size:11px;color:var(--tx3)}
-.msgs-area{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:6px;padding-bottom:8px}
-.msg{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
-.msg-o{background:linear-gradient(135deg,var(--ac),#5a3fd4);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-.msg-i{background:var(--s3);color:var(--tx);align-self:flex-start;border-bottom-left-radius:4px}
-.msg-nick{font-size:11px;color:var(--ac2);margin-bottom:2px;padding:0 4px;align-self:flex-start}
-.msg-admin{font-size:11px;color:var(--yl);margin-bottom:2px;padding:0 4px;align-self:flex-start}
-.msg-t{font-size:10px;opacity:.6;margin-top:3px;text-align:right}
+.msgs-area{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:4px;padding-bottom:8px}
+.msg-row{display:flex;flex-direction:column}
+.msg-row.out{align-items:flex-end}
+.msg-row.in{align-items:flex-start}
+.msg-nick{font-size:11px;color:var(--ac2);margin-bottom:2px;padding:0 4px;cursor:pointer}
+.msg-admin-label{font-size:11px;color:var(--yl);margin-bottom:2px;padding:0 4px}
+.msg-bubble{max-width:80%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;cursor:pointer;position:relative}
+.msg-bubble.out{background:linear-gradient(135deg,var(--ac),#5a3fd4);color:#fff;border-bottom-right-radius:4px}
+.msg-bubble.in{background:var(--s3);color:var(--tx);border-bottom-left-radius:4px}
+.msg-reply-preview{background:rgba(255,255,255,.1);border-left:2px solid rgba(255,255,255,.5);border-radius:6px;padding:4px 8px;margin-bottom:6px;font-size:11px;opacity:.8}
+.msg-reply-preview.in-bubble{background:rgba(0,0,0,.15);border-left-color:var(--ac2)}
+.msg-time{font-size:10px;opacity:.6;margin-top:3px;text-align:right}
+.reply-bar{background:var(--s2);border-top:1px solid var(--br);padding:8px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.reply-bar-text{flex:1;font-size:12px;color:var(--tx2)}
+.reply-bar-close{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:18px;padding:0}
 .chat-input-bar{background:rgba(8,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--br);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;flex-shrink:0}
 .cinput{flex:1;background:var(--s3);border:1.5px solid var(--br);border-radius:24px;padding:10px 16px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;outline:none}
 .cinput:focus{border-color:var(--ac)}
 .csend{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .csend:active{transform:scale(.9)}
-/* ORDER CARD IN CHAT */
+/* ORDER CARD */
 .ord-card-chat{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin:8px 0}
 /* FORM */
 .field{margin-bottom:14px}
@@ -118,20 +125,12 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--ac)}
 .field textarea{resize:none;height:80px}
 .field select option{background:var(--s2)}
-/* PREM TOGGLE */
-.prem-card{background:var(--s2);border:1.5px solid var(--br);border-radius:16px;padding:16px;cursor:pointer;transition:all .15s;margin-bottom:12px}
-.prem-card.on{border-color:var(--yl);background:rgba(245,158,11,.08)}
-.prem-card:active{transform:scale(.98)}
-/* SELL TYPE SELECT */
+/* SELL TYPE */
 .sell-type-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 .sell-type-card{background:var(--s2);border:2px solid var(--br);border-radius:18px;padding:18px 14px;cursor:pointer;text-align:center;transition:all .15s}
 .sell-type-card:active{transform:scale(.97)}
 .sell-type-card.on{border-color:var(--ac)}
 .sell-type-card.on.prem{border-color:var(--yl)}
-.sell-type-icon{font-size:28px;margin-bottom:8px}
-.sell-type-name{font-weight:700;font-size:14px;margin-bottom:4px}
-.sell-type-desc{font-size:11px;color:var(--tx3);line-height:1.5}
-.sell-type-price{font-size:12px;font-weight:700;margin-top:8px}
 /* WALLET TOPUP */
 .amts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .amt-btn{background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:13px 4px;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer;transition:all .12s;font-family:'Manrope',sans-serif}
@@ -140,7 +139,6 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .cinp-sm{flex:1;background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:12px 14px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;outline:none;-webkit-appearance:none}
 .cinp-sm:focus{border-color:var(--ac)}
 .pay-code{background:var(--s1);border:2px solid var(--gr);border-radius:12px;padding:16px;text-align:center;cursor:pointer;margin:12px 0;font-size:18px;font-weight:800;color:var(--gr2);letter-spacing:2px;font-family:'Unbounded',sans-serif}
-/* MISC */
 .g-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .g-btn{background:var(--s2);border:1.5px solid var(--br);border-radius:12px;padding:12px;font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;text-align:center;transition:all .15s}
 .g-btn.sel{border-color:var(--ac);color:var(--ac2);background:rgba(123,92,240,.1)}
@@ -148,26 +146,29 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .w-calc{background:linear-gradient(135deg,#0a1525,#140e2a);border:1px solid #2a1f50;border-radius:16px;padding:16px;margin-bottom:14px;text-align:center}
 .w-stars{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--yl);margin:8px 0}
 .hr{height:1px;background:var(--br);margin:16px 0}
+/* POPUP */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;padding:0}
+.popup-box{background:var(--s2);border:1px solid var(--br2);border-radius:24px 24px 0 0;padding:28px 24px calc(28px + env(safe-area-inset-bottom));width:100%;text-align:center;animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.popup-title{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+.popup-text{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:20px}
+/* CTX */
+.ctx-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.4)}
+.ctx-sheet{position:fixed;bottom:0;left:0;right:0;z-index:301;background:var(--s2);border-radius:20px 20px 0 0;padding:16px 8px calc(16px + env(safe-area-inset-bottom));animation:slideUp .2s ease}
+.ctx-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;padding:14px 16px;cursor:pointer;border-radius:12px;text-align:left}
+.ctx-btn:active{background:var(--s3)}
+.ctx-btn.danger{color:var(--rd)}
+.ctx-btn .ctx-icon{font-size:20px;width:24px;text-align:center}
+.ctx-divider{height:1px;background:var(--br);margin:4px 8px}
 /* TOAST */
 .toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:85vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-/* POPUP */
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
-.popup-box{background:var(--s2);border:1px solid var(--br2);border-radius:24px;padding:28px 24px;max-width:320px;width:100%;text-align:center}
-.popup-title{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;margin-bottom:10px}
-.popup-text{font-size:13px;color:var(--tx2);line-height:1.7;margin-bottom:20px}
-/* LOADER */
 .loader{text-align:center;padding:50px;color:var(--tx3)}
 .spin{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--br2);border-top-color:var(--ac);animation:sp .7s linear infinite;margin:0 auto 10px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .empty{text-align:center;padding:50px 20px;color:var(--tx3)}
 .empty-i{font-size:40px;margin-bottom:10px}
-/* CTX MENU */
-.ctx-overlay{position:fixed;inset:0;z-index:300}
-.ctx-menu{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--br2);border-radius:16px;padding:8px;z-index:301;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-.ctx-btn{display:block;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;padding:12px 16px;text-align:left;cursor:pointer;border-radius:10px;font-weight:500}
-.ctx-btn:active{background:var(--s2)}
-.ctx-btn.danger{color:var(--rd)}
+.friends-badge{background:var(--gr);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:6px}
 </style>
 </head>
 <body>
@@ -175,47 +176,34 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="hdr">
   <div class="hdr-logo">ANONPEAK</div>
   <button class="hdr-ico" onclick="goSearch()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
-  <button class="hdr-ico" id="hdr-settings" onclick="goSettings()" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-    <div style="background:var(--s3);border:1px solid var(--br);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--gr2);cursor:pointer" id="hBal" onclick="goPage('wallet')">0 ₽</div>
-  </div>
+  <!-- Settings gear — only on profile tab -->
+  <button class="hdr-ico" id="hdr-gear" style="display:none" onclick="goSettings()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 </div>
 <div class="toast" id="toast"></div>
 
-<!-- PAGES -->
 <div class="pg on" id="pg-market"></div>
 <div class="pg" id="pg-sell"></div>
 <div class="pg" id="pg-msgs"></div>
 <div class="pg" id="pg-wallet"></div>
 <div class="pg" id="pg-profile"></div>
 
-<!-- FULL SCREEN PAGES -->
-<div class="fullpg" id="fp-chat"><div class="chat-container" id="chat-inner"></div></div>
-<div class="fullpg" id="fp-product"><div id="product-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
-<div class="fullpg" id="fp-settings"><div id="settings-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
-<div class="fullpg" id="fp-userprofile"><div id="userprofile-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
-<div class="fullpg" id="fp-topup"><div id="topup-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
-<div class="fullpg" id="fp-withdraw"><div id="withdraw-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
-<div class="fullpg" id="fp-search"><div id="search-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
-<div class="fullpg" id="fp-selltype"><div id="selltype-inner" style="padding:16px 16px 80px;overflow-y:auto;flex:1"></div></div>
+<div class="fullpg" id="fp-chat"><div class="chat-wrap" id="chat-inner"></div></div>
+<div class="fullpg" id="fp-product" style="overflow-y:auto"><div id="product-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-settings" style="overflow-y:auto"><div id="settings-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-userprofile" style="overflow-y:auto"><div id="userprofile-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-topup" style="overflow-y:auto"><div id="topup-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-withdraw" style="overflow-y:auto"><div id="withdraw-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-search" style="overflow-y:auto"><div id="search-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-selltype" style="overflow-y:auto"><div id="selltype-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-friends" style="overflow-y:auto"><div id="friends-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-adminsup" style="overflow-y:auto"><div id="adminsup-inner" style="padding:16px 16px 80px"></div></div>
 
 <nav class="nav">
-  <button class="nb on" id="nb-market" onclick="goPage('market')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Маркет
-  </button>
-  <button class="nb" id="nb-sell" onclick="goPage('sell')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Продать
-  </button>
-  <button class="nb" id="nb-msgs" onclick="goPage('msgs')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Сообщения
-    <span class="nb-badge" id="badge-msgs"></span>
-  </button>
-  <button class="nb" id="nb-wallet" onclick="goPage('wallet')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Кошелёк
-  </button>
-  <button class="nb" id="nb-profile" onclick="goPage('profile')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль
-  </button>
+  <button class="nb on" id="nb-market" onclick="goPage('market')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Маркет</button>
+  <button class="nb" id="nb-sell" onclick="goPage('sell')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Продать</button>
+  <button class="nb" id="nb-msgs" onclick="goPage('msgs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Сообщения<span class="nb-badge" id="badge-msgs"></span></button>
+  <button class="nb" id="nb-wallet" onclick="goPage('wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Кошелёк</button>
+  <button class="nb" id="nb-profile" onclick="goPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
 </nav>
 
 <audio id="snd" preload="auto"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
@@ -224,33 +212,52 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 const API='https://anonpeak-production.up.railway.app';
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
-const S={page:'market',user:null,cat:null,chatInterval:null,gcInterval:null,gender:'',selAmt:0,isPrem:false,sellData:null};
+const S={page:'market',user:null,cat:null,chatInterval:null,gcInterval:null,supInterval:null,gender:'',selAmt:0,sellData:null,replyTo:null};
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 const uid=()=>tg?.initDataUnsafe?.user?.id||null;
 const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=100;
-let blockedUsers=[];try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
+let blockedUsers=[],mutedUsers=[],sellTypeSelected='normal';
+try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
+try{mutedUsers=JSON.parse(localStorage.getItem('muted')||'[]');}catch(e){}
 
-function playSound(){try{document.getElementById('snd')?.play();}catch(e){}}
+function playSound(){try{if(!mutedUsers.includes('all'))document.getElementById('snd')?.play();}catch(e){}}
 function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),ms);}
 
 async function api(path,body=null){
   const u=uid();const params=new URLSearchParams();
-  if(u) params.set('uid',String(u));
-  if(body) for(const[k,v]of Object.entries(body)) if(v!==null&&v!==undefined) params.set(k,String(v));
+  if(u)params.set('uid',String(u));
+  if(body)for(const[k,v]of Object.entries(body))if(v!==null&&v!==undefined)params.set(k,String(v));
   const url=API+path+(params.toString()?'?'+params.toString():'');
-  try{
-    const r=await fetch(url);
-    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status);}
-    return r.json();
-  }catch(e){throw new Error(e.message||'Ошибка соединения');}
+  try{const r=await fetch(url);if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status);}return r.json();}
+  catch(e){throw new Error(e.message||'Ошибка');}
+}
+
+// POST for avatar (binary data)
+async function apiPostAvatar(dataUrl){
+  const u=uid();if(!u)throw new Error('Нет uid');
+  const r=await fetch(`${API}/me/set_avatar?uid=${u}`,{method:'POST',body:dataUrl,headers:{'Content-Type':'text/plain'}});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Error');}
+  return r.json();
 }
 
 // ── POPUP ─────────────────────────────────────────────────
 function showPopup(title,text){
   const el=document.createElement('div');el.className='popup-overlay';
-  el.innerHTML=`<div class="popup-box"><div class="popup-title">${esc(title)}</div><div class="popup-text">${esc(text)}</div><button class="btn btn-pr" onclick="this.closest('.popup-overlay').remove()">Понятно</button></div>`;
+  el.innerHTML=`<div class="popup-box"><div class="popup-title">${esc(title)}</div><div class="popup-text">${text}</div><button class="btn btn-pr" onclick="this.closest('.popup-overlay').remove()">Понятно</button></div>`;
   el.addEventListener('click',e=>{if(e.target===el)el.remove();});
   document.body.appendChild(el);
+}
+
+// ── CTX SHEET ─────────────────────────────────────────────
+function showCtxSheet(items){
+  const ov=document.createElement('div');ov.className='ctx-overlay';
+  const sh=document.createElement('div');sh.className='ctx-sheet';
+  sh.innerHTML=items.map((it,i)=>it==='---'?'<div class="ctx-divider"></div>':`<button class="ctx-btn${it.danger?' danger':''}" data-i="${i}"><span class="ctx-icon">${it.icon||''}</span>${esc(it.label)}</button>`).join('');
+  sh.querySelectorAll('.ctx-btn').forEach(btn=>{
+    btn.onclick=()=>{const i=parseInt(btn.dataset.i);if(items[i]?.fn)items[i].fn();ov.remove();sh.remove();};
+  });
+  ov.onclick=()=>{ov.remove();sh.remove();};
+  document.body.appendChild(ov);document.body.appendChild(sh);
 }
 
 // ── NAV ───────────────────────────────────────────────────
@@ -258,19 +265,23 @@ function closeAllFull(){document.querySelectorAll('.fullpg').forEach(p=>p.classL
 function goPage(name){
   if(S.chatInterval){clearInterval(S.chatInterval);S.chatInterval=null;}
   if(S.gcInterval){clearInterval(S.gcInterval);S.gcInterval=null;}
+  if(S.supInterval){clearInterval(S.supInterval);S.supInterval=null;}
   closeAllFull();
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+name)?.classList.add('on');
   document.getElementById('nb-'+name)?.classList.add('on');
-  // Show settings gear only on profile
-  const gear=document.getElementById('hdr-settings');
-  if(gear) gear.style.display=name==='profile'?'flex':'none';
+  document.getElementById('hdr-gear').style.display=name==='profile'?'flex':'none';
   S.page=name;
   ({market:renderMarket,sell:renderSell,msgs:renderMsgs,wallet:renderWallet,profile:renderProfile}[name]||function(){})();
 }
-function showFull(id){closeAllFull();document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.getElementById('fp-'+id)?.classList.add('on');S.page=id;}
-function backToPage(name){closeAllFull();goPage(name);}
+function showFull(id){
+  closeAllFull();
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('fp-'+id)?.classList.add('on');
+  S.page=id;
+}
+function backTo(name){closeAllFull();goPage(name);}
 
 // ── MARKET ────────────────────────────────────────────────
 function renderMarket(){
@@ -295,7 +306,7 @@ async function renderProducts(catId){
       ?`<div class="prods">${prods.map(p=>`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
           ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
-          <div class="prod-thumb">${p.seller_avatar?`<img src="${esc(p.seller_avatar)}">`:'📦'}</div>
+          <div class="prod-thumb">📦</div>
           <div style="flex:1;min-width:0">
             <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
             <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">@${esc(p.seller_nick)} · ⭐${p.seller_rating}</div>
@@ -311,10 +322,10 @@ async function openProduct(id){
   try{
     const p=await api('/product/'+id);const isMine=uid()&&p.seller_id===uid();
     document.getElementById('product-inner').innerHTML=`
-      <button class="back" onclick="backToPage('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <button class="back" onclick="backTo('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
       <div style="width:100%;aspect-ratio:1;border-radius:20px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:64px;margin-bottom:16px">📦</div>
       <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px">${esc(p.title)}</div>
-      <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов)</div>
+      <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов) →</div>
       <div style="color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px">${esc(p.description||'Без описания')}</div>
       <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price} ₽</div>
       ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`}`;
@@ -325,37 +336,79 @@ async function doBuy(id,price){
   if((S.user?.balance??0)<price){toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);return;}
   try{
     const r=await api('/buy',{product_id:id});
-    if(r.ok){playSound();toast('✅ Куплено! '+r.short_id);if(S.user){S.user.balance-=price;document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}setTimeout(()=>goPage('msgs'),1000);}
+    if(r.ok){playSound();toast('✅ Куплено! '+r.short_id);if(S.user){S.user.balance-=price;}setTimeout(()=>goPage('msgs'),1000);}
     else{toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);}
   }catch(e){toast('❌ '+e.message);}
 }
 
-// ── USER PROFILE ──────────────────────────────────────────
+// ── USER PROFILE PAGE ─────────────────────────────────────
 async function openUserProfile(userId){
   document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('userprofile');
   try{
-    const u=await api('/user/'+userId);
+    const[u,fs]=await Promise.all([api('/user/'+userId),S.user?api('/friends/status',{other_id:userId}):Promise.resolve({status:'none'})]);
     const gl=u.gender==='male'?'👨 Мужской':u.gender==='female'?'👩 Женский':'';
     const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
+    const fStatus=fs.status;
+    let friendBtn='';
+    if(userId!==uid()){
+      if(fStatus==='accepted') friendBtn=`<button class="btn btn-ol">✅ В друзьях</button>`;
+      else if(fStatus==='pending') friendBtn=`<button class="btn btn-ol" disabled>⏳ Заявка отправлена</button>`;
+      else friendBtn=`<button class="btn btn-pr" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`;
+    }
     document.getElementById('userprofile-inner').innerHTML=`
-      <button class="back" onclick="history.back();closeAllFull();"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <button class="back" onclick="closeAllFull()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
       <div class="prof-header">
-        <div class="prof-ava">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤'}</div>
+        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${u.avatar_url}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
         <div class="prof-name">${esc(u.nickname)}</div>
         ${sub?`<div class="prof-sub">${sub}</div>`:''}
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">⭐ ${u.rating}</div><div class="stat-l">Рейтинг</div></div>
         <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
-      </div>`;
+      </div>
+      ${friendBtn}`;
   }catch(e){document.getElementById('userprofile-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+}
+async function addFriend(friendId){
+  try{await api('/friends/add',{friend_id:friendId});toast('✅ Заявка отправлена!');openUserProfile(friendId);}
+  catch(e){toast('❌ '+e.message);}
+}
+
+// ── FRIENDS PAGE ──────────────────────────────────────────
+async function openFriends(){
+  document.getElementById('friends-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('friends');
+  try{
+    const[friends,requests]=await Promise.all([api('/friends/list'),api('/friends/requests')]);
+    let html=`<button class="back" onclick="backTo('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>`;
+    if(requests.length){
+      html+=`<div class="st">Заявки в друзья</div>`;
+      html+=requests.map(r=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--br)">
+        <div class="conv-ava">👤</div>
+        <div style="flex:1"><div style="font-weight:700">${esc(r.nickname)}</div></div>
+        <button class="btn btn-gr" style="width:auto;padding:8px 14px;margin:0;font-size:13px" onclick="acceptFriend(${r.user_id})">Принять</button>
+      </div>`).join('');
+    }
+    html+=`<div class="st">Друзья</div>`;
+    if(friends.filter(f=>f.status==='accepted').length){
+      html+=friends.filter(f=>f.status==='accepted').map(f=>`<div class="conv-item" onclick="openUserProfile(${f.friend_id})">
+        <div class="conv-ava">👤</div>
+        <div class="conv-body"><div class="conv-name">${esc(f.nickname)}</div></div>
+      </div>`).join('');
+    }else html+='<div class="empty" style="padding:20px"><div class="empty-i">👥</div>Друзей пока нет</div>';
+    document.getElementById('friends-inner').innerHTML=html;
+  }catch(e){document.getElementById('friends-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+}
+async function acceptFriend(friendId){
+  try{await api('/friends/accept',{friend_id:friendId});toast('✅ Теперь вы друзья!');openFriends();}
+  catch(e){toast('❌ '+e.message);}
 }
 
 // ── SELL ─────────────────────────────────────────────────
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
-  S.isPrem=false;S.sellData=null;
+  S.sellData=null;sellTypeSelected='normal';
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Новый товар</div>
     <div class="field"><label>Название</label><input id="s-title" placeholder="Что продаёшь?" maxlength="100"></div>
@@ -372,7 +425,6 @@ function renderSell(){
     </div>
     <button class="btn btn-pr" onclick="goSellType()">Далее →</button>`;
 }
-
 function goSellType(){
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
@@ -382,52 +434,38 @@ function goSellType(){
   if(!price||price<15){toast('⚠️ Мин. цена 15 ₽');return;}
   if(!cat){toast('⚠️ Выбери категорию');return;}
   S.sellData={title,desc:desc||'',price,cat};
-  const gets=(price*(1-SELL_C)).toFixed(0);
   document.getElementById('selltype-inner').innerHTML=`
-    <div style="padding:16px 16px 80px">
-      <button class="back" onclick="backToPage('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="st">Тип размещения</div>
-      <div class="sell-type-wrap">
-        <div class="sell-type-card on" id="stype-normal" onclick="selSellType('normal')">
-          <div class="sell-type-icon">📦</div>
-          <div class="sell-type-name">Обычный</div>
-          <div class="sell-type-desc">Показывается среди других товаров. Новые — выше старых.</div>
-          <div class="sell-type-price" style="color:var(--gr2)">Бесплатно</div>
-        </div>
-        <div class="sell-type-card prem" id="stype-prem" onclick="selSellType('prem')">
-          <div class="sell-type-icon">⭐</div>
-          <div class="sell-type-name">Премиум</div>
-          <div class="sell-type-desc">Всегда выше обычных товаров. Больше просмотров и продаж.</div>
-          <div class="sell-type-price" style="color:var(--yl)">−${PREM_P} ₽ с баланса</div>
-        </div>
+    <button class="back" onclick="backTo('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <div class="st">Тип размещения</div>
+    <div class="sell-type-wrap">
+      <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
+        <div style="font-size:28px;margin-bottom:8px">📦</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Обычный</div>
+        <div style="font-size:11px;color:var(--tx3);line-height:1.5">Показывается среди других. Новые — выше старых.</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--gr2)">Бесплатно</div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--tx2);line-height:1.7">
-        💰 Вы получите: <b style="color:var(--gr2)">${gets} ₽</b> после продажи
+      <div class="sell-type-card prem" id="stype-p" onclick="selSellType('prem')">
+        <div style="font-size:28px;margin-bottom:8px">⭐</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Премиум</div>
+        <div style="font-size:11px;color:var(--tx3);line-height:1.5">Всегда выше обычных. Больше просмотров и продаж.</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--yl)">−${PREM_P} ₽ с баланса</div>
       </div>
-      <button class="btn btn-pr" onclick="doSell()">📦 Опубликовать</button>
-    </div>`;
+    </div>
+    <button class="btn btn-pr" onclick="doSell()">📦 Опубликовать</button>`;
   showFull('selltype');
 }
-
-let sellTypeSelected='normal';
 function selSellType(t){
   sellTypeSelected=t;
-  document.getElementById('stype-normal').classList.toggle('on',t==='normal');
-  document.getElementById('stype-prem').classList.toggle('on',t==='prem');
+  document.getElementById('stype-n').classList.toggle('on',t==='normal');
+  document.getElementById('stype-p').classList.toggle('on',t==='prem');
 }
-
 async function doSell(){
-  if(!S.sellData){toast('⚠️ Заполни форму');backToPage('sell');return;}
+  if(!S.sellData){toast('⚠️ Заполни форму');backTo('sell');return;}
   const isPrem=sellTypeSelected==='prem';
   if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
   try{
     const r=await api('/products/create',{title:S.sellData.title,description:S.sellData.desc,price:S.sellData.price,category:S.sellData.cat,is_premium:isPrem});
-    if(r.ok){
-      toast('✅ Опубликовано!');
-      if(isPrem&&S.user){S.user.balance-=PREM_P;document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}
-      S.sellData=null;sellTypeSelected='normal';
-      setTimeout(()=>goPage('market'),800);
-    }
+    if(r.ok){toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);}
   }catch(e){toast('❌ '+e.message);}
 }
 
@@ -443,12 +481,17 @@ async function renderMsgs(){
 async function loadMsgsList(){
   try{
     const[orders,gcMsgs]=await Promise.all([api('/orders'),api('/chat/messages')]);
-    const myId=uid();let totalUnread=0;
-    orders.forEach(o=>totalUnread+=(o.unread||0));
+    const myId=uid();let total=0;orders.forEach(o=>total+=(o.unread||0));
     const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
+    // Admin gets support panel too
+    const isAdmin=myId==780434845;
     document.getElementById('pg-msgs').innerHTML=`
       <div class="st" style="margin-top:0">Сообщения</div>
       <div class="conv-list">
+        ${isAdmin?`<div class="conv-item" onclick="openAdminSupport()">
+          <div class="conv-ava sup">🎧</div>
+          <div class="conv-body"><div class="conv-head"><div class="conv-name">Все тикеты поддержки</div></div><div class="conv-preview">Нажми чтобы ответить пользователям</div></div>
+        </div>`:''}
         <div class="conv-item" onclick="openGlobalChat()">
           <div class="conv-ava gc">💬</div>
           <div class="conv-body">
@@ -457,13 +500,9 @@ async function loadMsgsList(){
           </div>
         </div>
         <div class="conv-item" onclick="openSupportChat()">
-          <div class="conv-ava support">🎧</div>
-          <div class="conv-body">
-            <div class="conv-head"><div class="conv-name">Поддержка</div><div class="conv-time"></div></div>
-            <div class="conv-preview">Напиши если есть вопросы</div>
-          </div>
+          <div class="conv-ava sup">🎧</div>
+          <div class="conv-body"><div class="conv-head"><div class="conv-name">Поддержка</div></div><div class="conv-preview">Напиши если есть вопросы</div></div>
         </div>
-        <div style="height:8px"></div>
         ${orders.length?orders.map(o=>{
           const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
           return`<div class="conv-item" onclick="openOrderChat(${o.id})">
@@ -471,23 +510,21 @@ async function loadMsgsList(){
             <div class="conv-body">
               <div class="conv-head">
                 <div class="conv-name">${esc(o.partner_nick)}</div>
-                <div style="display:flex;align-items:center;gap:4px">
-                  ${o.unread>0?`<span class="conv-unread">${o.unread}</span>`:''}
-                </div>
+                <div>${o.unread>0?`<span class="conv-unread">${o.unread}</span>`:''}</div>
               </div>
               <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
-          </div>`;}).join(''):'<div style="text-align:center;color:var(--tx3);padding:20px;font-size:13px">Заказов пока нет</div>'}
+          </div>`;}).join(''):''}
       </div>`;
     const badge=document.getElementById('badge-msgs');
-    if(badge){if(totalUnread>0){badge.textContent=totalUnread>9?'9+':totalUnread;badge.classList.add('on');}else badge.classList.remove('on');}
+    if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
   }catch(e){document.getElementById('pg-msgs').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 
 // ── ORDER CHAT ────────────────────────────────────────────
 async function openOrderChat(orderId){
-  document.getElementById('chat-inner').innerHTML='<div class="loader" style="flex:1;display:flex;align-items:center;justify-content:center"><div><div class="spin"></div></div></div>';
-  showFull('chat');
+  document.getElementById('chat-inner').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
+  showFull('chat');S.replyTo=null;
   try{
     const orders=await api('/orders');const order=orders.find(o=>o.id===orderId);
     if(!order)throw new Error('Заказ не найден');
@@ -497,49 +534,81 @@ async function openOrderChat(orderId){
   }catch(e){document.getElementById('chat-inner').innerHTML=`<div style="padding:16px"><div class="empty"><div class="empty-i">⚠️</div>${e.message}</div></div>`;}
 }
 async function buildOrderChat(order){
-  const msgs=await api('/orders/'+order.id+'/messages');
-  const myId=uid();
+  const msgs=await api('/orders/'+order.id+'/messages');const myId=uid();
   const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
   const canConfirm=order.role==='buyer'&&['paid','seller_confirmed'].includes(order.status);
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="closeChat()" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">${order.role==='buyer'?'🛒':'🏪'}</div>
-      <div style="flex:1"><div class="chat-hdr-name">${esc(order.partner_nick)}</div><div class="chat-hdr-sub">${sl[order.status]||order.status} · ${order.amount} ₽</div></div>
+      <div style="flex:1;cursor:pointer" onclick="openUserProfile(${order.role==='buyer'?order.seller_id:order.buyer_id})"><div style="font-weight:700;font-size:14px">${esc(order.partner_nick)}</div><div style="font-size:11px;color:var(--tx3)">${sl[order.status]||order.status} · ${order.amount} ₽</div></div>
     </div>
     <div class="msgs-area" id="cmsgs">
-      <div class="ord-card-chat" onclick="toast('Заказ ${esc(order.short_id)}')">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <span style="font-size:22px">📦</span>
-          <div><div style="font-weight:600;font-size:13px">${esc(order.product_title)}</div><div style="font-size:11px;color:var(--tx3)">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div></div>
-        </div>
+      <div class="ord-card-chat">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><span style="font-size:22px">📦</span><div><div style="font-weight:600;font-size:13px">${esc(order.product_title)}</div><div style="font-size:11px;color:var(--tx3)">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div></div></div>
         <div style="font-weight:700;font-size:14px;color:var(--gr2)">${order.amount} ₽ · ${sl[order.status]||order.status}</div>
       </div>
-      ${msgs.map(m=>`<div style="display:flex;flex-direction:column;align-items:${m.sender_id===myId?'flex-end':'flex-start'}">
-        <div class="msg ${m.sender_id===myId?'msg-o':'msg-i'}">${esc(m.text||'📎')}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
-      </div>`).join('')}
-      ${!msgs.length?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>':''}
+      ${renderMsgsList(msgs,myId,'order',order.id)}
     </div>
-    ${canConfirm?`<div style="padding:8px 16px;flex-shrink:0"><button class="btn btn-gr" onclick="doConfirm(${order.id})">✅ Получил товар — закрыть заказ</button></div>`:''}
+    ${canConfirm?`<div style="padding:8px 16px;flex-shrink:0"><button class="btn btn-gr" onclick="doConfirm(${order.id})">✅ Получил товар</button></div>`:''}
+    <div id="reply-bar" style="display:none" class="reply-bar">
+      <div class="reply-bar-text" id="reply-bar-text">Ответ на сообщение</div>
+      <button class="reply-bar-close" onclick="clearReply()">✕</button>
+    </div>
     ${order.status!=='done'?`<div class="chat-input-bar">
       <input class="cinput" id="cinput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendOrderMsg(${order.id})">
       <button class="csend" onclick="sendOrderMsg(${order.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>`:'<div style="height:env(safe-area-inset-bottom)"></div>'}`;
   scrollChat('cmsgs');
 }
+
+function renderMsgsList(msgs,myId,type,contextId){
+  if(!msgs.length)return'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
+  return msgs.map(m=>{
+    const isOut=m.sender_id===myId;
+    const replyHtml=m.reply_to_text?`<div class="msg-reply-preview${isOut?'':' in-bubble'}">↩ ${esc(m.reply_to_text?.slice(0,40))}</div>`:'';
+    return`<div class="msg-row ${isOut?'out':'in'}">
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="onMsgTap(event,${m.id},'${esc(m.text?.slice(0,50)?.replace(/'/g,"\\'")||'')}',${isOut},'${type}',${contextId})">
+        ${replyHtml}${esc(m.text||'📎')}
+        <div class="msg-time">${(m.created_at||'').slice(11,16)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function onMsgTap(e,msgId,msgText,isOut,type,contextId){
+  const items=[
+    {icon:'↩',label:'Ответить',fn:()=>setReply(msgId,msgText)},
+    '---',
+  ];
+  if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление недоступно')});
+  showCtxSheet(items);
+}
+
+function setReply(msgId,text){
+  S.replyTo={id:msgId,text};
+  const bar=document.getElementById('reply-bar');
+  const barText=document.getElementById('reply-bar-text');
+  if(bar)bar.style.display='flex';
+  if(barText)barText.textContent='↩ '+text;
+  document.getElementById('cinput')?.focus();
+}
+function clearReply(){
+  S.replyTo=null;
+  const bar=document.getElementById('reply-bar');
+  if(bar)bar.style.display='none';
+}
+
 async function refreshOrderMsgs(orderId){
   if(S.page!=='chat'){clearInterval(S.chatInterval);S.chatInterval=null;return;}
   try{
     const msgs=await api('/orders/'+orderId+'/messages');const myId=uid();
     const el=document.getElementById('cmsgs');if(!el)return;
     const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
+    const prev=el.querySelectorAll('.msg-bubble').length;
     const card=el.querySelector('.ord-card-chat');
-    const prev=el.querySelectorAll('.msg').length;
     Array.from(el.children).forEach(c=>{if(!c.classList.contains('ord-card-chat'))c.remove();});
-    const html=msgs.map(m=>`<div style="display:flex;flex-direction:column;align-items:${m.sender_id===myId?'flex-end':'flex-start'}">
-      <div class="msg ${m.sender_id===myId?'msg-o':'msg-i'}">${esc(m.text||'📎')}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
-    </div>`).join('')||'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
-    el.insertAdjacentHTML('beforeend',html);
+    el.insertAdjacentHTML('beforeend',renderMsgsList(msgs,myId,'order',orderId));
     if(msgs.length>prev)playSound();
     if(atBot)scrollChat('cmsgs');
   }catch(e){}
@@ -547,14 +616,20 @@ async function refreshOrderMsgs(orderId){
 async function sendOrderMsg(orderId){
   const inp=document.getElementById('cinput');const text=inp?.value?.trim();
   if(!text)return;inp.value='';
-  try{await api('/send_msg',{order_id:orderId,text});await refreshOrderMsgs(orderId);scrollChat('cmsgs');}
+  const body={order_id:orderId,text};
+  try{await api('/send_msg',body);clearReply();await refreshOrderMsgs(orderId);scrollChat('cmsgs');}
   catch(e){toast('❌ '+e.message);}
 }
 async function doConfirm(orderId){
   try{await api('/confirm_order',{order_id:orderId});toast('✅ Заказ завершён!');clearInterval(S.chatInterval);S.chatInterval=null;closeChat();}
   catch(e){toast('❌ '+e.message);}
 }
-function closeChat(){if(S.chatInterval){clearInterval(S.chatInterval);S.chatInterval=null;}if(S.gcInterval){clearInterval(S.gcInterval);S.gcInterval=null;}goPage('msgs');}
+function closeChat(){
+  if(S.chatInterval){clearInterval(S.chatInterval);S.chatInterval=null;}
+  if(S.gcInterval){clearInterval(S.gcInterval);S.gcInterval=null;}
+  if(S.supInterval){clearInterval(S.supInterval);S.supInterval=null;}
+  goPage('msgs');
+}
 function scrollChat(id){const el=document.getElementById(id);if(el)el.scrollTop=el.scrollHeight;}
 
 // ── GLOBAL CHAT ───────────────────────────────────────────
@@ -572,21 +647,24 @@ async function buildGlobalChat(){
     <div class="chat-hdr">
       <button onclick="closeChat()" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava" style="background:linear-gradient(135deg,var(--gr),var(--ac))">💬</div>
-      <div style="flex:1"><div class="chat-hdr-name">Общий чат</div><div class="chat-hdr-sub">Все пользователи AnonPeak</div></div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">Общий чат</div><div style="font-size:11px;color:var(--tx3)">Все пользователи AnonPeak</div></div>
     </div>
-    <div class="msgs-area" id="gcmsgs">
-      ${msgs.length?msgs.filter(m=>!blockedUsers.includes(m.user_id)).map(m=>{
-        const isMe=m.user_id===myId;
-        return`<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
-          ${!isMe?`<div class="msg-nick" style="cursor:pointer" onclick="openUserProfile(${m.user_id})">${esc(m.nickname)}</div>`:''}
-          <div class="msg ${isMe?'msg-o':'msg-i'}" onclick="showCtx(${m.id},${m.user_id},'${esc(m.nickname)}',${isMe})">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
-        </div>`;}).join(''):'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>'}
-    </div>
+    <div class="msgs-area" id="gcmsgs">${buildGcHtml(msgs,myId)}</div>
     <div class="chat-input-bar">
       <input class="cinput" id="gc-inp" placeholder="Написать..." onkeydown="if(event.key==='Enter')gcSend()">
       <button class="csend" onclick="gcSend()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>`;
   scrollChat('gcmsgs');
+}
+function buildGcHtml(msgs,myId){
+  if(!msgs.length)return'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>';
+  return msgs.filter(m=>!blockedUsers.includes(m.user_id)).map(m=>{
+    const isOut=m.user_id===myId;
+    return`<div class="msg-row ${isOut?'out':'in'}">
+      ${!isOut?`<div class="msg-nick" onclick="openUserProfile(${m.user_id})">${esc(m.nickname)}</div>`:''}
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="gcMsgTap(${m.id},${m.user_id},'${esc(m.nickname?.replace(/'/g,"\\'"))}',${isOut})">${esc(m.message)}<div class="msg-time">${(m.created_at||'').slice(11,16)}</div></div>
+    </div>`;
+  }).join('');
 }
 async function refreshGlobalChat(){
   if(S.page!=='chat'){clearInterval(S.gcInterval);S.gcInterval=null;return;}
@@ -595,12 +673,7 @@ async function refreshGlobalChat(){
     const el=document.getElementById('gcmsgs');if(!el)return;
     const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
     if(msgs.length>gcPrev)playSound();gcPrev=msgs.length;
-    el.innerHTML=msgs.length?msgs.filter(m=>!blockedUsers.includes(m.user_id)).map(m=>{
-      const isMe=m.user_id===myId;
-      return`<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
-        ${!isMe?`<div class="msg-nick" style="cursor:pointer" onclick="openUserProfile(${m.user_id})">${esc(m.nickname)}</div>`:''}
-        <div class="msg ${isMe?'msg-o':'msg-i'}" onclick="showCtx(${m.id},${m.user_id},'${esc(m.nickname)}',${isMe})">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
-      </div>`;}).join(''):'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Будь первым 👋</div>';
+    el.innerHTML=buildGcHtml(msgs,myId);
     if(atBot)scrollChat('gcmsgs');
   }catch(e){}
 }
@@ -610,69 +683,71 @@ async function gcSend(){
   try{await api('/chat/send',{message:text});await refreshGlobalChat();scrollChat('gcmsgs');}
   catch(e){toast('❌ '+e.message);}
 }
-function showCtx(msgId,userId,nick,isMe){
-  const ov=document.createElement('div');ov.className='ctx-overlay';
-  const m=document.createElement('div');m.className='ctx-menu';
-  const items=[];
-  if(isMe)items.push({t:'🗑 Удалить',cls:'danger',fn:()=>gcDelete(msgId)});
+function gcMsgTap(msgId,userId,nick,isOut){
   const isBlocked=blockedUsers.includes(userId);
-  if(!isMe)items.push({t:`👤 Профиль ${nick}`,cls:'',fn:()=>openUserProfile(userId)});
-  if(!isMe&&!isBlocked)items.push({t:`🚫 Заблокировать`,cls:'danger',fn:()=>gcBlock(userId,nick)});
-  if(!isMe&&isBlocked)items.push({t:`✅ Разблокировать`,cls:'',fn:()=>gcUnblock(userId,nick)});
-  items.push({t:'Отмена',cls:'',fn:()=>{}});
-  m.innerHTML=items.map(i=>`<button class="ctx-btn ${i.cls||''}">${i.t}</button>`).join('');
-  m.querySelectorAll('.ctx-btn').forEach((btn,i)=>{btn.onclick=()=>{items[i].fn();ov.remove();m.remove();};});
-  ov.onclick=()=>{ov.remove();m.remove();};
-  document.body.appendChild(ov);document.body.appendChild(m);
+  const isMuted=mutedUsers.includes(userId);
+  const items=[
+    {icon:'👤',label:'Профиль '+nick,fn:()=>openUserProfile(userId)},
+    {icon:'➕',label:'Добавить в друзья',fn:()=>addFriend(userId)},
+    '---',
+  ];
+  if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>gcDelete(msgId)});
+  if(!isOut){
+    items.push({icon:isMuted?'🔔':'🔇',label:isMuted?'Включить уведомления':'Замутить',fn:()=>toggleMute(userId,nick)});
+    items.push({icon:isBlocked?'✅':'🚫',label:isBlocked?'Разблокировать':'Заблокировать',danger:!isBlocked,fn:()=>isBlocked?gcUnblock(userId,nick):gcBlock(userId,nick)});
+  }
+  showCtxSheet(items);
 }
 async function gcDelete(msgId){try{await api('/chat/delete',{msg_id:msgId});await refreshGlobalChat();}catch(e){toast('❌ '+e.message);}}
 function gcBlock(u,n){if(!blockedUsers.includes(u)){blockedUsers.push(u);try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}toast('🚫 '+n+' заблокирован');refreshGlobalChat();}}
 function gcUnblock(u,n){blockedUsers=blockedUsers.filter(id=>id!==u);try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}toast('✅ '+n+' разблокирован');refreshGlobalChat();}
+function toggleMute(u,n){
+  if(mutedUsers.includes(u)){mutedUsers=mutedUsers.filter(id=>id!==u);toast('🔔 Уведомления включены');}
+  else{mutedUsers.push(u);toast('🔇 '+n+' замучен');}
+  try{localStorage.setItem('muted',JSON.stringify(mutedUsers));}catch(e){}
+}
 
 // ── SUPPORT CHAT ──────────────────────────────────────────
-let supInterval=null;
 async function openSupportChat(){
   document.getElementById('chat-inner').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
   showFull('chat');
   await buildSupportChat();
-  if(supInterval)clearInterval(supInterval);
-  supInterval=setInterval(refreshSupportChat,5000);
+  if(S.supInterval)clearInterval(S.supInterval);
+  S.supInterval=setInterval(refreshSupportChat,5000);
 }
 async function buildSupportChat(){
   if(!uid()){document.getElementById('chat-inner').innerHTML='<div style="padding:16px"><div class="empty"><div class="empty-i">🔐</div>Нужен Telegram</div></div>';return;}
-  const msgs=await api('/support/messages');
+  const msgs=await api('/support/messages');const myId=uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(supInterval);supInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <div class="chat-hdr-ava support">🎧</div>
-      <div style="flex:1"><div class="chat-hdr-name">Поддержка</div><div class="chat-hdr-sub">Обычно отвечаем быстро</div></div>
+      <button onclick="clearInterval(S.supInterval);S.supInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="chat-hdr-ava" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🎧</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">Поддержка</div><div style="font-size:11px;color:var(--tx3)">Обычно отвечаем быстро</div></div>
     </div>
-    <div class="msgs-area" id="supmsgs">
-      ${!msgs.length?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Напиши нам — мы поможем! 👋</div>':''}
-      ${msgs.map(m=>{
-        const isAdmin=m.from_admin;
-        return`<div style="display:flex;flex-direction:column;align-items:${isAdmin?'flex-start':'flex-end'}">
-          ${isAdmin?'<div class="msg-admin">🎧 Поддержка</div>':''}
-          <div class="msg ${isAdmin?'msg-i':'msg-o'}">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
-        </div>`;}).join('')}
-    </div>
+    <div class="msgs-area" id="supmsgs">${buildSupHtml(msgs,myId)}</div>
     <div class="chat-input-bar">
-      <input class="cinput" id="sup-inp" placeholder="Написать в поддержку..." onkeydown="if(event.key==='Enter')supSend()">
+      <input class="cinput" id="sup-inp" placeholder="Напиши нам..." onkeydown="if(event.key==='Enter')supSend()">
       <button class="csend" onclick="supSend()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>`;
   scrollChat('supmsgs');
 }
+function buildSupHtml(msgs,myId){
+  if(!msgs.length)return'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Напиши нам — поможем 👋</div>';
+  return msgs.map(m=>{
+    const isAdmin=m.from_admin;
+    return`<div class="msg-row ${isAdmin?'in':'out'}">
+      ${isAdmin?'<div class="msg-admin-label">🎧 Поддержка</div>':''}
+      <div class="msg-bubble ${isAdmin?'in':'out'}">${esc(m.message)}<div class="msg-time">${(m.created_at||'').slice(11,16)}</div></div>
+    </div>`;
+  }).join('');
+}
 async function refreshSupportChat(){
-  if(S.page!=='chat'){clearInterval(supInterval);supInterval=null;return;}
+  if(S.page!=='chat'){clearInterval(S.supInterval);S.supInterval=null;return;}
   try{
-    const msgs=await api('/support/messages');
+    const msgs=await api('/support/messages');const myId=uid();
     const el=document.getElementById('supmsgs');if(!el)return;
     const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
-    el.innerHTML=!msgs.length?'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Напиши нам — мы поможем! 👋</div>':
-      msgs.map(m=>{const isAdmin=m.from_admin;return`<div style="display:flex;flex-direction:column;align-items:${isAdmin?'flex-start':'flex-end'}">
-        ${isAdmin?'<div class="msg-admin">🎧 Поддержка</div>':''}
-        <div class="msg ${isAdmin?'msg-i':'msg-o'}">${esc(m.message)}<div class="msg-t">${(m.created_at||'').slice(11,16)}</div></div>
-      </div>`;}).join('');
+    el.innerHTML=buildSupHtml(msgs,myId);
     if(atBot)scrollChat('supmsgs');
   }catch(e){}
 }
@@ -683,206 +758,274 @@ async function supSend(){
   catch(e){toast('❌ '+e.message);}
 }
 
+// ── ADMIN SUPPORT PANEL ───────────────────────────────────
+async function openAdminSupport(){
+  document.getElementById('adminsup-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('adminsup');
+  try{
+    const tickets=await api('/support/tickets');
+    document.getElementById('adminsup-inner').innerHTML=`
+      <button class="back" onclick="backTo('msgs')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="st">Тикеты поддержки</div>
+      ${tickets.length?tickets.map(t=>`
+        <div class="conv-item" onclick="openAdminChatWith(${t.user_id},'${esc(t.nickname?.replace(/'/g,"\\'"))}')">
+          <div class="conv-ava sup">👤</div>
+          <div class="conv-body">
+            <div class="conv-head"><div class="conv-name">${esc(t.nickname)}</div><div class="conv-time">${(t.last_time||'').slice(11,16)}</div></div>
+            <div class="conv-preview">${esc(t.last_message?.slice(0,40))}</div>
+          </div>
+        </div>`).join(''):'<div class="empty" style="padding:20px"><div class="empty-i">🎧</div>Тикетов нет</div>'}`;
+  }catch(e){document.getElementById('adminsup-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+}
+
+let adminChatUserId=null,adminChatInterval=null;
+async function openAdminChatWith(userId,nick){
+  adminChatUserId=userId;
+  document.getElementById('chat-inner').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
+  showFull('chat');
+  await buildAdminChat(userId,nick);
+  if(adminChatInterval)clearInterval(adminChatInterval);
+  adminChatInterval=setInterval(()=>refreshAdminChat(userId,nick),4000);
+}
+async function buildAdminChat(userId,nick){
+  // Fetch messages for this user
+  const params=new URLSearchParams();params.set('uid',String(userId));
+  const r=await fetch(API+'/support/messages?'+params.toString());
+  const msgs=await r.json();
+  const myId=uid();
+  document.getElementById('chat-inner').innerHTML=`
+    <div class="chat-hdr">
+      <button onclick="clearInterval(adminChatInterval);adminChatInterval=null;closeChat();openAdminSupport();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="chat-hdr-ava">👤</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">${esc(nick)}</div><div style="font-size:11px;color:var(--tx3)">ID: ${userId}</div></div>
+    </div>
+    <div class="msgs-area" id="adminchat">${buildAdminMsgHtml(msgs,myId)}</div>
+    <div class="chat-input-bar">
+      <input class="cinput" id="admin-inp" placeholder="Ответить..." onkeydown="if(event.key==='Enter')adminReply(${userId})">
+      <button class="csend" onclick="adminReply(${userId})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>`;
+  scrollChat('adminchat');
+}
+function buildAdminMsgHtml(msgs,adminId){
+  if(!msgs.length)return'<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Нет сообщений</div>';
+  return msgs.map(m=>{
+    const isAdmin=m.from_admin;
+    return`<div class="msg-row ${isAdmin?'out':'in'}">
+      ${!isAdmin?'<div class="msg-admin-label">👤 Пользователь</div>':''}
+      <div class="msg-bubble ${isAdmin?'out':'in'}">${esc(m.message)}<div class="msg-time">${(m.created_at||'').slice(11,16)}</div></div>
+    </div>`;
+  }).join('');
+}
+async function refreshAdminChat(userId,nick){
+  const params=new URLSearchParams();params.set('uid',String(userId));
+  try{
+    const r=await fetch(API+'/support/messages?'+params.toString());const msgs=await r.json();
+    const el=document.getElementById('adminchat');if(!el)return;
+    const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
+    el.innerHTML=buildAdminMsgHtml(msgs,uid());
+    if(atBot)scrollChat('adminchat');
+  }catch(e){}
+}
+async function adminReply(userId){
+  const inp=document.getElementById('admin-inp');const text=inp?.value?.trim();
+  if(!text)return;inp.value='';
+  try{
+    await api('/support/reply',{user_id:userId,message:text});
+    await refreshAdminChat(userId,'');scrollChat('adminchat');
+  }catch(e){toast('❌ '+e.message);}
+}
+
 // ── WALLET ────────────────────────────────────────────────
 function renderWallet(){
   const bal=S.user?.balance??0;const earn=S.user?.earn_balance??0;
   document.getElementById('pg-wallet').innerHTML=`
     <div class="wal-cards">
       <div class="wal-card">
-        <div class="wal-card-label">Баланс <div class="wal-card-info" onclick="showPopup('Доступный баланс','Вы можете тратить этот баланс на покупки товаров и продвижение своих товаров')">!</div></div>
-        <div class="wal-card-amount">${bal.toFixed(0)} ₽</div>
+        <div class="wal-card-label">Баланс<button class="wal-info-btn" onclick="showPopup('Доступный баланс','Вы можете тратить этот баланс на покупки товаров и продвижение своих товаров')">!</button></div>
+        <div class="wal-amount">${bal.toFixed(0)} ₽</div>
       </div>
       <div class="wal-card">
-        <div class="wal-card-label">К выводу <div class="wal-card-info" onclick="showPopup('Баланс для вывода','Вы можете вывести только те деньги, которые заработали на продаже товаров. Нельзя выводить баланс, если вы пополнили его через платёжную систему')">!</div></div>
-        <div class="wal-card-amount" style="color:var(--yl)">${earn.toFixed(0)} ₽</div>
+        <div class="wal-card-label">К выводу<button class="wal-info-btn" onclick="showPopup('Баланс для вывода','Вы можете вывести только те деньги, которые заработали на продаже товаров. Нельзя выводить баланс, если вы пополнили его через платёжную систему')">!</button></div>
+        <div class="wal-amount" style="color:var(--yl)">${earn.toFixed(0)} ₽</div>
       </div>
     </div>
     <div class="wal-actions">
-      <div class="wal-action primary" onclick="goTopup()">ПОПОЛНИТЬ</div>
+      <div class="wal-action p" onclick="goTopup()">ПОПОЛНИТЬ</div>
       <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
-    <div class="wal-history-label">ТУТ ИСТОРИЯ ОПЕРАЦИЙ БУДЕТ</div>`;
+    <div class="wal-history">ТУТ ИСТОРИЯ ОПЕРАЦИЙ БУДЕТ</div>`;
 }
-
 function goTopup(){
   document.getElementById('topup-inner').innerHTML=`
-    <div style="padding:16px 16px 80px">
-      <button class="back" onclick="backToPage('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
-      <div class="st">Пополнить баланс</div>
-      <div class="amts">${[100,250,500,1000,2500,5000].map(a=>`<button class="amt-btn" data-a="${a}" onclick="selAmt(${a})">${a} ₽</button>`).join('')}</div>
-      <div class="custom-row">
-        <input class="cinp-sm" id="custom-amt" type="number" inputmode="numeric" placeholder="Своя сумма (от 10 ₽)" min="10">
-        <button class="btn btn-ol" style="width:auto;padding:12px 16px;margin:0;flex-shrink:0" onclick="applyCustom()">OK</button>
-      </div>
-      <button class="btn btn-pr" id="confirm-topup" onclick="confirmTopup()" disabled style="opacity:.4">Выбери сумму</button>
-    </div>`;
+    <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
+    <div class="st">Пополнить баланс</div>
+    <div class="amts">${[100,250,500,1000,2500,5000].map(a=>`<button class="amt-btn" data-a="${a}" onclick="selAmt(${a})">${a} ₽</button>`).join('')}</div>
+    <div class="custom-row">
+      <input class="cinp-sm" id="custom-amt" type="number" inputmode="numeric" placeholder="Своя сумма (от 10 ₽)" min="10">
+      <button class="btn btn-ol" style="width:auto;padding:12px 16px;margin:0;flex-shrink:0" onclick="applyCustom()">OK</button>
+    </div>
+    <button class="btn btn-pr" id="confirm-topup" onclick="confirmTopup()" disabled style="opacity:.4">Выбери сумму</button>`;
   showFull('topup');
 }
-
 function selAmt(a){
-  S.selAmt=a;
-  document.querySelectorAll('.amt-btn').forEach(b=>b.classList.toggle('sel',parseInt(b.dataset.a)===a));
+  S.selAmt=a;document.querySelectorAll('.amt-btn').forEach(b=>b.classList.toggle('sel',parseInt(b.dataset.a)===a));
   if(document.getElementById('custom-amt'))document.getElementById('custom-amt').value='';
-  const btn=document.getElementById('confirm-topup');
-  if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${a} ₽ →`;}
+  const btn=document.getElementById('confirm-topup');if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${a} ₽ →`;}
 }
 function applyCustom(){
   const val=parseInt(document.getElementById('custom-amt')?.value||'0');
   if(!val||val<10){toast('⚠️ Минимум 10 ₽');return;}
   S.selAmt=val;document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('sel'));
-  const btn=document.getElementById('confirm-topup');
-  if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${val} ₽ →`;}
+  const btn=document.getElementById('confirm-topup');if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${val} ₽ →`;}
 }
 async function confirmTopup(){
   if(!S.selAmt||S.selAmt<10){toast('⚠️ Выбери сумму');return;}
   if(!uid()){toast('⚠️ Нужен Telegram');return;}
-  const btn=document.getElementById('confirm-topup');
-  if(btn){btn.disabled=true;btn.textContent='Создаём...';}
+  const btn=document.getElementById('confirm-topup');if(btn){btn.disabled=true;btn.textContent='Создаём...';}
   try{
     const r=await api('/topup/create',{amount:S.selAmt});
     document.getElementById('topup-inner').innerHTML=`
-      <div style="padding:16px 16px 80px">
-        <button class="back" onclick="goTopup()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-        <div class="st">Оплата ${r.amount} ₽</div>
-        <div style="background:var(--s2);border:1px solid var(--br);border-radius:20px;padding:20px">
-          <div style="font-size:13px;color:var(--tx3);margin-bottom:8px">1️⃣ Открой DonationAlerts и задонать <b style="color:var(--gr2)">${r.amount} ₽</b></div>
-          <a href="${r.da_link}" target="_blank" class="btn btn-pr" style="text-decoration:none;margin-bottom:16px">Открыть DonationAlerts →</a>
-          <div style="font-size:13px;color:var(--tx3);margin-bottom:4px">2️⃣ В поле «Сообщение» вставь код:</div>
-          <div class="pay-code" onclick="copyCode('${r.code}')">${r.code} 📋</div>
-          <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
-        </div>
+      <button class="back" onclick="goTopup()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="st">Оплата ${r.amount} ₽</div>
+      <div style="background:var(--s2);border:1px solid var(--br);border-radius:20px;padding:20px">
+        <div style="font-size:13px;color:var(--tx3);margin-bottom:8px">1️⃣ Открой DonationAlerts и задонать <b style="color:var(--gr2)">${r.amount} ₽</b></div>
+        <a href="${r.da_link}" target="_blank" class="btn btn-pr" style="text-decoration:none;margin-bottom:16px">Открыть DonationAlerts →</a>
+        <div style="font-size:13px;color:var(--tx3);margin-bottom:4px">2️⃣ В поле «Сообщение» вставь код:</div>
+        <div class="pay-code" onclick="copyCode('${r.code}')">${r.code} 📋</div>
+        <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
       </div>`;
   }catch(e){toast('❌ '+e.message);if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`;}}
 }
-function copyCode(t){
-  navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{
-    const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();
-    try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);
-  });
-}
-
+function copyCode(t){navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);});}
 function goWithdraw(){
   const earn=S.user?.earn_balance??0;
   document.getElementById('withdraw-inner').innerHTML=`
-    <div style="padding:16px 16px 80px">
-      <button class="back" onclick="backToPage('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
-      <div class="st">Вывод в Telegram Stars</div>
-      <div class="info-box">Доступно к выводу: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>100 ₽</b><br>⚠️ После указания @username не меняй его</div>
-      <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 100 ₽" max="${earn}" oninput="updWdCalc()"></div>
-      <div class="w-calc" id="w-calc" style="display:none">
-        <div style="font-size:12px;color:var(--tx3);margin-bottom:4px">Вы получите</div>
-        <div class="w-stars" id="w-stars">0 ⭐</div>
-        <div style="font-size:12px;color:var(--tx3)" id="w-after"></div>
-      </div>
-      <div class="field"><label>Ваш @username</label><input id="w-user" placeholder="@username" oninput="if(!this.value.startsWith('@'))this.value='@'+this.value.replace('@','')"></div>
-      <button class="btn btn-pr" onclick="doWithdraw()">💸 Вывести</button>
-    </div>`;
+    <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
+    <div class="st">Вывод в Telegram Stars</div>
+    <div class="info-box">Доступно: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>100 ₽</b></div>
+    <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 100 ₽" max="${earn}" oninput="updWd()"></div>
+    <div class="w-calc" id="w-calc" style="display:none">
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:4px">Вы получите</div>
+      <div class="w-stars" id="w-stars">0 ⭐</div>
+      <div style="font-size:12px;color:var(--tx3)" id="w-after"></div>
+    </div>
+    <div class="field"><label>Ваш @username</label><input id="w-user" placeholder="@username" oninput="if(!this.value.startsWith('@'))this.value='@'+this.value.replace('@','')"></div>
+    <button class="btn btn-pr" onclick="doWithdraw()">💸 Вывести</button>`;
   showFull('withdraw');
 }
-function updWdCalc(){
-  const a=parseFloat(document.getElementById('w-amt')?.value||'0');
-  const el=document.getElementById('w-calc');if(!el)return;
+function updWd(){
+  const a=parseFloat(document.getElementById('w-amt')?.value||'0');const el=document.getElementById('w-calc');if(!el)return;
   if(a>=100){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
   else el.style.display='none';
 }
 async function doWithdraw(){
-  const amount=parseFloat(document.getElementById('w-amt')?.value||'0');
-  const username=document.getElementById('w-user')?.value?.trim();
+  const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
   const earn=S.user?.earn_balance??0;
   if(!amount||amount<100){toast('⚠️ Минимум 100 ₽');return;}
-  if(amount>earn){toast(`❌ Доступно для вывода: ${earn.toFixed(0)} ₽`);return;}
+  if(amount>earn){toast(`❌ Доступно: ${earn.toFixed(0)} ₽`);return;}
   if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
-  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.earn_balance-=amount;S.user.balance-=amount;}setTimeout(()=>backToPage('wallet'),1000);}}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.earn_balance-=amount;S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
   catch(e){toast('❌ '+e.message);}
 }
 
 // ── PROFILE ───────────────────────────────────────────────
 async function renderProfile(){
-  document.getElementById('hdr-settings').style.display='flex';
+  document.getElementById('hdr-gear').style.display='flex';
   if(!uid()){document.getElementById('pg-profile').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
   document.getElementById('pg-profile').innerHTML='<div class="loader"><div class="spin"></div></div>';
   try{
     S.user=await api('/me');
-    document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';
+    // Нет профиля — показываем setup экран
+    if(!S.user.nickname){
+      document.getElementById('pg-profile').innerHTML=`
+        <div class="setup-card">
+          <div class="setup-icon">👤</div>
+          <div class="setup-title">Настрой профиль</div>
+          <div class="setup-desc">Укажи никнейм, возраст и аватарку чтобы другие пользователи могли тебя узнать</div>
+          <button class="btn btn-pr" onclick="goSettings()">⚙️ Настроить профиль</button>
+        </div>`;
+      return;
+    }
     const gl=S.user.gender==='male'?'👨 Мужской':S.user.gender==='female'?'👩 Женский':'';
-    const sub=[S.user.age?S.user.age+' лет':'',gl].filter(Boolean).join(' · ')||'Профиль не заполнен';
+    const sub=[S.user.age?S.user.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
     document.getElementById('pg-profile').innerHTML=`
       <div class="prof-header">
-        <div class="prof-ava" onclick="pickAvatar()">${S.user.avatar_url?`<img src="${esc(S.user.avatar_url)}">`:'👤'}<div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div></div>
-        <div class="prof-name">${esc(S.user.nickname||'Аноним')}</div>
-        <div class="prof-sub">${sub}</div>
+        <div class="prof-ava">
+          ${S.user.avatar_url?`<img src="${S.user.avatar_url}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
+          <div class="prof-ava-edit" onclick="pickAvatar()">📷</div>
+        </div>
+        <div class="prof-name">${esc(S.user.nickname)}</div>
+        ${sub?`<div class="prof-sub">${sub}</div>`:''}
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">${S.user.balance.toFixed(0)} ₽</div><div class="stat-l">Баланс</div></div>
         <div class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
-      <button class="btn btn-pr" onclick="goSettings()">⚙️ Настройки профиля</button>
-      <button class="btn btn-ol" onclick="goPage('wallet')">💰 Кошелёк</button>
-      <button class="btn btn-ol" onclick="openSupportChat()">🆘 Поддержка</button>`;
+      <button class="btn btn-ol" onclick="openFriends()">👥 Друзья</button>`;
   }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
-}
-
-// Выбор аватарки из галереи
-function pickAvatar(){
-  const input=document.createElement('input');input.type='file';input.accept='image/*';
-  input.onchange=async(e)=>{
-    const file=e.target.files[0];if(!file)return;
-    const reader=new FileReader();
-    reader.onload=async(ev)=>{
-      const dataUrl=ev.target.result;
-      // Сохраняем как data URL (base64) — простой вариант без сервера
-      try{
-        await api('/me/set_avatar',{avatar_url:dataUrl.slice(0,500)});
-        // Локально обновляем
-        if(S.user) S.user.avatar_url=dataUrl;
-        const ava=document.querySelector('.prof-ava');
-        if(ava) ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div>`;
-        toast('✅ Аватарка обновлена!');
-      }catch(err){toast('❌ '+err.message);}
-    };
-    reader.readAsDataURL(file);
-  };
-  input.click();
 }
 
 // ── SETTINGS ─────────────────────────────────────────────
 function goSettings(){
   const u=S.user||{};S.gender=u.gender||'';
   document.getElementById('settings-inner').innerHTML=`
-    <div style="padding:16px 16px 80px">
-      <button class="back" onclick="backToPage('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>
-      <div class="st">Настройки профиля</div>
-      <div style="text-align:center;margin-bottom:20px">
-        <div class="prof-ava" style="cursor:pointer" onclick="pickAvatarSettings()">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤'}<div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div></div>
-        <div style="font-size:12px;color:var(--tx3);margin-top:8px">Нажми чтобы изменить фото</div>
+    <button class="back" onclick="backTo('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>
+    <div class="st">Настройки профиля</div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="prof-ava" style="cursor:pointer" onclick="pickAvatarSettings()">
+        ${u.avatar_url?`<img src="${u.avatar_url}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
+        <div class="prof-ava-edit">📷</div>
       </div>
-      <div class="field"><label>Никнейм</label><input id="ep-nick" value="${esc(u.nickname||'')}" placeholder="Твой ник" maxlength="30"></div>
-      <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?" min="1" max="120"></div>
-      <div class="field"><label>Пол</label></div>
-      <div class="g-row">
-        <button class="g-btn ${S.gender==='male'?'sel':''}" id="g-male" onclick="selGender('male')">👨 Мужской</button>
-        <button class="g-btn ${S.gender==='female'?'sel':''}" id="g-female" onclick="selGender('female')">👩 Женский</button>
-      </div>
-      <button class="btn btn-pr" onclick="saveProfile()">💾 Сохранить</button>
-      <button class="btn btn-ol" onclick="backToPage('profile')">Отмена</button>
-    </div>`;
+      <div style="font-size:12px;color:var(--tx3);margin-top:8px">Нажми чтобы изменить фото</div>
+    </div>
+    <div class="field"><label>Никнейм</label><input id="ep-nick" value="${esc(u.nickname||'')}" placeholder="Твой ник" maxlength="30"></div>
+    <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?" min="1" max="120"></div>
+    <div class="field"><label>Пол (нельзя изменить через поддержку)</label></div>
+    <div class="g-row">
+      <button class="g-btn ${S.gender==='male'?'sel':''}" id="g-male" onclick="selGender('male')">👨 Мужской</button>
+      <button class="g-btn ${S.gender==='female'?'sel':''}" id="g-female" onclick="selGender('female')">👩 Женский</button>
+    </div>
+    <button class="btn btn-pr" onclick="saveProfile()">💾 Сохранить</button>
+    <button class="btn btn-ol" onclick="backTo('profile')">Отмена</button>`;
   showFull('settings');
 }
 
-function pickAvatarSettings(){
-  const input=document.createElement('input');input.type='file';input.accept='image/*';
-  input.onchange=(e)=>{
+function pickAvatar(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=(e)=>{
     const file=e.target.files[0];if(!file)return;
+    if(file.size>2*1024*1024){toast('⚠️ Файл слишком большой (макс 2MB)');return;}
     const reader=new FileReader();
-    reader.onload=(ev)=>{
+    reader.onload=async(ev)=>{
       const dataUrl=ev.target.result;
-      if(S.user) S.user.avatar_url=dataUrl;
-      const ava=document.querySelector('#settings-inner .prof-ava');
-      if(ava) ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div>`;
+      try{
+        await apiPostAvatar(dataUrl);
+        if(S.user)S.user.avatar_url=dataUrl;
+        const ava=document.querySelector('#pg-profile .prof-ava');
+        if(ava)ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="prof-ava-edit" onclick="pickAvatar()">📷</div>`;
+        toast('✅ Аватарка обновлена!');
+      }catch(err){toast('❌ '+err.message);}
     };
     reader.readAsDataURL(file);
   };
-  input.click();
+  inp.click();
+}
+
+function pickAvatarSettings(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=(e)=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>2*1024*1024){toast('⚠️ Файл слишком большой');return;}
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      const dataUrl=ev.target.result;
+      if(S.user)S.user.avatar_url=dataUrl;
+      const ava=document.querySelector('#settings-inner .prof-ava');
+      if(ava)ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="prof-ava-edit" onclick="pickAvatarSettings()">📷</div>`;
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
 }
 
 function selGender(g){S.gender=g;document.getElementById('g-male').classList.toggle('sel',g==='male');document.getElementById('g-female').classList.toggle('sel',g==='female');}
@@ -894,23 +1037,20 @@ async function saveProfile(){
   if(!age||age<1||age>120){toast('⚠️ Укажи возраст');return;}
   try{
     await api('/me/update',{nickname:nick,age,gender:S.gender||''});
-    // Сохраняем аватарку если была выбрана
-    if(S.user?.avatar_url&&S.user.avatar_url.startsWith('data:')){
-      try{await api('/me/set_avatar',{avatar_url:S.user.avatar_url.slice(0,500)});}catch(e){}
+    if(S.user?.avatar_url?.startsWith('data:')){
+      try{await apiPostAvatar(S.user.avatar_url);}catch(e){}
     }
     toast('✅ Сохранено!');if(S.user){S.user.nickname=nick;S.user.age=age;S.user.gender=S.gender;}
-    backToPage('profile');
+    backTo('profile');
   }catch(e){toast('❌ '+e.message);}
 }
 
 // ── SEARCH ───────────────────────────────────────────────
 function goSearch(){
   document.getElementById('search-inner').innerHTML=`
-    <div style="padding:16px 16px 80px">
-      <button class="back" onclick="backToPage('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="field"><label>Поиск товаров</label><input id="srch" placeholder="Название..." autofocus oninput="doSearch(this.value)"></div>
-      <div id="srch-res"><div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div></div>
-    </div>`;
+    <button class="back" onclick="backTo('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <div class="field"><label>Поиск товаров</label><input id="srch" placeholder="Название..." autofocus oninput="doSearch(this.value)"></div>
+    <div id="srch-res"><div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div></div>`;
   showFull('search');
   setTimeout(()=>document.getElementById('srch')?.focus(),100);
 }
@@ -930,7 +1070,7 @@ async function doSearch(q){
   },400);
 }
 
-// ── UNREAD CHECK ─────────────────────────────────────────
+// ── UNREAD ────────────────────────────────────────────────
 let prevUnread=0;
 async function checkUnread(){
   if(!uid())return;
@@ -947,9 +1087,9 @@ async function checkUnread(){
 async function init(){
   renderMarket();
   if(uid()){
-    try{S.user=await api('/me');document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}catch(e){}
+    try{S.user=await api('/me');}catch(e){}
   }
-  setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');document.getElementById('hBal').textContent=S.user.balance.toFixed(0)+' ₽';}catch(e){}},60000);
+  setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');}catch(e){}},60000);
   setInterval(checkUnread,15000);checkUnread();
 }
 init();
