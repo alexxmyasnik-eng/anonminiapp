@@ -175,6 +175,14 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .sub-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--br);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
 .sub-tab:active{transform:scale(.95)}
 .sub-tab.on{background:rgba(123,92,240,.18);border-color:var(--ac);color:var(--ac2)}
+/* SELL CAT GRID */
+.sell-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.sell-cat{background:var(--s2);border:2px solid var(--br);border-radius:16px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .15s}
+.sell-cat:active{transform:scale(.96)}
+.sell-cat.on{border-color:var(--ac);background:rgba(123,92,240,.1)}
+.sell-cat-i{font-size:26px;margin-bottom:6px}
+.sell-cat-n{font-size:12px;font-weight:600;color:var(--tx2)}
+.sell-cat.on .sell-cat-n{color:var(--ac2)}
 </style>
 </head>
 <body>
@@ -289,12 +297,12 @@ function showFull(id){
 }
 function backTo(name){closeAllFull();goPage(name);}
 
-// ── CATEGORIES (sync with api.py CATEGORIES) ─────────────
+// ── CATEGORIES ────────────────────────────────────────────
 const CATEGORIES={
   photos:{name:'📸 Фото',subs:['Все','Соло','Игрушки','Тематика']},
   videos:{name:'🎬 Видео',subs:['Все','Мастурбация','Кастом','Анальное']},
   domination:{name:'⛓️ Доминация',subs:['Все','Оценка','Задания','Контроль','Унижение']},
-  slaves:{name:'🧎‍♀️ Рабыня',subs:['Все','Повиновение','Отчеты']},
+  slaves:{name:'🧎 Рабыня',subs:['Все','Повиновение','Отчеты']},
   audio:{name:'🎧 Аудио',subs:['Все','Секстинг','Стоны','Унижение']},
   signa:{name:'🖊 Сигны',subs:['Все','На теле','Видео-сигна']}
 };
@@ -307,22 +315,23 @@ function renderMarket(){
     <div class="st">Категории</div>
     <div class="cats">
       ${entries.map(([id,c])=>{
-        const emoji=c.name.match(/^\S+/)?.[0]||'';
-        const label=c.name.replace(/^\S+\s*/,'');
-        return`<div class="cat" onclick="openCat('${id}')"><div class="cat-i">${emoji}</div><div class="cat-n">${label}</div></div>`;
+        const parts=c.name.match(/^(\S+)\s*(.*)/)||['','',''];
+        return`<div class="cat" onclick="openCat('${id}')"><div class="cat-i">${parts[1]}</div><div class="cat-n">${parts[2]}</div></div>`;
       }).join('')}
     </div>`;
 }
 async function openCat(c){S.cat=c;S.sub='Все';await renderProducts(c,'Все');}
-async function renderProducts(catId,activeSub='Все'){
-  S.sub=activeSub;
+async function renderProducts(catId,activeSub){
+  activeSub=activeSub||'Все';S.sub=activeSub;
   const cat=CATEGORIES[catId]||{name:catId,subs:['Все']};
   const el=document.getElementById('pg-market');
-  const subsHtml=`<div class="subs-wrap">${cat.subs.map(s=>`<button class="sub-tab${s===activeSub?' on':''}" onclick="renderProducts('${catId}','${s}')">${s}</button>`).join('')}</div>`;
+  const subsHtml=`<div class="subs-wrap" id="subs-row">${cat.subs.map(s=>`<button class="sub-tab${s===activeSub?' on':''}" onclick="renderProducts('${catId}','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}</div>`;
   el.innerHTML=`<button class="back" onclick="S.cat=null;S.sub=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${cat.name}</button>${subsHtml}<div class="loader"><div class="spin"></div></div>`;
+  // Scroll active tab into view
+  requestAnimationFrame(()=>{const a=el.querySelector('.sub-tab.on');if(a)a.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});});
   try{
-    const apiSub=activeSub==='Все'?null:activeSub;
-    const prods=await api('/products/'+catId+(apiSub?'?sub='+encodeURIComponent(apiSub):''));
+    const qs=activeSub&&activeSub!=='Все'?'?sub='+encodeURIComponent(activeSub):'';
+    const prods=await api('/products/'+catId+qs);
     el.querySelector('.loader').outerHTML=prods.length
       ?`<div class="prods">${prods.map(p=>`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
@@ -443,22 +452,41 @@ async function acceptFriend(friendId){
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
   S.sellData=null;sellTypeSelected='normal';
+  const catOptions=Object.entries(CATEGORIES).map(([id,c])=>`<option value="${id}">${c.name}</option>`).join('');
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Новый товар</div>
     <div class="field"><label>Название</label><input id="s-title" placeholder="Что продаёшь?" maxlength="100"></div>
     <div class="field"><label>Описание</label><textarea id="s-desc" placeholder="Подробнее..."></textarea></div>
     <div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>
     <div class="field"><label>Категория</label>
-      <select id="s-cat">
+      <select id="s-cat" onchange="onSellCatChange(this.value)">
         <option value="">Выбери категорию</option>
-        <option value="signa">🖊 Сигна</option>
-        <option value="mugs">☕ Кружки</option>
-        <option value="photos">📸 Фото</option>
-        <option value="videos">🎬 Видео</option>
+        ${catOptions}
       </select>
+    </div>
+    <div class="field" id="s-sub-wrap" style="display:none"><label>Подкатегория</label>
+      <div class="subs-wrap" id="s-sub-row"></div>
     </div>
     <button class="btn btn-pr" onclick="goSellType()">Далее →</button>`;
 }
+
+let sellSubSelected='';
+function onSellCatChange(catId){
+  sellSubSelected='';
+  const wrap=document.getElementById('s-sub-wrap');
+  const row=document.getElementById('s-sub-row');
+  if(!catId||!CATEGORIES[catId]){wrap.style.display='none';row.innerHTML='';return;}
+  const subs=CATEGORIES[catId].subs.filter(s=>s!=='Все');
+  if(!subs.length){wrap.style.display='none';return;}
+  row.innerHTML=subs.map(s=>`<button type="button" class="sub-tab" onclick="pickSellSub(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+  wrap.style.display='block';
+}
+function pickSellSub(btn,sub){
+  sellSubSelected=sub;
+  document.querySelectorAll('#s-sub-row .sub-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
 function goSellType(){
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
@@ -467,7 +495,9 @@ function goSellType(){
   if(!title){toast('⚠️ Введи название');return;}
   if(!price||price<15){toast('⚠️ Мин. цена 15 ₽');return;}
   if(!cat){toast('⚠️ Выбери категорию');return;}
-  S.sellData={title,desc:desc||'',price,cat};
+  const subs=CATEGORIES[cat]?.subs.filter(s=>s!=='Все')||[];
+  if(subs.length&&!sellSubSelected){toast('⚠️ Выбери подкатегорию');return;}
+  S.sellData={title,desc:desc||'',price,cat,sub:sellSubSelected||null};
   document.getElementById('selltype-inner').innerHTML=`
     <button class="back" onclick="backTo('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тип размещения</div>
@@ -503,7 +533,7 @@ async function doSell(){
   const btn=document.querySelector('#fp-selltype .btn-pr');
   if(btn){btn.disabled=true;btn.textContent='Публикуем...';}
   try{
-    const r=await api('/products/create',{title:S.sellData.title,description:S.sellData.desc,price:S.sellData.price,category:S.sellData.cat,is_premium:isPrem});
+    const r=await api('/products/create',{title:S.sellData.title,description:S.sellData.desc,price:S.sellData.price,category:S.sellData.cat,subcategory:S.sellData.sub||'',is_premium:isPrem});
     if(r.ok){toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);}
   }catch(e){
     toast('❌ '+e.message);
