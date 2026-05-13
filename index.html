@@ -169,6 +169,12 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .empty{text-align:center;padding:50px 20px;color:var(--tx3)}
 .empty-i{font-size:40px;margin-bottom:10px}
 .friends-badge{background:var(--gr);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:6px}
+/* SUBCATEGORY TABS */
+.subs-wrap{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px}
+.subs-wrap::-webkit-scrollbar{display:none}
+.sub-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--br);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
+.sub-tab:active{transform:scale(.95)}
+.sub-tab.on{background:rgba(123,92,240,.18);border-color:var(--ac);color:var(--ac2)}
 </style>
 </head>
 <body>
@@ -212,7 +218,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 const API='https://anonpeak-production.up.railway.app';
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
-const S={page:'market',user:null,cat:null,chatInterval:null,gcInterval:null,supInterval:null,gender:'',selAmt:0,sellData:null,replyTo:null};
+const S={page:'market',user:null,cat:null,sub:null,chatInterval:null,gcInterval:null,supInterval:null,gender:'',selAmt:0,sellData:null,replyTo:null};
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 const uid=()=>tg?.initDataUnsafe?.user?.id||null;
 const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=100;
@@ -283,25 +289,40 @@ function showFull(id){
 }
 function backTo(name){closeAllFull();goPage(name);}
 
+// ── CATEGORIES (sync with api.py CATEGORIES) ─────────────
+const CATEGORIES={
+  photos:{name:'📸 Фото',subs:['Все','Соло','Игрушки','Тематика']},
+  videos:{name:'🎬 Видео',subs:['Все','Мастурбация','Кастом','Анальное']},
+  domination:{name:'⛓️ Доминация',subs:['Все','Оценка','Задания','Контроль','Унижение']},
+  slaves:{name:'🧎‍♀️ Рабыня',subs:['Все','Повиновение','Отчеты']},
+  audio:{name:'🎧 Аудио',subs:['Все','Секстинг','Стоны','Унижение']},
+  signa:{name:'🖊 Сигны',subs:['Все','На теле','Видео-сигна']}
+};
+
 // ── MARKET ────────────────────────────────────────────────
 function renderMarket(){
-  if(S.cat){renderProducts(S.cat);return;}
+  if(S.cat){renderProducts(S.cat,S.sub||'Все');return;}
+  const entries=Object.entries(CATEGORIES);
   document.getElementById('pg-market').innerHTML=`
     <div class="st">Категории</div>
     <div class="cats">
-      <div class="cat" onclick="openCat('signa')"><div class="cat-i">🖊</div><div class="cat-n">Сигна</div></div>
-      <div class="cat" onclick="openCat('mugs')"><div class="cat-i">☕</div><div class="cat-n">Кружки</div></div>
-      <div class="cat" onclick="openCat('photos')"><div class="cat-i">📸</div><div class="cat-n">Фото</div></div>
-      <div class="cat" onclick="openCat('videos')"><div class="cat-i">🎬</div><div class="cat-n">Видео</div></div>
+      ${entries.map(([id,c])=>{
+        const emoji=c.name.match(/^\S+/)?.[0]||'';
+        const label=c.name.replace(/^\S+\s*/,'');
+        return`<div class="cat" onclick="openCat('${id}')"><div class="cat-i">${emoji}</div><div class="cat-n">${label}</div></div>`;
+      }).join('')}
     </div>`;
 }
-async function openCat(c){S.cat=c;await renderProducts(c);}
-async function renderProducts(catId){
-  const names={signa:'🖊 Сигна',mugs:'☕ Кружки',photos:'📸 Фото',videos:'🎬 Видео'};
+async function openCat(c){S.cat=c;S.sub='Все';await renderProducts(c,'Все');}
+async function renderProducts(catId,activeSub='Все'){
+  S.sub=activeSub;
+  const cat=CATEGORIES[catId]||{name:catId,subs:['Все']};
   const el=document.getElementById('pg-market');
-  el.innerHTML=`<button class="back" onclick="S.cat=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${names[catId]}</button><div class="loader"><div class="spin"></div></div>`;
+  const subsHtml=`<div class="subs-wrap">${cat.subs.map(s=>`<button class="sub-tab${s===activeSub?' on':''}" onclick="renderProducts('${catId}','${s}')">${s}</button>`).join('')}</div>`;
+  el.innerHTML=`<button class="back" onclick="S.cat=null;S.sub=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${cat.name}</button>${subsHtml}<div class="loader"><div class="spin"></div></div>`;
   try{
-    const prods=await api('/products/'+catId);
+    const apiSub=activeSub==='Все'?null:activeSub;
+    const prods=await api('/products/'+catId+(apiSub?'?sub='+encodeURIComponent(apiSub):''));
     el.querySelector('.loader').outerHTML=prods.length
       ?`<div class="prods">${prods.map(p=>`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
