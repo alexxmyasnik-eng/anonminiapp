@@ -380,7 +380,11 @@ async function openFriends(){
   document.getElementById('friends-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('friends');
   try{
-    const[friends,requests]=await Promise.all([api('/friends/list'),api('/friends/requests')]);
+    const[friends,requests,unreadMap]=await Promise.all([
+      api('/friends/list'),
+      api('/friends/requests'),
+      api('/dm/unread_count').catch(()=>({}))
+    ]);
     let html=`<button class="back" onclick="backTo('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>`;
     if(requests.length){
       html+=`<div class="st">Заявки в друзья</div>`;
@@ -391,11 +395,20 @@ async function openFriends(){
       </div>`).join('');
     }
     html+=`<div class="st">Друзья</div>`;
-    if(friends.filter(f=>f.status==='accepted').length){
-      html+=friends.filter(f=>f.status==='accepted').map(f=>`<div class="conv-item" onclick="openUserProfile(${f.friend_id})">
-        <div class="conv-ava">👤</div>
-        <div class="conv-body"><div class="conv-name">${esc(f.nickname)}</div></div>
-      </div>`).join('');
+    const accepted=friends.filter(f=>f.status==='accepted');
+    if(accepted.length){
+      html+=accepted.map(f=>{
+        const unread=unreadMap[String(f.friend_id)]||0;
+        return`<div class="conv-item" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:12px;flex:1" onclick="openUserProfile(${f.friend_id})">
+            <div class="conv-ava">👤</div>
+            <div class="conv-body"><div class="conv-name">${esc(f.nickname)}</div><div class="conv-preview">Нажми чтобы написать →</div></div>
+          </div>
+          <button onclick="openDmChat(${f.friend_id},'${f.nickname?.replace(/'/g,"\'")}','')" style="background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;border-radius:12px;padding:10px 14px;color:#fff;font-family:Manrope,sans-serif;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;position:relative">
+            💬${unread>0?`<span style="position:absolute;top:-4px;right:-4px;background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:8px">${unread}</span>`:''}
+          </button>
+        </div>`;
+      }).join('');
     }else html+='<div class="empty" style="padding:20px"><div class="empty-i">👥</div>Друзей пока нет</div>';
     document.getElementById('friends-inner').innerHTML=html;
   }catch(e){document.getElementById('friends-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -459,14 +472,22 @@ function selSellType(t){
   document.getElementById('stype-n').classList.toggle('on',t==='normal');
   document.getElementById('stype-p').classList.toggle('on',t==='prem');
 }
+let sellPublishing=false;
 async function doSell(){
+  if(sellPublishing)return;
   if(!S.sellData){toast('⚠️ Заполни форму');backTo('sell');return;}
   const isPrem=sellTypeSelected==='prem';
   if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
+  sellPublishing=true;
+  const btn=document.querySelector('#fp-selltype .btn-pr');
+  if(btn){btn.disabled=true;btn.textContent='Публикуем...';}
   try{
     const r=await api('/products/create',{title:S.sellData.title,description:S.sellData.desc,price:S.sellData.price,category:S.sellData.cat,is_premium:isPrem});
     if(r.ok){toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);}
-  }catch(e){toast('❌ '+e.message);}
+  }catch(e){
+    toast('❌ '+e.message);
+    if(btn){btn.disabled=false;btn.textContent='📦 Опубликовать';}
+  }finally{sellPublishing=false;}
 }
 
 // ── MSGS ─────────────────────────────────────────────────
@@ -1083,6 +1104,119 @@ async function checkUnread(){
   }catch(e){}
 }
 
+
+// ── DIRECT MESSAGES ──────────────────────────────────────
+let dmInterval=null;
+let dmUnread={};
+
+async function openDmChat(friendId, friendNick, friendAvatar){
+  document.getElementById('chat-inner').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center"><div class="loader"><div class="spin"></div></div></div>';
+  showFull('chat');
+  await buildDmChat(friendId, friendNick, friendAvatar);
+  if(dmInterval)clearInterval(dmInterval);
+  dmInterval=setInterval(()=>refreshDmChat(friendId,friendNick,friendAvatar),4000);
+}
+
+async function buildDmChat(friendId, friendNick, friendAvatar){
+  const msgs = await api('/dm/messages', {with_id: friendId});
+  const myId = uid();
+  document.getElementById('chat-inner').innerHTML=`
+    <div class="chat-hdr">
+      <button onclick="clearInterval(dmInterval);dmInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="chat-hdr-ava">${friendAvatar?`<img src="${esc(friendAvatar)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}</div>
+      <div style="flex:1;cursor:pointer" onclick="openUserProfile(${friendId})">
+        <div style="font-weight:700;font-size:14px">${esc(friendNick)}</div>
+        <div style="font-size:11px;color:var(--tx3)">Личные сообщения</div>
+      </div>
+    </div>
+    <div class="msgs-area" id="dmmsgs">
+      ${buildDmHtml(msgs, myId, friendId)}
+    </div>
+    <div id="reply-bar-dm" style="display:none" class="reply-bar">
+      <div class="reply-bar-text" id="reply-bar-dm-text">Ответ</div>
+      <button class="reply-bar-close" onclick="S.replyTo=null;document.getElementById('reply-bar-dm').style.display='none'">✕</button>
+    </div>
+    <div class="chat-input-bar">
+      <input class="cinput" id="dm-inp" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')dmSend(${friendId})">
+      <button class="csend" onclick="dmSend(${friendId})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>`;
+  scrollChat('dmmsgs');
+  // Remove unread badge
+  if(dmUnread[friendId]){delete dmUnread[friendId];updateDmBadges();}
+}
+
+function buildDmHtml(msgs, myId, friendId){
+  if(!msgs.length) return '<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
+  return msgs.map(m=>{
+    const isOut = m.from_id===myId;
+    return`<div class="msg-row ${isOut?'out':'in'}">
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\'"))||''}',${isOut})">
+        ${esc(m.message||'')}
+        <div class="msg-time">${(m.created_at||'').slice(11,16)}${isOut?(m.is_read?' ✓✓':' ✓'):''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function dmMsgTap(e, text, isOut){
+  showCtxSheet([
+    {icon:'↩',label:'Ответить',fn:()=>{
+      S.replyTo={text};
+      const bar=document.getElementById('reply-bar-dm');
+      const barText=document.getElementById('reply-bar-dm-text');
+      if(bar)bar.style.display='flex';
+      if(barText)barText.textContent='↩ '+text;
+      document.getElementById('dm-inp')?.focus();
+    }},
+    ...(isOut?[{icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
+  ]);
+}
+
+async function dmSend(friendId){
+  const inp=document.getElementById('dm-inp');const text=inp?.value?.trim();
+  if(!text)return;inp.value='';S.replyTo=null;
+  const bar=document.getElementById('reply-bar-dm');if(bar)bar.style.display='none';
+  try{
+    await api('/dm/send',{to_id:friendId,message:text});
+    await refreshDmChat(friendId,'','');scrollChat('dmmsgs');
+  }catch(e){toast('❌ '+e.message);}
+}
+
+async function refreshDmChat(friendId, nick, ava){
+  if(S.page!=='chat'){clearInterval(dmInterval);dmInterval=null;return;}
+  try{
+    const msgs=await api('/dm/messages',{with_id:friendId});const myId=uid();
+    const el=document.getElementById('dmmsgs');if(!el)return;
+    const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
+    const prev=el.querySelectorAll('.msg-bubble').length;
+    el.innerHTML=buildDmHtml(msgs,myId,friendId);
+    if(msgs.length>prev)playSound();
+    if(atBot)scrollChat('dmmsgs');
+  }catch(e){}
+}
+
+function updateDmBadges(){
+  const total=Object.values(dmUnread).reduce((a,b)=>a+b,0);
+  const badge=document.getElementById('badge-msgs');
+  if(badge){
+    if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
+    else if(!badge.textContent||badge.textContent==='0')badge.classList.remove('on');
+  }
+}
+
+async function checkDmUnread(){
+  if(!uid())return;
+  try{
+    const res=await api('/dm/unread_count');
+    dmUnread=res;
+    const total=Object.values(res).reduce((a,b)=>a+b,0);
+    if(total>0){
+      const badge=document.getElementById('badge-msgs');
+      if(badge){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
+    }
+  }catch(e){}
+}
+
 // ── INIT ─────────────────────────────────────────────────
 async function init(){
   renderMarket();
@@ -1091,6 +1225,7 @@ async function init(){
   }
   setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');}catch(e){}},60000);
   setInterval(checkUnread,15000);checkUnread();
+  setInterval(checkDmUnread,20000);checkDmUnread();
 }
 init();
 </script>
