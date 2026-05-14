@@ -175,14 +175,13 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .sub-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--br);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
 .sub-tab:active{transform:scale(.95)}
 .sub-tab.on{background:rgba(123,92,240,.18);border-color:var(--ac);color:var(--ac2)}
-/* SELL CAT GRID */
-.sell-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
-.sell-cat{background:var(--s2);border:2px solid var(--br);border-radius:16px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .15s}
-.sell-cat:active{transform:scale(.96)}
-.sell-cat.on{border-color:var(--ac);background:rgba(123,92,240,.1)}
-.sell-cat-i{font-size:26px;margin-bottom:6px}
-.sell-cat-n{font-size:12px;font-weight:600;color:var(--tx2)}
-.sell-cat.on .sell-cat-n{color:var(--ac2)}
+/* MY PRODUCTS */
+.my-prod{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.my-prod-del{background:rgba(244,63,94,.15);border:1px solid var(--rd);border-radius:10px;padding:8px 10px;color:var(--rd);font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:700}
+.my-prod-del:active{transform:scale(.93)}
+/* USER PROFILE OVERLAY */
+.uprofile{padding:20px 16px 40px}
+.uprofile .prof-header{padding-bottom:12px}
 </style>
 </head>
 <body>
@@ -315,8 +314,8 @@ function renderMarket(){
     <div class="st">Категории</div>
     <div class="cats">
       ${entries.map(([id,c])=>{
-        const parts=c.name.match(/^(\S+)\s*(.*)/)||['','',''];
-        return`<div class="cat" onclick="openCat('${id}')"><div class="cat-i">${parts[1]}</div><div class="cat-n">${parts[2]}</div></div>`;
+        const m=c.name.match(/^(\S+)\s*(.*)/)||['','',''];
+        return`<div class="cat" onclick="openCat('${id}')"><div class="cat-i">${m[1]}</div><div class="cat-n">${m[2]}</div></div>`;
       }).join('')}
     </div>`;
 }
@@ -325,14 +324,14 @@ async function renderProducts(catId,activeSub){
   activeSub=activeSub||'Все';S.sub=activeSub;
   const cat=CATEGORIES[catId]||{name:catId,subs:['Все']};
   const el=document.getElementById('pg-market');
-  const subsHtml=`<div class="subs-wrap" id="subs-row">${cat.subs.map(s=>`<button class="sub-tab${s===activeSub?' on':''}" onclick="renderProducts('${catId}','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}</div>`;
+  const subsHtml=`<div class="subs-wrap">${cat.subs.map(s=>`<button class="sub-tab${s===activeSub?' on':''}" onclick="renderProducts('${catId}','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}</div>`;
   el.innerHTML=`<button class="back" onclick="S.cat=null;S.sub=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${cat.name}</button>${subsHtml}<div class="loader"><div class="spin"></div></div>`;
-  // Scroll active tab into view
   requestAnimationFrame(()=>{const a=el.querySelector('.sub-tab.on');if(a)a.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});});
   try{
     const qs=activeSub&&activeSub!=='Все'?'?sub='+encodeURIComponent(activeSub):'';
     const prods=await api('/products/'+catId+qs);
-    el.querySelector('.loader').outerHTML=prods.length
+    const spin=el.querySelector('.loader');if(!spin)return;
+    spin.outerHTML=prods.length
       ?`<div class="prods">${prods.map(p=>`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
           ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
@@ -344,7 +343,7 @@ async function renderProducts(catId,activeSub){
           </div>
         </div>`).join('')}</div>`
       :'<div class="empty"><div class="empty-i">📭</div>Товаров пока нет</div>';
-  }catch(e){el.querySelector('.loader').outerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+  }catch(e){const spin=el.querySelector('.loader');if(spin)spin.outerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 async function openProduct(id){
   document.getElementById('product-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
@@ -432,9 +431,9 @@ async function openFriends(){
         return`<div class="conv-item" style="justify-content:space-between">
           <div style="display:flex;align-items:center;gap:12px;flex:1" onclick="openUserProfile(${f.friend_id})">
             <div class="conv-ava">👤</div>
-            <div class="conv-body"><div class="conv-name">${esc(f.nickname)}</div><div class="conv-preview">Нажми чтобы написать →</div></div>
+            <div class="conv-body"><div class="conv-name">${esc(f.nickname)}</div><div class="conv-preview">Нажми для профиля</div></div>
           </div>
-          <button onclick="openDmChat(${f.friend_id},'${f.nickname?.replace(/'/g,"\'")}','')" style="background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;border-radius:12px;padding:10px 14px;color:#fff;font-family:Manrope,sans-serif;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;position:relative">
+          <button onclick="event.stopPropagation();openDmChat(${f.friend_id},'${f.nickname?.replace(/'/g,"\'")}','')" style="background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;border-radius:12px;padding:10px 14px;color:#fff;font-family:Manrope,sans-serif;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;position:relative">
             💬${unread>0?`<span style="position:absolute;top:-4px;right:-4px;background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:8px">${unread}</span>`:''}
           </button>
         </div>`;
@@ -451,7 +450,7 @@ async function acceptFriend(friendId){
 // ── SELL ─────────────────────────────────────────────────
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
-  S.sellData=null;sellTypeSelected='normal';
+  S.sellData=null;sellTypeSelected='normal';sellSubSelected='';
   const catOptions=Object.entries(CATEGORIES).map(([id,c])=>`<option value="${id}">${c.name}</option>`).join('');
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Новый товар</div>
@@ -464,20 +463,20 @@ function renderSell(){
         ${catOptions}
       </select>
     </div>
-    <div class="field" id="s-sub-wrap" style="display:none"><label>Подкатегория</label>
+    <div class="field" id="s-sub-wrap" style="display:none">
+      <label>Подкатегория</label>
       <div class="subs-wrap" id="s-sub-row"></div>
     </div>
     <button class="btn btn-pr" onclick="goSellType()">Далее →</button>`;
 }
-
 let sellSubSelected='';
 function onSellCatChange(catId){
   sellSubSelected='';
   const wrap=document.getElementById('s-sub-wrap');
   const row=document.getElementById('s-sub-row');
-  if(!catId||!CATEGORIES[catId]){wrap.style.display='none';row.innerHTML='';return;}
+  if(!catId||!CATEGORIES[catId]){if(wrap)wrap.style.display='none';return;}
   const subs=CATEGORIES[catId].subs.filter(s=>s!=='Все');
-  if(!subs.length){wrap.style.display='none';return;}
+  if(!subs.length){if(wrap)wrap.style.display='none';return;}
   row.innerHTML=subs.map(s=>`<button type="button" class="sub-tab" onclick="pickSellSub(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
   wrap.style.display='block';
 }
@@ -486,7 +485,6 @@ function pickSellSub(btn,sub){
   document.querySelectorAll('#s-sub-row .sub-tab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
-
 function goSellType(){
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
@@ -498,6 +496,26 @@ function goSellType(){
   const subs=CATEGORIES[cat]?.subs.filter(s=>s!=='Все')||[];
   if(subs.length&&!sellSubSelected){toast('⚠️ Выбери подкатегорию');return;}
   S.sellData={title,desc:desc||'',price,cat,sub:sellSubSelected||null};
+  document.getElementById('selltype-inner').innerHTML=`
+    <button class="back" onclick="backTo('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <div class="st">Тип размещения</div>
+    <div class="sell-type-wrap">
+      <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
+        <div style="font-size:28px;margin-bottom:8px">📦</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Обычный</div>
+        <div style="font-size:11px;color:var(--tx3);line-height:1.5">Показывается среди других. Новые — выше старых.</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--gr2)">Бесплатно</div>
+      </div>
+      <div class="sell-type-card prem" id="stype-p" onclick="selSellType('prem')">
+        <div style="font-size:28px;margin-bottom:8px">⭐</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Премиум</div>
+        <div style="font-size:11px;color:var(--tx3);line-height:1.5">Всегда выше обычных. Больше просмотров и продаж.</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--yl)">−${PREM_P} ₽ с баланса</div>
+      </div>
+    </div>
+    <button class="btn btn-pr" onclick="doSell()">📦 Опубликовать</button>`;
+  showFull('selltype');
+}
   document.getElementById('selltype-inner').innerHTML=`
     <button class="back" onclick="backTo('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тип размещения</div>
@@ -1007,7 +1025,6 @@ async function renderProfile(){
   document.getElementById('pg-profile').innerHTML='<div class="loader"><div class="spin"></div></div>';
   try{
     S.user=await api('/me');
-    // Нет профиля — показываем setup экран
     if(!S.user.nickname){
       document.getElementById('pg-profile').innerHTML=`
         <div class="setup-card">
@@ -1020,6 +1037,23 @@ async function renderProfile(){
     }
     const gl=S.user.gender==='male'?'👨 Мужской':S.user.gender==='female'?'👩 Женский':'';
     const sub=[S.user.age?S.user.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
+    // Load my products from all categories
+    let myProds=[];
+    try{
+      const res=await api('/my_products');
+      myProds=Array.isArray(res)?res:[];
+    }catch(e){myProds=[];}
+    const prodsHtml=myProds.length
+      ?`<div style="display:flex;flex-direction:column;gap:0">${myProds.map(p=>`
+        <div class="my-prod">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+            <div style="font-size:11px;color:var(--tx3)">${CATEGORIES[p.category]?.name||p.category}${p.subcategory?' · '+p.subcategory:''}</div>
+            <div style="font-weight:700;font-size:13px;color:var(--gr2);margin-top:2px">${p.price} ₽${p.is_premium?' ⭐':''}</div>
+          </div>
+          <button class="my-prod-del" onclick="deleteMyProduct(${p.id},this)">🗑</button>
+        </div>`).join('')}</div>`
+      :'<div style="color:var(--tx3);font-size:13px;padding:8px 0">У тебя пока нет товаров</div>';
     document.getElementById('pg-profile').innerHTML=`
       <div class="prof-header">
         <div class="prof-ava">
@@ -1033,8 +1067,19 @@ async function renderProfile(){
         <div class="stat"><div class="stat-v">${S.user.balance.toFixed(0)} ₽</div><div class="stat-l">Баланс</div></div>
         <div class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
-      <button class="btn btn-ol" onclick="openFriends()">👥 Друзья</button>`;
+      <button class="btn btn-ol" onclick="openFriends()">👥 Друзья</button>
+      <div class="st">Мои товары</div>
+      ${prodsHtml}`;
   }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+}
+async function deleteMyProduct(id,btn){
+  if(!confirm('Удалить товар?'))return;
+  btn.disabled=true;btn.textContent='...';
+  try{
+    await api('/products/delete',{product_id:id});
+    btn.closest('.my-prod').remove();
+    toast('✅ Товар удалён');
+  }catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
 }
 
 // ── SETTINGS ─────────────────────────────────────────────
@@ -1117,7 +1162,54 @@ async function saveProfile(){
   }catch(e){toast('❌ '+e.message);}
 }
 
-// ── SEARCH ───────────────────────────────────────────────
+// ── USER PROFILE (others) ─────────────────────────────────
+async function openUserProfile(userId){
+  document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('userprofile');
+  try{
+    const u=await api('/user/'+userId);
+    const gl=u.gender==='male'?'👨 Мужской':u.gender==='female'?'👩 Женский':'';
+    const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
+    const isMe=uid()&&uid()===userId;
+    // Check friendship
+    let isFriend=false;
+    try{const fr=await api('/friends');isFriend=fr.some&&fr.some(f=>f.friend_id===userId&&f.status==='accepted');}catch(e){}
+    // Load their products
+    let prods=[];
+    try{
+      for(const catId of Object.keys(CATEGORIES)){
+        const p=await api('/products/'+catId+'?seller='+userId);
+        if(Array.isArray(p))prods=prods.concat(p);
+      }
+    }catch(e){}
+    const prodsHtml=prods.length
+      ?`<div class="prods">${prods.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3);margin-bottom:3px">${CATEGORIES[p.category]?.name||p.category}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
+      :'<div style="color:var(--tx3);font-size:13px;padding:8px 0">Нет товаров</div>';
+    document.getElementById('userprofile-inner').innerHTML=`
+      <button class="back" onclick="backFull('userprofile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="uprofile">
+        <div class="prof-header">
+          <div class="prof-ava" style="margin:0 auto 12px">
+            ${u.avatar_url?`<img src="${u.avatar_url}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
+          </div>
+          <div class="prof-name">${esc(u.nickname||'Аноним')}</div>
+          ${sub?`<div class="prof-sub">${sub}</div>`:''}
+          <div style="color:var(--tx3);font-size:12px;margin-top:4px">⭐ ${u.rating||'—'}</div>
+        </div>
+        ${!isMe?`<div style="display:flex;gap:8px;margin-bottom:4px">
+          ${isFriend?`<button class="btn btn-pr" style="margin:0;flex:1" onclick="closeFull('userprofile');openDmChat(${userId},'${esc(u.nickname?.replace(/'/g,"\\'"))||''}','${u.avatar_url||''}')">💬 Написать</button>`:''}
+          ${!isFriend?`<button class="btn btn-ol" style="margin:0;flex:1" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`:''}
+        </div>`:''}
+        <div class="st">Товары</div>
+        ${prodsHtml}
+      </div>`;
+  }catch(e){document.getElementById('userprofile-inner').innerHTML=`<div style="padding:20px"><div class="empty"><div class="empty-i">⚠️</div>${e.message}</div></div>`;}
+}
+function backFull(id){
+  const el=document.getElementById('fp-'+id);
+  if(el){el.classList.remove('on');}
+}
+function closeFull(id){backFull(id);}
 function goSearch(){
   document.getElementById('search-inner').innerHTML=`
     <button class="back" onclick="backTo('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
@@ -1133,7 +1225,7 @@ async function doSearch(q){
   srchT=setTimeout(async()=>{
     if(el)el.innerHTML='<div class="loader"><div class="spin"></div></div>';
     try{
-      let all=[];for(const c of['signa','mugs','photos','videos']){const p=await api('/products/'+c);all=all.concat(p);}
+      let all=[];for(const c of Object.keys(CATEGORIES)){try{const p=await api('/products/'+c);if(Array.isArray(p))all=all.concat(p);}catch(e){}}
       const found=all.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
       if(el)el.innerHTML=found.length
         ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
