@@ -542,7 +542,7 @@ async function renderMsgs(){
 }
 async function loadMsgsList(){
   try{
-    const[orders,gcMsgs,dmUnread]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({}))]);
+    const[orders,gcMsgs,dmUnread,friends]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({})),api('/friends').catch(()=>[])]);
     const myId=uid();let total=0;orders.forEach(o=>total+=(o.unread||0));
     const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
     // Admin gets support panel too
@@ -577,14 +577,14 @@ async function loadMsgsList(){
               <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
           </div>`;}).join(''):''}
-        ${Object.keys(dmUnread).length?Object.entries(dmUnread).map(([fid,cnt])=>`
-          <div class="conv-item" onclick="openDmChat(${fid},'','')">
+        ${Array.isArray(friends)&&friends.filter(f=>f.status==='accepted').length?friends.filter(f=>f.status==='accepted').map(f=>{const cnt=dmUnread[f.friend_id]||0;return`
+          <div class="conv-item" onclick="openDmChat(${f.friend_id},'${(f.nickname||'').replace(/'/g,"\\'")}','')">
             <div class="conv-ava">👤</div>
             <div class="conv-body">
-              <div class="conv-head"><div class="conv-name">Личное сообщение</div>${cnt>0?`<span class="conv-unread">${cnt}</span>`:''}</div>
-              <div class="conv-preview">Новых: ${cnt}</div>
+              <div class="conv-head"><div class="conv-name">${esc(f.nickname||'Друг')}</div>${cnt>0?`<span class="conv-unread">${cnt}</span>`:''}</div>
+              <div class="conv-preview">${cnt>0?'Новых: '+cnt:'Нажми чтобы написать'}</div>
             </div>
-          </div>`).join(''):''}
+          </div>`;}).join(''):''}
       </div>`;
     const badge=document.getElementById('badge-msgs');
     if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
@@ -1053,7 +1053,7 @@ async function renderProfile(){
 async function deleteMyProduct(id,btn){
   if(!confirm('Удалить товар?'))return;
   btn.disabled=true;btn.textContent='...';
-  try{await api('/products/delete',{product_id:id});btn.closest('.my-prod').remove();toast('✅ Товар удалён');}
+  try{await api('/products/delete',{product_id:+id});btn.closest('.my-prod').remove();toast('✅ Товар удалён');}
   catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
 }
 
