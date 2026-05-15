@@ -71,7 +71,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .wal-action{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;cursor:pointer;text-align:center;transition:all .15s;font-weight:700;font-size:13px;font-family:'Manrope',sans-serif;color:var(--tx)}
 .wal-action:active{transform:scale(.97)}
 .wal-action.p{background:rgba(123,92,240,.15);border-color:var(--ac);color:var(--ac2)}
-.wal-history{font-size:11px;color:var(--rd);font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:center;padding:20px;background:var(--s2);border-radius:14px;border:1px dashed var(--br2)}
+.wal-history{margin-top:4px}
 /* STATS */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .stat{background:var(--s2);border:1px solid var(--br);border-radius:16px;padding:14px;text-align:center}
@@ -169,6 +169,21 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .empty{text-align:center;padding:50px 20px;color:var(--tx3)}
 .empty-i{font-size:40px;margin-bottom:10px}
 .friends-badge{background:var(--gr);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:6px}
+.subs-wrap{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px}
+.subs-wrap::-webkit-scrollbar{display:none}
+.sub-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--br);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
+.sub-tab:active{transform:scale(.95)}
+.sub-tab.on{background:rgba(123,92,240,.18);border-color:var(--ac);color:var(--ac2)}
+.my-prod{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.my-prod-del{background:rgba(244,63,94,.15);border:1px solid var(--rd);border-radius:10px;padding:8px 10px;color:var(--rd);font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:700}
+.my-prod-del:active{transform:scale(.93)}
+.tx-item{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tx-icon{font-size:20px;flex-shrink:0}
+.tx-body{flex:1;min-width:0}
+.tx-desc{font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:11px;color:var(--tx3);margin-top:2px}
+.tx-amt{font-size:15px;font-weight:700;flex-shrink:0}
+.tx-frozen{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.3)}
 /* SUBCATEGORY TABS */
 .subs-wrap{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px}
 .subs-wrap::-webkit-scrollbar{display:none}
@@ -320,10 +335,12 @@ async function renderProducts(catId,activeSub){
   el.innerHTML=`<button class="back" onclick="S.cat=null;S.sub=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${cat.name}</button>${subsHtml}<div class="loader"><div class="spin"></div></div>`;
   requestAnimationFrame(()=>{const a=el.querySelector('.sub-tab.on');if(a)a.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});});
   try{
-    const qs=activeSub&&activeSub!=='Все'?'?sub='+encodeURIComponent(activeSub):'';
-    const prods=await api('/products/'+catId+qs);
+    const subParam=activeSub&&activeSub!=='Все'?'&sub='+encodeURIComponent(activeSub):'';
+    const resp=await fetch(API+'/products/'+catId+'?uid='+(uid()||'')+subParam);
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const prods=await resp.json();
     const spin=el.querySelector('.loader');if(!spin)return;
-    spin.outerHTML=prods.length
+    spin.outerHTML=Array.isArray(prods)&&prods.length
       ?`<div class="prods">${prods.map(p=>`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
           ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
@@ -542,7 +559,7 @@ async function renderMsgs(){
 }
 async function loadMsgsList(){
   try{
-    const[orders,gcMsgs,dmUnread,friends]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({})),api('/friends').catch(()=>[])]);
+    const[orders,gcMsgs,dmUnread]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({}))]);
     const myId=uid();let total=0;orders.forEach(o=>total+=(o.unread||0));
     const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
     // Admin gets support panel too
@@ -577,14 +594,14 @@ async function loadMsgsList(){
               <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
           </div>`;}).join(''):''}
-        ${Array.isArray(friends)?friends.filter(f=>f.status==='accepted').map(f=>{const cnt=dmUnread[String(f.friend_id)]||0;return`
-          <div class="conv-item" onclick="openDmChat(${f.friend_id},'${(f.nickname||'').replace(/'/g,"\'")}','')">
+        ${Object.keys(dmUnread).length?Object.entries(dmUnread).map(([fid,cnt])=>`
+          <div class="conv-item" onclick="openDmChat(${fid},'','')">
             <div class="conv-ava">👤</div>
             <div class="conv-body">
-              <div class="conv-head"><div class="conv-name">${esc(f.nickname||'Друг')}</div>${cnt>0?`<span class="conv-unread">${cnt}</span>`:''}</div>
-              <div class="conv-preview">${cnt>0?'Новых: '+cnt:'Личные сообщения'}</div>
+              <div class="conv-head"><div class="conv-name">Личное сообщение</div>${cnt>0?`<span class="conv-unread">${cnt}</span>`:''}</div>
+              <div class="conv-preview">Новых: ${cnt}</div>
             </div>
-          </div>`;}).join(''):''}
+          </div>`).join(''):''}
       </div>`;
     const badge=document.getElementById('badge-msgs');
     if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
@@ -908,24 +925,53 @@ async function adminReply(userId){
 }
 
 // ── WALLET ────────────────────────────────────────────────
-function renderWallet(){
-  const bal=S.user?.balance??0;const earn=S.user?.earn_balance??0;
+async function renderWallet(){
+  const bal=S.user?.balance??0;
   document.getElementById('pg-wallet').innerHTML=`
     <div class="wal-cards">
-      <div class="wal-card">
-        <div class="wal-card-label">Баланс<button class="wal-info-btn" onclick="showPopup('Доступный баланс','Вы можете тратить этот баланс на покупки товаров и продвижение своих товаров')">!</button></div>
+      <div class="wal-card" style="grid-column:1/-1">
+        <div class="wal-card-label">Баланс</div>
         <div class="wal-amount">${bal.toFixed(0)} ₽</div>
-      </div>
-      <div class="wal-card">
-        <div class="wal-card-label">К выводу<button class="wal-info-btn" onclick="showPopup('Баланс для вывода','Вы можете вывести только те деньги, которые заработали на продаже товаров. Нельзя выводить баланс, если вы пополнили его через платёжную систему')">!</button></div>
-        <div class="wal-amount" style="color:var(--yl)">${earn.toFixed(0)} ₽</div>
       </div>
     </div>
     <div class="wal-actions">
       <div class="wal-action p" onclick="goTopup()">ПОПОЛНИТЬ</div>
       <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
-    <div class="wal-history">ТУТ ИСТОРИЯ ОПЕРАЦИЙ БУДЕТ</div>`;
+    <div class="st">История операций</div>
+    <div id="wal-tx-list"><div class="loader"><div class="spin"></div></div></div>`;
+  try{
+    const data=await api('/transactions');
+    const frozen=data.frozen||[];const txs=data.transactions||[];
+    const txIcon={topup:'💰',sale:'✅',frozen:'❄️',withdraw:'💸',default:'📋'};
+    const txColor={topup:'var(--gr2)',sale:'var(--gr2)',frozen:'#60a5fa',withdraw:'var(--rd)',default:'var(--tx)'};
+    let html='';
+    frozen.forEach(f=>{
+      html+=`<div class="tx-item tx-frozen">
+        <div class="tx-icon">❄️</div>
+        <div class="tx-body">
+          <div class="tx-desc">${esc(f.description)}</div>
+          <div class="tx-date">Разморозится ${f.unfreeze_at.slice(0,10)}</div>
+        </div>
+        <div class="tx-amt" style="color:#60a5fa">+${f.amount.toFixed(0)} ₽</div>
+      </div>`;
+    });
+    txs.forEach(t=>{
+      const icon=txIcon[t.type]||txIcon.default;
+      const color=txColor[t.type]||txColor.default;
+      const sign=t.amount>0?'+':'';
+      const dt=t.created_at.slice(0,16).replace('T',' ');
+      html+=`<div class="tx-item">
+        <div class="tx-icon">${icon}</div>
+        <div class="tx-body">
+          <div class="tx-desc">${esc(t.description)}</div>
+          <div class="tx-date">${dt}</div>
+        </div>
+        <div class="tx-amt" style="color:${color}">${sign}${t.amount.toFixed(0)} ₽</div>
+      </div>`;
+    });
+    document.getElementById('wal-tx-list').innerHTML=html||'<div style="color:var(--tx3);font-size:13px;padding:12px 0;text-align:center">Операций пока нет</div>';
+  }catch(e){document.getElementById('wal-tx-list').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 function goTopup(){
   document.getElementById('topup-inner').innerHTML=`
@@ -992,11 +1038,11 @@ function updWd(){
 }
 async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
-  const earn=S.user?.earn_balance??0;
+  const bal2=S.user?.balance??0;
   if(!amount||amount<100){toast('⚠️ Минимум 100 ₽');return;}
-  if(amount>earn){toast(`❌ Доступно: ${earn.toFixed(0)} ₽`);return;}
+  if(amount>bal2){toast(`❌ Доступно: ${bal2.toFixed(0)} ₽`);return;}
   if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
-  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.earn_balance-=amount;S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.balance-=amount;S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
   catch(e){toast('❌ '+e.message);}
 }
 
@@ -1053,8 +1099,11 @@ async function renderProfile(){
 async function deleteMyProduct(id,btn){
   if(!confirm('Удалить товар?'))return;
   btn.disabled=true;btn.textContent='...';
-  try{await api('/products/delete',{product_id:id});btn.closest('.my-prod').remove();toast('✅ Товар удалён');}
-  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
+  try{
+    const r=await fetch(API+'/products/delete?uid='+(uid()||'')+'&product_id='+id);
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Ошибка '+r.status);}
+    btn.closest('.my-prod').remove();toast('✅ Товар удалён');
+  }catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
 }
 
 // ── SETTINGS ─────────────────────────────────────────────
