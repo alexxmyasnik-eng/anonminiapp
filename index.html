@@ -184,16 +184,6 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .tx-date{font-size:11px;color:var(--tx3);margin-top:2px}
 .tx-amt{font-size:15px;font-weight:700;flex-shrink:0}
 .tx-frozen{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.3)}
-/* SUBCATEGORY TABS */
-.subs-wrap{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:4px}
-.subs-wrap::-webkit-scrollbar{display:none}
-.sub-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--br);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Manrope',sans-serif}
-.sub-tab:active{transform:scale(.95)}
-.sub-tab.on{background:rgba(123,92,240,.18);border-color:var(--ac);color:var(--ac2)}
-/* MY PRODUCTS */
-.my-prod{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
-.my-prod-del{background:rgba(244,63,94,.15);border:1px solid var(--rd);border-radius:10px;padding:8px 10px;color:var(--rd);font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:700}
-.my-prod-del:active{transform:scale(.93)}
 </style>
 </head>
 <body>
@@ -461,52 +451,109 @@ let sellSubSelected='';
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
   S.sellData=null;sellTypeSelected='normal';sellSubSelected='';
-  const catOptions=Object.entries(CATEGORIES).map(([id,c])=>`<option value="${id}">${c.name}</option>`).join('');
   document.getElementById('pg-sell').innerHTML=`
-    <div class="st">Новый товар</div>
-    <div class="field"><label>Название</label><input id="s-title" placeholder="Что продаёшь?" maxlength="100"></div>
-    <div class="field"><label>Описание</label><textarea id="s-desc" placeholder="Подробнее..."></textarea></div>
-    <div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>
-    <div class="field"><label>Категория</label>
-      <select id="s-cat" onchange="onSellCatChange(this.value)">
-        <option value="">Выбери категорию</option>
-        ${catOptions}
-      </select>
-    </div>
-    <div class="field" id="s-sub-wrap" style="display:none">
-      <label>Подкатегория</label>
-      <div class="subs-wrap" id="s-sub-row"></div>
-    </div>
-    <button class="btn btn-pr" onclick="goSellType()">Далее →</button>`;
+    <div class="st">Выбери категорию</div>
+    <div class="cats">
+      ${Object.entries(CATEGORIES).map(([id,c])=>{
+        const m=c.name.match(/^(\S+)\s*(.*)/)||['','',''];
+        return`<div class="cat" onclick="openSellCat('${id}')"><div class="cat-i">${m[1]}</div><div class="cat-n">${m[2]}</div></div>`;
+      }).join('')}
+    </div>`;
 }
-function onSellCatChange(catId){
-  sellSubSelected='';
-  const wrap=document.getElementById('s-sub-wrap');
-  const row=document.getElementById('s-sub-row');
-  if(!catId||!CATEGORIES[catId]){if(wrap)wrap.style.display='none';return;}
-  const subs=CATEGORIES[catId].subs.filter(s=>s!=='Все');
-  if(!subs.length){if(wrap)wrap.style.display='none';return;}
-  row.innerHTML=subs.map(s=>`<button type="button" class="sub-tab" onclick="pickSellSub(this,'${s.replace(/'/g,"\'")}')">${s}</button>`).join('');
-  wrap.style.display='block';
+
+function openSellCat(catId){
+  const cat=CATEGORIES[catId];
+  const subs=cat.subs.filter(s=>s!=='Все');
+  document.getElementById('pg-sell').innerHTML=`
+    <button class="back" onclick="renderSell()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <div class="st">${cat.name} — подкатегория</div>
+    <div class="cats">
+      ${subs.map(s=>`<div class="cat" onclick="openSellForm('${catId}','${s.replace(/'/g,"\\'")}')"><div class="cat-i">→</div><div class="cat-n">${s}</div></div>`).join('')}
+    </div>`;
 }
-function pickSellSub(btn,sub){
+
+// Определяем группу товара
+function getSellGroup(catId, sub){
+  const groupA=[
+    ['photos','Соло'],['photos','Игрушки'],['photos','Тематика'],
+    ['videos','Мастурбация'],['videos','Анальное'],
+    ['audio','Секстинг'],['audio','Стоны'],['audio','Унижение']
+  ];
+  const groupB=[['signa','На теле'],['signa','Видео-сигна']];
+  const groupC=[
+    ['domination','Оценка'],['domination','Задания'],['domination','Контроль'],['domination','Унижение'],
+    ['slaves','Повиновение'],['slaves','Отчеты'],
+    ['videos','Кастом']
+  ];
+  if(groupA.some(([c,s])=>c===catId&&s===sub))return'A';
+  if(groupB.some(([c,s])=>c===catId&&s===sub))return'B';
+  if(groupC.some(([c,s])=>c===catId&&s===sub))return'C';
+  return'A';
+}
+
+function openSellForm(catId, sub){
   sellSubSelected=sub;
-  document.querySelectorAll('#s-sub-row .sub-tab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
+  const group=getSellGroup(catId,sub);
+  const cat=CATEGORIES[catId];
+  const commonFields=`
+    <div class="field"><label>Название</label><input id="s-title" placeholder="Краткое название" maxlength="100"></div>
+    <div class="field"><label>Описание</label><textarea id="s-desc" placeholder="Подробнее..."></textarea></div>`;
+
+  let priceField='';
+  let extraFields='';
+
+  if(group==='A'){
+    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+  }
+  else if(group==='B'){
+    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+    extraFields=`<div class="info-box" style="border-color:var(--ac)">📌 Покупатель сам введёт ник для сигны при покупке</div>`;
+  }
+  else if(group==='C'){
+    priceField=`
+      <div class="field"><label>Тип цены</label>
+        <div class="g-row" style="margin-bottom:8px">
+          <button class="g-btn sel" id="pt-fixed" onclick="selPriceType('fixed')">💰 Фиксированная</button>
+          <button class="g-btn" id="pt-nego" onclick="selPriceType('nego')">🤝 Договорная</button>
+        </div>
+        <input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽" style="display:block">
+      </div>`;
+  }
+
+  document.getElementById('pg-sell').innerHTML=`
+    <button class="back" onclick="openSellCat('${catId}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <div class="st">${cat.name} · ${sub}</div>
+    ${commonFields}
+    ${priceField}
+    ${extraFields}
+    <button class="btn btn-pr" onclick="goSellType('${catId}','${sub.replace(/'/g,"\\'")}','${group}')">Далее →</button>`;
 }
-function goSellType(){
+
+let priceTypeSelected='fixed';
+function selPriceType(t){
+  priceTypeSelected=t;
+  document.getElementById('pt-fixed').classList.toggle('sel',t==='fixed');
+  document.getElementById('pt-nego').classList.toggle('sel',t==='nego');
+  const priceInp=document.getElementById('s-price');
+  if(priceInp){
+    if(t==='nego'){priceInp.style.display='none';priceInp.value='15';}
+    else{priceInp.style.display='block';priceInp.value='';}
+  }
+}
+
+function goSellType(catId, sub, group){
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
-  const price=parseFloat(document.getElementById('s-price')?.value||'0');
-  const cat=document.getElementById('s-cat')?.value;
+  let price=parseFloat(document.getElementById('s-price')?.value||'0');
+  const isNego=group==='C'&&priceTypeSelected==='nego';
+  if(isNego)price=15; // минимальная для прохождения валидации
+
   if(!title){toast('⚠️ Введи название');return;}
-  if(!price||price<15){toast('⚠️ Мин. цена 15 ₽');return;}
-  if(!cat){toast('⚠️ Выбери категорию');return;}
-  const subs=CATEGORIES[cat]?.subs.filter(s=>s!=='Все')||[];
-  if(subs.length&&!sellSubSelected){toast('⚠️ Выбери подкатегорию');return;}
-  S.sellData={title,desc:desc||'',price,cat,sub:sellSubSelected||null};
+  if(!isNego&&(!price||price<15)){toast('⚠️ Мин. цена 15 ₽');return;}
+
+  S.sellData={title,desc:desc||'',price,cat:catId,sub:sub,group,isNego};
   document.getElementById('selltype-inner').innerHTML=`
-    <button class="back" onclick="backTo('sell')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <button class="back" onclick="openSellForm('${catId}','${sub.replace(/'/g,"\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тип размещения</div>
     <div class="sell-type-wrap">
       <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
@@ -808,7 +855,7 @@ async function buildSupportChat(){
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="clearInterval(S.supInterval);S.supInterval=null;closeChat();"
-        style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🎧</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">Поддержка</div><div style="font-size:11px;color:var(--tx3)">Обычно отвечаем быстро</div></div>
     </div>
@@ -884,7 +931,7 @@ async function buildAdminChat(userId,nick){
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="clearInterval(adminChatInterval);adminChatInterval=null;closeChat();openAdminSupport();"
-        style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">👤</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">${esc(nick)}</div><div style="font-size:11px;color:var(--tx3)">ID: ${userId}</div></div>
     </div>
@@ -1298,7 +1345,7 @@ async function buildDmChat(friendId, friendNick, friendAvatar){
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="clearInterval(dmInterval);dmInterval=null;closeChat();"
-        style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">${friendAvatar?`<img src="${esc(friendAvatar)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}</div>
       <div style="flex:1;cursor:pointer" onclick="openUserProfile(${friendId})">
         <div style="font-weight:700;font-size:14px">${esc(friendNick)}</div>
