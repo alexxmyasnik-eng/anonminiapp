@@ -230,7 +230,7 @@ const S={page:'market',user:null,cat:null,sub:null,chatInterval:null,gcInterval:
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 const uid=()=>tg?.initDataUnsafe?.user?.id||null;
 const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=100;
-let blockedUsers=[],mutedUsers=[],sellTypeSelected='normal';
+let blockedUsers=[],mutedUsers=[],sellTypeSelected='';
 try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
 try{mutedUsers=JSON.parse(localStorage.getItem('muted')||'[]');}catch(e){}
 
@@ -338,7 +338,7 @@ async function renderProducts(catId,activeSub){
           <div style="flex:1;min-width:0">
             <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
             <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">@${esc(p.seller_nick)} · ⭐${p.seller_rating}</div>
-            <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price} ₽</div>
+            <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
           </div>
         </div>`).join('')}</div>`
       :'<div class="empty"><div class="empty-i">📭</div>Товаров пока нет</div>';
@@ -355,8 +355,8 @@ async function openProduct(id){
       <div style="font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px">${esc(p.title)}</div>
       <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов) →</div>
       <div style="color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px">${esc(p.description||'Без описания')}</div>
-      <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price} ₽</div>
-      ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`}`;
+      <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
+      ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`${p.price==0 ? \`<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>\` : \`<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>\`}`}`;
   }catch(e){document.getElementById('product-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 async function doBuy(id,price){
@@ -450,7 +450,10 @@ async function acceptFriend(friendId){
 let sellSubSelected='';
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
-  S.sellData=null;sellTypeSelected='normal';sellSubSelected='';
+  S.sellData=null;
+  S.sellPreview=null;
+  S.sellContent=null;
+  sellTypeSelected='';sellSubSelected='';
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Выбери категорию</div>
     <div class="cats">
@@ -504,6 +507,26 @@ function openSellForm(catId, sub){
 
   if(group==='A'){
     priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+    const needsPreview=['photos','videos'].includes(catId)&&['Соло','Игрушки','Тематика','Мастурбация','Анальное'].includes(sub);
+    
+    extraFields=`
+      ${needsPreview?`
+      <div class="field">
+        <label>Превью (фото с блюром)</label>
+        <div id="preview-wrap" style="background:var(--s2);border:1.5px dashed var(--br2);border-radius:12px;padding:20px;text-align:center;cursor:pointer" onclick="document.getElementById('preview-inp').click()">
+          <div id="preview-thumb" style="font-size:32px;margin-bottom:6px">🖼</div>
+          <div style="font-size:12px;color:var(--tx3)">Нажми чтобы загрузить обложку</div>
+        </div>
+        <input type="file" id="preview-inp" accept="image/*" style="display:none" onchange="loadPreview(this)">
+      </div>`:''}
+      <div class="field">
+        <label>Контент (до 20 фото/файлов)</label>
+        <div id="content-wrap" style="background:var(--s2);border:1.5px dashed var(--br2);border-radius:12px;padding:20px;text-align:center;cursor:pointer" onclick="document.getElementById('content-inp').click()">
+          <div id="content-thumb" style="font-size:32px;margin-bottom:6px">📦</div>
+          <div style="font-size:12px;color:var(--tx3)" id="content-label">Нажми чтобы загрузить файлы (макс. 20)</div>
+        </div>
+        <input type="file" id="content-inp" accept="image/*,video/*" multiple style="display:none" onchange="loadContent(this)">
+      </div>`;
   }
   else if(group==='B'){
     priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
@@ -529,6 +552,30 @@ function openSellForm(catId, sub){
     <button class="btn btn-pr" onclick="goSellType('${catId}','${sub.replace(/'/g,"\\'")}','${group}')">Далее →</button>`;
 }
 
+function loadPreview(inp){
+  const file=inp.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    const wrap=document.getElementById('preview-wrap');
+    if(!wrap)return;
+    wrap.innerHTML=`<div style="position:relative;display:inline-block">
+      <img src="${ev.target.result}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;filter:blur(8px)">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;letter-spacing:2px;text-shadow:0 2px 8px #000">CENSORED</div>
+    </div>
+    <div style="font-size:11px;color:var(--gr2);margin-top:6px">✅ Превью загружено (блюр)</div>`;
+    S.sellPreview=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadContent(inp){
+  const files=Array.from(inp.files).slice(0,20);
+  if(!files.length)return;
+  document.getElementById('content-label').textContent=`✅ Загружено: ${files.length} файл(ов)`;
+  document.getElementById('content-thumb').textContent='📦';
+  S.sellContent=files;
+}
+
 let priceTypeSelected='fixed';
 function selPriceType(t){
   priceTypeSelected=t;
@@ -542,11 +589,12 @@ function selPriceType(t){
 }
 
 function goSellType(catId, sub, group){
+  sellTypeSelected='';
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
   let price=parseFloat(document.getElementById('s-price')?.value||'0');
   const isNego=group==='C'&&priceTypeSelected==='nego';
-  if(isNego)price=15; // минимальная для прохождения валидации
+  if(isNego)price=0; // минимальная для прохождения валидации
 
   if(!title){toast('⚠️ Введи название');return;}
   if(!isNego&&(!price||price<15)){toast('⚠️ Мин. цена 15 ₽');return;}
@@ -556,7 +604,7 @@ function goSellType(catId, sub, group){
     <button class="back" onclick="openSellForm('${catId}','${sub.replace(/'/g,"\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тип размещения</div>
     <div class="sell-type-wrap">
-      <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
+      <div class="sell-type-card" id="stype-n" onclick="selSellType('normal')">
         <div style="font-size:28px;margin-bottom:8px">📦</div>
         <div style="font-weight:700;font-size:14px;margin-bottom:4px">Обычный</div>
         <div style="font-size:11px;color:var(--tx3);line-height:1.5">Показывается среди других. Новые — выше старых.</div>
@@ -576,10 +624,13 @@ function selSellType(t){
   sellTypeSelected=t;
   document.getElementById('stype-n').classList.toggle('on',t==='normal');
   document.getElementById('stype-p').classList.toggle('on',t==='prem');
+  const btn=document.querySelector('#fp-selltype .btn-pr');
+  if(btn)btn.style.opacity='1';
 }
 let sellPublishing=false;
 async function doSell(){
   if(sellPublishing)return;
+  if(!sellTypeSelected){toast('⚠️ Выбери тип размещения');return;}
   if(!S.sellData){toast('⚠️ Заполни форму');backTo('sell');return;}
   const isPrem=sellTypeSelected==='prem';
   if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
@@ -588,7 +639,7 @@ async function doSell(){
   if(btn){btn.disabled=true;btn.textContent='Публикуем...';}
   try{
     const r=await api('/products/create',{title:S.sellData.title,description:S.sellData.desc,price:S.sellData.price,category:S.sellData.cat,subcategory:S.sellData.sub||'',is_premium:isPrem});
-    if(r.ok){toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);}
+    if(r.ok){toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='';setTimeout(()=>goPage('market'),800);}
   }catch(e){
     toast('❌ '+e.message);
     if(btn){btn.disabled=false;btn.textContent='📦 Опубликовать';}
