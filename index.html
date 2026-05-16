@@ -223,10 +223,16 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <audio id="snd" preload="auto"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
 
 <script>
-window.onerror=function(msg,src,line){
-  document.body.innerHTML=`<div style="color:red;padding:20px;font-size:13px;font-family:monospace">ОШИБКА: ${msg}<br>Строка: ${line}</div>`;
-  return false;
-};
+document.addEventListener('DOMContentLoaded', function(){
+  const el = document.getElementById('pg-market');
+  if(el){
+    el.style.display = 'block';
+    el.innerHTML = '<div style="color:white;padding:20px;font-size:20px">✅ DOM работает</div>';
+  } else {
+    document.body.innerHTML = '<div style="color:red;padding:20px">❌ pg-market не найден</div>';
+  }
+});
+</script>
   
 const API='https://anonpeak-production.up.railway.app';
 const tg=window.Telegram?.WebApp;
