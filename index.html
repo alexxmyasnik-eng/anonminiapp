@@ -825,20 +825,16 @@ document.getElementById('chat-inner').innerHTML=`
   <div style="padding:8px 16px;flex-shrink:0">
     <button class="btn btn-ol" onclick="showDeliveryFiles(${order.product_id})">📥 Получить файлы</button>
   </div>`:''}
-<div id="reply-bar" style="display:none" class="reply-bar">
+${canConfirm?`<div style="padding:8px 16px;flex-shrink:0"><button class="btn btn-gr" onclick="doConfirm(${order.id})">✅ Получил товар</button></div>`:''}
+    <div id="reply-bar" style="display:none" class="reply-bar">
       <div class="reply-bar-text" id="reply-bar-text">Ответ на сообщение</div>
       <button class="reply-bar-close" onclick="clearReply()">✕</button>
     </div>
-    ${order.role==='buyer'&&['paid','seller_confirmed','done'].includes(order.status)?`<div style="padding:8px 16px 0;flex-shrink:0"><button class="btn btn-ol" id="get-files-btn">📥 Получить файлы</button></div>`:''}
-    ${canConfirm?`<div style="padding:4px 16px 8px;flex-shrink:0"><button class="btn btn-gr" onclick="doConfirm(${order.id})">✅ Получил товар</button></div>`:''}
     ${order.status!=='done'?`<div class="chat-input-bar">
       <input class="cinput" id="cinput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')sendOrderMsg(${order.id})">
       <button class="csend" onclick="sendOrderMsg(${order.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>`:'<div style="height:env(safe-area-inset-bottom)"></div>'}`;
-  scrollChat('cmsgs');
-  if(document.getElementById('get-files-btn')){
-    document.getElementById('get-files-btn').addEventListener('click',()=>showDeliveryFiles(order.product_id));
-  }
+scrollChat('cmsgs');
 }
 
 function renderMsgsList(msgs,myId,type,contextId){
