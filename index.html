@@ -1493,16 +1493,8 @@ async function checkDmUnread(){
 }
 
 // ── INIT ─────────────────────────────────────────────────
-// СТАЛО:
 async function init(){
-  try{
-    const el=document.getElementById('pg-market');
-    if(!el){document.body.innerHTML='<div style="color:red;padding:20px">pg-market не найден</div>';return;}
-    renderMarket();
-  }catch(e){
-    document.body.innerHTML=`<div style="color:red;padding:20px;font-size:12px">init error: ${e.message}<br>${e.stack}</div>`;
-    return;
-  }
+  renderMarket();
   if(uid()){
     try{S.user=await api('/me');}catch(e){}
   }
@@ -1510,7 +1502,6 @@ async function init(){
   setInterval(checkUnread,15000);checkUnread();
   setInterval(checkDmUnread,20000);checkDmUnread();
 }
-
 init();
 </script>
 </body>
