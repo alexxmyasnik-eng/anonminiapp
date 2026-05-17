@@ -453,7 +453,13 @@ async function acceptFriend(friendId){
 let sellSubSelected='';
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
-  S.sellData=null;sellTypeSelected='normal';sellSubSelected='';
+  S.sellData=null;
+  
+  // ДОБАВЛЕНО СЮДА:
+  S.sellPreview=null;
+  S.sellContent=null;
+  
+  sellTypeSelected='normal';sellSubSelected='';
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Выбери категорию</div>
     <div class="cats">
@@ -505,8 +511,31 @@ function openSellForm(catId, sub){
   let priceField='';
   let extraFields='';
 
-  if(group==='A'){
-    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+  // В openSellForm, замени блок group==='A':
+if(group==='A'){
+  priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+  
+  const needsPreview=['photos','videos'].includes(catId)&&['Соло','Игрушки','Тематика','Мастурбация','Анальное'].includes(sub);
+  
+  extraFields=`
+    ${needsPreview?`
+    <div class="field">
+      <label>Превью (фото с блюром)</label>
+      <div id="preview-wrap" style="background:var(--s2);border:1.5px dashed var(--br2);border-radius:12px;padding:20px;text-align:center;cursor:pointer" onclick="document.getElementById('preview-inp').click()">
+        <div id="preview-thumb" style="font-size:32px;margin-bottom:6px">🖼</div>
+        <div style="font-size:12px;color:var(--tx3)">Нажми чтобы загрузить обложку</div>
+      </div>
+      <input type="file" id="preview-inp" accept="image/*" style="display:none" onchange="loadPreview(this)">
+    </div>`:''}
+    <div class="field">
+      <label>Контент (до 20 фото/файлов)</label>
+      <div id="content-wrap" style="background:var(--s2);border:1.5px dashed var(--br2);border-radius:12px;padding:20px;text-align:center;cursor:pointer" onclick="document.getElementById('content-inp').click()">
+        <div id="content-thumb" style="font-size:32px;margin-bottom:6px">📦</div>
+        <div style="font-size:12px;color:var(--tx3)" id="content-label">Нажми чтобы загрузить файлы (макс. 20)</div>
+      </div>
+      <input type="file" id="content-inp" accept="image/*,video/*" multiple style="display:none" onchange="loadContent(this)">
+    </div>`;
+}
   }
   else if(group==='B'){
     priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
@@ -532,6 +561,30 @@ function openSellForm(catId, sub){
     <button class="btn btn-pr" onclick="goSellType('${catId}','${sub.replace(/'/g,"\\'")}','${group}')">Далее →</button>`;
 }
 
+function loadPreview(inp){
+  const file=inp.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    const wrap=document.getElementById('preview-wrap');
+    if(!wrap)return;
+    wrap.innerHTML=`<div style="position:relative;display:inline-block">
+      <img src="${ev.target.result}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;filter:blur(8px)">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;letter-spacing:2px;text-shadow:0 2px 8px #000">CENSORED</div>
+    </div>
+    <div style="font-size:11px;color:var(--gr2);margin-top:6px">✅ Превью загружено (блюр)</div>`;
+    S.sellPreview=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadContent(inp){
+  const files=Array.from(inp.files).slice(0,20);
+  if(!files.length)return;
+  document.getElementById('content-label').textContent=`✅ Загружено: ${files.length} файл(ов)`;
+  document.getElementById('content-thumb').textContent='📦';
+  S.sellContent=files;
+}
+  
 let priceTypeSelected='fixed';
 function selPriceType(t){
   priceTypeSelected=t;
@@ -545,6 +598,8 @@ function selPriceType(t){
 }
 
 function goSellType(catId, sub, group){
+  sellTypeSelected='';
+  
   const title=document.getElementById('s-title')?.value?.trim();
   const desc=document.getElementById('s-desc')?.value?.trim();
   let price=parseFloat(document.getElementById('s-price')?.value||'0');
@@ -559,7 +614,7 @@ function goSellType(catId, sub, group){
     <button class="back" onclick="openSellForm('${catId}','${sub.replace(/'/g,"\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тип размещения</div>
     <div class="sell-type-wrap">
-      <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
+      <div class="sell-type-card" id="stype-n" onclick="selSellType('normal')">
         <div style="font-size:28px;margin-bottom:8px">📦</div>
         <div style="font-weight:700;font-size:14px;margin-bottom:4px">Обычный</div>
         <div style="font-size:11px;color:var(--tx3);line-height:1.5">Показывается среди других. Новые — выше старых.</div>
@@ -579,10 +634,13 @@ function selSellType(t){
   sellTypeSelected=t;
   document.getElementById('stype-n').classList.toggle('on',t==='normal');
   document.getElementById('stype-p').classList.toggle('on',t==='prem');
+  const btn=document.querySelector('#fp-selltype .btn-pr');
+  if(btn)btn.style.opacity='1';
 }
 let sellPublishing=false;
 async function doSell(){
   if(sellPublishing)return;
+  if(!sellTypeSelected){toast('⚠️ Выбери тип размещения');return;}
   if(!S.sellData){toast('⚠️ Заполни форму');backTo('sell');return;}
   const isPrem=sellTypeSelected==='prem';
   if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
