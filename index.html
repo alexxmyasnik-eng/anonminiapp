@@ -597,7 +597,10 @@ extraFields=`<div class="info-box" style="border-color:var(--ac)">📌 Поку�
     ${commonFields}
     ${priceField}
     ${extraFields}
-    <button class="btn btn-pr" onclick="goSellType('${catId}','${sub.replace(/'/g,"\\\\'")}',${group})">Далее →</button>`;
+    <button class="btn btn-pr" id="sell-next-btn">Далее →</button>`;
+
+// Сразу после innerHTML= присвоения добавь:
+document.getElementById('sell-next-btn').addEventListener('click', ()=>goSellType(catId, sub, group));
 }
 
 let sellDeliveryFiles = [];
