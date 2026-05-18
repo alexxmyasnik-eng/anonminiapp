@@ -990,13 +990,7 @@ function gcMsgTap(msgId,userId,nick,isOut){
     showCtxSheet(items);
   });
 }
-if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>gcDelete(msgId)});
-  if(!isOut){
-    items.push({icon:isMuted?'🔔':'🔇',label:isMuted?'Включить уведомления':'Замутить',fn:()=>toggleMute(userId,nick)});
-    items.push({icon:isBlocked?'✅':'🚫',label:isBlocked?'Разблокировать':'Заблокировать',danger:!isBlocked,fn:()=>isBlocked?gcUnblock(userId,nick):gcBlock(userId,nick)});
-  }
-  showCtxSheet(items);
-}
+
 async function gcDelete(msgId){try{await api('/chat/delete',{msg_id:msgId});await refreshGlobalChat();}catch(e){toast('❌ '+e.message);}}
 function gcBlock(u,n){if(!blockedUsers.includes(u)){blockedUsers.push(u);try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}toast('🚫 '+n+' заблокирован');refreshGlobalChat();}}
 function gcUnblock(u,n){blockedUsers=blockedUsers.filter(id=>id!==u);try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}toast('✅ '+n+' разблокирован');refreshGlobalChat();}
