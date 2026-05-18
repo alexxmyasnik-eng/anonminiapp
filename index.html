@@ -770,8 +770,8 @@ return`<div class="conv-item" onclick="openOrderChat(${o.id})">
             </div>
           </div>`;}).join(''):''}
         ${dmConvs.map(f=>`
-          <div class="conv-item" onclick="openDmChat(${f.partner_id},'${esc(f.nickname)}','')">
-            <div class="conv-ava">👤</div>
+          <div class="conv-item" onclick="openDmChat(${f.partner_id},'${esc(f.nickname)}','${esc(f.avatar_url||'')}')">
+            <div class="conv-ava">${f.avatar_url?`<img src="${esc(f.avatar_url)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}</div>
             <div class="conv-body">
               <div class="conv-head">
                 <div class="conv-name">${esc(f.nickname)}</div>
@@ -837,8 +837,7 @@ scrollChat('cmsgs');
 
 function fmtTime(dt){
   if(!dt)return'';
-  const d=new Date(dt.replace(' ','T')+'Z');
-  return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'});
+  return String(dt).slice(11,16);
 }
   
 function renderMsgsList(msgs,myId,type,contextId){
@@ -965,12 +964,32 @@ async function gcSend(){
 }
 function gcMsgTap(msgId,userId,nick,isOut){
   const isBlocked=blockedUsers.includes(userId);
-const isMuted=mutedUsers.includes(userId);
+  const isMuted=mutedUsers.includes(userId);
   const items=[
     {icon:'👤',label:'Профиль '+nick,fn:()=>openUserProfile(userId)},
-    {icon:'➕',label:'Добавить в друзья',fn:()=>addFriend(userId)},
-    '---',
   ];
+  api('/friends/status',{other_id:userId}).then(r=>{
+    if(r.status==='accepted'){
+      items.push({icon:'💬',label:'Написать',fn:()=>openDmChat(userId,nick,'')});
+      items.push({icon:'❌',label:'Удалить из друзей',danger:true,fn:()=>removeFriend(userId,nick)});
+    } else if(r.status==='pending'){
+      items.push({icon:'⏳',label:'Заявка отправлена',fn:()=>{}});
+    } else {
+      items.push({icon:'➕',label:'Добавить в друзья',fn:()=>addFriend(userId)});
+    }
+    items.push('---');
+    if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>gcDelete(msgId)});
+    if(!isOut){
+      items.push({icon:isMuted?'🔔':'🔇',label:isMuted?'Включить уведомления':'Замутить',fn:()=>toggleMute(userId,nick)});
+      items.push({icon:isBlocked?'✅':'🚫',label:isBlocked?'Разблокировать':'Заблокировать',danger:!isBlocked,fn:()=>isBlocked?gcUnblock(userId,nick):gcBlock(userId,nick)});
+    }
+    showCtxSheet(items);
+  }).catch(()=>{
+    items.push({icon:'➕',label:'Добавить в друзья',fn:()=>addFriend(userId)});
+    items.push('---');
+    showCtxSheet(items);
+  });
+}
 if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>gcDelete(msgId)});
   if(!isOut){
     items.push({icon:isMuted?'🔔':'🔇',label:isMuted?'Включить уведомления':'Замутить',fn:()=>toggleMute(userId,nick)});
@@ -986,6 +1005,22 @@ function toggleMute(u,n){
   else{mutedUsers.push(u);toast('🔇 '+n+' замучен');}
   try{localStorage.setItem('muted',JSON.stringify(mutedUsers));}catch(e){}
 }
+
+async function removeFriend(friendId, nick){
+  try{
+    await api('/friends/remove',{friend_id:friendId});
+    toast('✅ '+nick+' удалён из друзей');
+    if(S.page==='msgs')loadMsgsList();
+  }catch(e){toast('❌ '+e.message);}
+}
+
+async function deleteDmHistory(friendId, nick){
+  try{
+    await api('/dm/delete_history',{friend_id:friendId});
+    toast('🗑 Переписка удалена');
+    if(S.page==='msgs')loadMsgsList();
+  }catch(e){toast('❌ '+e.message);}
+}  
 
 // ── SUPPORT CHAT ──────────────────────────────────────────
 async function openSupportChat(){
@@ -1529,7 +1564,7 @@ function buildDmHtml(msgs, myId, friendId){
 return msgs.map(m=>{
     const isOut = m.from_id===myId;
     return`<div class="msg-row ${isOut?'out':'in'}">
-      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\\'"))||''}',${isOut})">
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\\'"))||''}',${isOut},${friendId},'${esc(friendNick?.replace(/'/g,"\\\\\'"))}')"
         ${esc(m.message||'')}
         <div class="msg-time">${(m.created_at||'').slice(11,16)}${isOut?(m.is_read?' ✓✓':' ✓'):''}</div>
       </div>
@@ -1537,7 +1572,7 @@ return msgs.map(m=>{
   }).join('');
 }
 
-function dmMsgTap(e, text, isOut){
+function dmMsgTap(e, text, isOut, friendId, friendNick){
   showCtxSheet([
     {icon:'↩',label:'Ответить',fn:()=>{
       S.replyTo={text};
@@ -1547,7 +1582,8 @@ function dmMsgTap(e, text, isOut){
       if(barText)barText.textContent='↩ '+text;
       document.getElementById('dm-inp')?.focus();
     }},
-    ...(isOut?[{icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
+    {icon:'🗑',label:'Удалить переписку',danger:true,fn:()=>deleteDmHistory(friendId,friendNick)},
+    ...(isOut?[{icon:'🗑',label:'Удалить сообщение',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
   ]);
 }
 
