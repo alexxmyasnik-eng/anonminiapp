@@ -406,7 +406,10 @@ showFull('userprofile');
     let friendBtn='';
 if(userId!==uid()){
       if(fStatus==='accepted') friendBtn=`<button class="btn btn-ol">✅ В друзьях</button>`;
-      else if(fStatus==='pending') friendBtn=`<button class="btn btn-ol" disabled>⏳ Заявка отправлена</button>`;
+      else if(fStatus==='pending') friendBtn=`<div style="display:flex;gap:8px;align-items:center">
+  <button class="btn btn-ol" disabled style="flex:1;margin:0;opacity:.7">⏳ Заявка отправлена</button>
+  <button class="btn btn-rd" style="width:auto;padding:14px 14px;margin:0;flex-shrink:0;font-size:13px" onclick="cancelFriendRequest(${userId})">Отменить</button>
+</div>`;
 else friendBtn=`<button class="btn btn-pr" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`;
     }
     document.getElementById('userprofile-inner').innerHTML=`
@@ -426,6 +429,10 @@ else friendBtn=`<button class="btn btn-pr" onclick="addFriend(${userId})">➕ Д
 }
 async function addFriend(friendId){
   try{await api('/friends/add',{friend_id:friendId});toast('✅ Заявка отправлена!');openUserProfile(friendId);}
+  catch(e){toast('❌ '+e.message);}
+}
+async function cancelFriendRequest(friendId){
+  try{await api('/friends/cancel',{friend_id:friendId});toast('❌ Заявка отменена');openUserProfile(friendId);}
   catch(e){toast('❌ '+e.message);}
 }
 
