@@ -96,7 +96,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .chat-hdr{background:var(--s2);border-bottom:1px solid var(--br);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .chat-hdr-ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;overflow:hidden}
 .chat-hdr-ava img{width:100%;height:100%;object-fit:cover}
-.msgs-area" id="cmsgs">
+.msgs-area{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
       <div class="ord-card-chat">
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><span style="font-size:22px">📦</span><div><div style="font-weight:600;font-size:13px">${esc(order.product_title)}</div><div style="font-size:11px;color:var(--tx3)">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div></div></div>
         <div style="font-weight:700;font-size:14px;color:var(--gr2)">${order.amount} ₽ · ${sl[order.status]||order.status}</div>
@@ -310,12 +310,12 @@ function backTo(name){closeAllFull();goPage(name);}
 
 // ── CATEGORIES ────────────────────────────────────────────
 const CATEGORIES={
-  photos:{name:'📸 Фото',subs:['Все','Соло','Игрушки','Тематика']},
-  videos:{name:'🎬 Видео',subs:['Все','Мастурбация','Кастом','Анальное']},
+  photos:{name:'📸 Фото',subs:['Все','В белье','Без белья','Игрушки','Тематика']},
+  videos:{name:'🎬 Видео',subs:['Все','Мастурбация','Проникновение','Анальное','Кастом']},
   domination:{name:'⛓️ Доминация',subs:['Все','Оценка','Задания','Контроль','Унижение']},
-  slaves:{name:'🧎 Рабыня',subs:['Все','Повиновение','Отчеты']},
+  slaves:{name:'🧎 Рабыня',subs:['Все','Лёгкие приказы','Интим-подчинение']},
   audio:{name:'🎧 Аудио',subs:['Все','Секстинг','Стоны','Унижение']},
-  signa:{name:'🖊 Сигны',subs:['Все','На теле','Видео-сигна']}
+  signa:{name:'🖊 Сигны',subs:['Все','Обычная','В белье','На голом теле','Видео-сигна']}
 };
 // ── MARKET ────────────────────────────────────────────────
 function renderMarket(){
