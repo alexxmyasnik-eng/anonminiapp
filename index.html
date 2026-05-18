@@ -399,7 +399,7 @@ async function openUserProfile(userId){
   document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
 showFull('userprofile');
   try{
-    const[u,fs]=await Promise.all([api('/user/'+userId),S.user?api('/friends/status',{other_id:userId}):Promise.resolve({status:'none'})]);
+    const[u,fs]=await Promise.all([api('/user/'+userId),uid()?api('/friends/status',{other_id:userId}):Promise.resolve({status:'none'})]);
     const gl=u.gender==='male'?'👨 Мужской':u.gender==='female'?'👩 Женский':'';
     const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
     const fStatus=fs.status;
@@ -432,8 +432,25 @@ async function addFriend(friendId){
   catch(e){toast('❌ '+e.message);}
 }
 async function cancelFriendRequest(friendId){
-  try{await api('/friends/cancel',{friend_id:friendId});toast('❌ Заявка отменена');openUserProfile(friendId);}
+  try{await api('/friends/cancel',{friend_id:friendId});toast('Заявка отменена');openUserProfile(friendId);}
   catch(e){toast('❌ '+e.message);}
+}
+async function removeFriend(friendId, nick){
+  if(!confirm('Удалить '+nick+' из друзей?'))return;
+  try{await api('/friends/remove',{friend_id:friendId});toast('Удалён из друзей');openUserProfile(friendId);}
+  catch(e){toast('❌ '+e.message);}
+}
+function toggleBlockUser(userId, nick){
+  if(blockedUsers.includes(userId)){
+    blockedUsers=blockedUsers.filter(id=>id!==userId);
+    try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}
+    toast('✅ '+nick+' разблокирован');
+  }else{
+    blockedUsers.push(userId);
+    try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}
+    toast('🚫 '+nick+' заблокирован');
+  }
+  openUserProfile(userId);
 }
 
 // ── FRIENDS PAGE ──────────────────────────────────────────
@@ -475,6 +492,32 @@ html+=requests.map(r=>`<div style="display:flex;align-items:center;gap:12px;padd
     document.getElementById('friends-inner').innerHTML=html;
   }catch(e){document.getElementById('friends-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
+
+function openBlocklist(){
+  const list=blockedUsers;
+  let html=`<button class="back" onclick="backTo('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>
+  <div class="st">Чёрный список</div>`;
+  if(!list.length){
+    html+='<div class="empty"><div class="empty-i">✅</div>Список пуст</div>';
+  }else{
+    html+=list.map(uid=>
+      `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--br)">
+        <div class="conv-ava" style="background:var(--s3);color:var(--tx3)">🚫</div>
+        <div style="flex:1"><div style="font-weight:700;color:var(--tx2)">ID: ${uid}</div></div>
+        <button class="btn btn-ol" style="width:auto;padding:8px 14px;margin:0;font-size:13px" onclick="unblockUser(${uid})">Разблокировать</button>
+      </div>`
+    ).join('');
+  }
+  document.getElementById('friends-inner').innerHTML=html;
+  showFull('friends');
+}
+function unblockUser(userId){
+  blockedUsers=blockedUsers.filter(id=>id!==userId);
+  try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}
+  toast('✅ Разблокирован');
+  openBlocklist();
+}
+  
 async function acceptFriend(friendId){
   try{await api('/friends/accept',{friend_id:friendId});toast('✅ Теперь вы друзья!');openFriends();}
   catch(e){toast('❌ '+e.message);}
@@ -1297,8 +1340,8 @@ document.getElementById('pg-profile').innerHTML=`
         <div 
 class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
-      <button class="btn btn-ol" onclick="openFriends()" id="friends-btn" style="position:relative">
-  👥 Друзья
+      <button class="btn btn-ol" onclick="openFriends()">👥 Друзья</button>
+<button class="btn btn-ol" onclick="openBlocklist()">🚫 Чёрный список</button>
   <span id="badge-friend-req" style="display:none;position:absolute;top:10px;right:14px;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">!</span>
 </button>
       <div class="st">Мои товары</div>
@@ -1415,43 +1458,46 @@ if(S.user?.avatar_url?.startsWith('data:')){
 async function openUserProfile(userId){
   document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('userprofile');
-try{
-    const u=await api('/user/'+userId);
+  try{
+    const isBlocked=blockedUsers.includes(userId);
+    const[u,fs]=await Promise.all([
+      api('/user/'+userId),
+      uid()?api('/friends/status',{other_id:userId}):Promise.resolve({status:'none'})
+    ]);
     const gl=u.gender==='male'?'👨 Мужской':u.gender==='female'?'👩 Женский':'';
     const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
-    const isMe=uid()&&uid()===userId;
-    let isFriend=false;
-try{const fr=await api('/friends');isFriend=Array.isArray(fr)&&fr.some(f=>f.friend_id===userId&&f.status==='accepted');}catch(e){}
-    let prods=[];
-    try{
-      for(const catId of Object.keys(CATEGORIES)){
-        const p=await api('/products/'+catId+'?seller='+userId);
-if(Array.isArray(p))prods=prods.concat(p);
+    const fStatus=fs.status;
+    let actionButtons='';
+    if(userId!==uid()){
+      if(fStatus==='accepted'){
+        actionButtons=`
+          <button class="btn btn-ol" onclick="openDmChat(${userId},'${esc((u.nickname||'').replace(/'/g,"\\'"))}','${u.avatar_url||''}')">💬 Написать</button>
+          <button class="btn btn-rd" style="opacity:.8" onclick="removeFriend(${userId},'${esc((u.nickname||'').replace(/'/g,"\\'"))}')">❌ Удалить из друзей</button>`;
+      } else if(fStatus==='pending'){
+        actionButtons=`<div style="display:flex;gap:8px">
+          <button class="btn btn-ol" disabled style="flex:1;margin:0;opacity:.6">⏳ Заявка отправлена</button>
+          <button class="btn btn-rd" style="width:auto;padding:14px 16px;margin:0;flex-shrink:0" onclick="cancelFriendRequest(${userId})">Отменить</button>
+        </div>`;
+      } else if(!isBlocked){
+        actionButtons=`<button class="btn btn-pr" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`;
       }
-    }catch(e){}
-    const prodsHtml=prods.length
-      ?`<div class="prods">${prods.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3);margin-bottom:3px">${CATEGORIES[p.category]?.name||p.category}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
-      :'<div style="color:var(--tx3);font-size:13px;padding:8px 0">Нет товаров</div>';
-document.getElementById('userprofile-inner').innerHTML=`
-      <button class="back" onclick="document.getElementById('fp-userprofile').classList.remove('on')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div style="padding:0 0 40px">
-        <div class="prof-header">
-          <div class="prof-ava" style="margin:0 auto 12px">
-            ${u.avatar_url?`<img src="${u.avatar_url}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
-          </div>
-          <div class="prof-name">${esc(u.nickname||'Аноним')}</div>
-          ${sub?`<div class="prof-sub">${sub}</div>`:''}
-  
-                 <div style="color:var(--tx3);font-size:12px;margin-top:4px">⭐ ${u.rating||'—'}</div>
-        </div>
-        ${!isMe?`<div style="display:flex;gap:8px;margin-bottom:4px">
-          ${isFriend?`<button class="btn btn-pr" style="margin:0;flex:1" onclick="document.getElementById('fp-userprofile').classList.remove('on');openDmChat(${userId},'${esc((u.nickname||'').replace(/'/g,"\\\\\'"))}','${u.avatar_url||''}')">💬 Написать</button>`:''}
-          ${!isFriend?`<button class="btn btn-ol" style="margin:0;flex:1" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`:''}
-        </div>`:''}
-        <div class="st">Товары</div>
-        ${prodsHtml}
-      </div>`;
-}catch(e){document.getElementById('userprofile-inner').innerHTML=`<div style="padding:20px"><div class="empty"><div class="empty-i">⚠️</div>${e.message}</div></div>`;}
+      actionButtons+=`<button class="btn btn-ol" style="color:var(--rd);border-color:var(--rd);opacity:.7;margin-top:6px" onclick="toggleBlockUser(${userId},'${esc((u.nickname||'').replace(/'/g,"\\'"))}')">
+        ${isBlocked?'✅ Разблокировать':'🚫 Заблокировать'}
+      </button>`;
+    }
+    document.getElementById('userprofile-inner').innerHTML=`
+      <button class="back" onclick="closeAllFull()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="prof-header">
+        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${u.avatar_url}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
+        <div class="prof-name">${esc(u.nickname)}</div>
+        ${sub?`<div class="prof-sub">${sub}</div>`:''}
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-v">⭐ ${u.rating}</div><div class="stat-l">Рейтинг</div></div>
+        <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${actionButtons}</div>`;
+  }catch(e){document.getElementById('userprofile-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 // ── SEARCH ───────────────────────────────────────────────
 function goSearch(){
