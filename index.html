@@ -731,9 +731,7 @@ async function renderMsgs(){
 }
 async function loadMsgsList(){
   try{
-    const[orders,gcMsgs,dmUnreadRes,friends]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({})),api('/friends/list').catch(()=>[])]);
-    const dmUnread=dmUnreadRes;
-    const acceptedFriends=friends.filter(f=>f.status==='accepted');
+    const[orders,gcMsgs,dmConvs]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/conversations').catch(()=>[])]);
     const myId=uid();let total=0;orders.forEach(o=>total+=(o.unread||0));
     const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
 // Admin gets support panel too
@@ -771,15 +769,20 @@ return`<div class="conv-item" onclick="openOrderChat(${o.id})">
      <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
           </div>`;}).join(''):''}
-        ${Object.keys(dmUnread).length?Object.entries(dmUnread).map(([fid,cnt])=>`
-          <div class="conv-item" onclick="openDmChat(${fid},'','')">
+        ${dmConvs.map(f=>`
+          <div class="conv-item" onclick="openDmChat(${f.partner_id},'${esc(f.nickname)}','')">
             <div class="conv-ava">👤</div>
             <div class="conv-body">
-              <div class="conv-head"><div class="conv-name">Личное сообщение</div>${cnt>0?`<span class="conv-unread">${cnt}</span>`:''}</div>
-  
-            <div class="conv-preview">Новых: ${cnt}</div>
+              <div class="conv-head">
+                <div class="conv-name">${esc(f.nickname)}</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span class="conv-time">${fmtTime(f.created_at)}</span>
+                  ${f.unread>0?`<span class="conv-unread">${f.unread}</span>`:''}
+                </div>
+              </div>
+              <div class="conv-preview">${f.is_out?'Вы: ':''}${esc((f.last_message||'').slice(0,35))}</div>
             </div>
-          </div>`).join(''):''}
+          </div>`).join('')}
       </div>`;
 const badge=document.getElementById('badge-msgs');
     if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
