@@ -1480,6 +1480,7 @@ if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">�
 
 // ── UNREAD ────────────────────────────────────────────────
 let prevUnread=0;
+let prevFriendReqs=0;  
 async function checkUnread(){
   if(!uid())return;
 try{
@@ -1612,6 +1613,8 @@ async function checkFriendRequests(){
   try{
     const reqs=await api('/friends/requests');
     const hasPending=reqs.length>0;
+    if(reqs.length > prevFriendReqs && prevFriendReqs !== -1) playSound();
+prevFriendReqs = reqs.length === 0 ? 0 : reqs.length;
     const badgeProfile=document.getElementById('badge-profile');
     const badgeFriends=document.getElementById('badge-friend-req');
     if(badgeProfile){if(hasPending){badgeProfile.textContent=reqs.length;badgeProfile.classList.add('on');}else badgeProfile.classList.remove('on');}
