@@ -731,7 +731,9 @@ async function renderMsgs(){
 }
 async function loadMsgsList(){
   try{
-    const[orders,gcMsgs,dmUnread]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({}))]);
+    const[orders,gcMsgs,dmUnreadRes,friends]=await Promise.all([api('/orders'),api('/chat/messages'),api('/dm/unread_count').catch(()=>({})),api('/friends/list').catch(()=>[])]);
+    const dmUnread=dmUnreadRes;
+    const acceptedFriends=friends.filter(f=>f.status==='accepted');
     const myId=uid();let total=0;orders.forEach(o=>total+=(o.unread||0));
     const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
 // Admin gets support panel too
