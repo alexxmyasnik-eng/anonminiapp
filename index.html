@@ -393,39 +393,7 @@ if(r.ok){playSound();toast('✅ Куплено! '+r.short_id);if(S.user){S.user.
   }catch(e){toast('❌ '+e.message);}
 }
 
-// ── USER PROFILE PAGE ─────────────────────────────────────
-async function openUserProfile(userId){
-  document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
-showFull('userprofile');
-  try{
-    const[u,fs]=await Promise.all([api('/user/'+userId),uid()?api('/friends/status',{other_id:userId}):Promise.resolve({status:'none'})]);
-    const gl=u.gender==='male'?'👨 Мужской':u.gender==='female'?'👩 Женский':'';
-    const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
-    const fStatus=fs.status;
-    let friendBtn='';
-if(userId!==uid()){
-      if(fStatus==='accepted') friendBtn=`<button class="btn btn-ol">✅ В друзьях</button>`;
-      else if(fStatus==='pending') friendBtn=`<div style="display:flex;gap:8px;align-items:center">
-  <button class="btn btn-ol" disabled style="flex:1;margin:0;opacity:.7">⏳ Заявка отправлена</button>
-  <button class="btn btn-rd" style="width:auto;padding:14px 14px;margin:0;flex-shrink:0;font-size:13px" onclick="cancelFriendRequest(${userId})">Отменить</button>
-</div>`;
-else friendBtn=`<button class="btn btn-pr" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`;
-    }
-    document.getElementById('userprofile-inner').innerHTML=`
-      <button class="back" onclick="closeAllFull()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="prof-header">
-        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${u.avatar_url}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
-        <div class="prof-name">${esc(u.nickname)}</div>
-        ${sub?`<div class="prof-sub">${sub}</div>`:''}
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="stat-v">⭐ ${u.rating}</div><div class="stat-l">Рейтинг</div></div>
-       
-  <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
-      </div>
-      ${friendBtn}`;
-}catch(e){document.getElementById('userprofile-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
-}
+
 async function addFriend(friendId){
   try{await api('/friends/add',{friend_id:friendId});toast('✅ Заявка отправлена!');openUserProfile(friendId);}
   catch(e){toast('❌ '+e.message);}
@@ -535,7 +503,9 @@ function unblockUser(userId){
   toast('✅ Разблокирован');
   openFriends();
 }
- 
+
+
+  
 async function acceptFriend(friendId){
   try{await api('/friends/accept',{friend_id:friendId});toast('✅ Теперь вы друзья!');openFriends();}
   catch(e){toast('❌ '+e.message);}
@@ -1358,10 +1328,7 @@ document.getElementById('pg-profile').innerHTML=`
         <div 
 class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
-      <button class="btn btn-ol" id="friends-btn" onclick="openFriends()">👥 Друзья</button>
-<button class="btn btn-ol" onclick="openBlocklist()">🚫 Чёрный список</button>
-  <span id="badge-friend-req" style="display:none;position:absolute;top:10px;right:14px;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">!</span>
-</button>
+      <button class="btn btn-ol" id="friends-btn" onclick="openFriends()" style="position:relative">👥 Друзья<span id="badge-friend-req" style="display:none;position:absolute;top:8px;right:12px;background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">!</span></button>
       <div class="st">Мои товары</div>
       ${prodsHtml}`;
   }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -1544,7 +1511,6 @@ if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">�
 
 // ── UNREAD ────────────────────────────────────────────────
 let prevUnread=0;
-let prevFriendReqs=0;  
 async function checkUnread(){
   if(!uid())return;
 try{
@@ -1671,6 +1637,8 @@ if(badge){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
     }
   }catch(e){}
 }
+
+
 
 async function showDeliveryFiles(productId){
   try{
