@@ -429,6 +429,11 @@ async function addFriend(friendId){
   catch(e){toast('❌ '+e.message);}
 }
 
+async function addFriend(friendId){
+  try{await api('/friends/add',{friend_id:friendId});toast('✅ Заявка отправлена!');openUserProfile(friendId);}
+  catch(e){toast('❌ '+e.message);}
+}
+
 // ── FRIENDS PAGE ──────────────────────────────────────────
 async function openFriends(){
   document.getElementById('friends-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
@@ -1440,7 +1445,8 @@ try{
     const sub=[u.age?u.age+' лет':'',gl].filter(Boolean).join(' · ')||'';
     const isMe=uid()&&uid()===userId;
     let isFriend=false;
-try{const fr=await api('/friends');isFriend=Array.isArray(fr)&&fr.some(f=>f.friend_id===userId&&f.status==='accepted');}catch(e){}
+    let isPending=false;
+    try{const fr=await api('/friends');isFriend=Array.isArray(fr)&&fr.some(f=>f.friend_id===userId&&f.status==='accepted');isPending=Array.isArray(fr)&&fr.some(f=>f.friend_id===userId&&f.status==='pending');}catch(e){}
     let prods=[];
     try{
       for(const catId of Object.keys(CATEGORIES)){
@@ -1465,7 +1471,7 @@ document.getElementById('userprofile-inner').innerHTML=`
         </div>
         ${!isMe?`<div style="display:flex;gap:8px;margin-bottom:4px">
           ${isFriend?`<button class="btn btn-pr" style="margin:0;flex:1" onclick="document.getElementById('fp-userprofile').classList.remove('on');openDmChat(${userId},'${esc((u.nickname||'').replace(/'/g,"\\\\\'"))}','${u.avatar_url||''}')">💬 Написать</button>`:''}
-          ${!isFriend?`<button class="btn btn-ol" style="margin:0;flex:1" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`:''}
+          ${isPending?`<button class="btn btn-ol" style="margin:0;flex:1" disabled>⏳ Заявка отправлена</button><button class="btn btn-rd" style="margin:0;flex:1" onclick="cancelFriend(${userId})">✕ Отменить</button>`:(!isFriend?`<button class="btn btn-ol" style="margin:0;flex:1" onclick="addFriend(${userId})">➕ Добавить в друзья</button>`:'')}
         </div>`:''}
         <div class="st">Товары</div>
         ${prodsHtml}
@@ -1558,7 +1564,7 @@ function buildDmHtml(msgs, myId, friendId){
 return msgs.map(m=>{
     const isOut = m.from_id===myId;
     return`<div class="msg-row ${isOut?'out':'in'}">
-      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\\'"))||''}',${isOut},${friendId},'${esc(friendNick?.replace(/'/g,"\\\\\'"))}')"
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\\'"))||''}',${isOut},${friendId},'${esc(friendNick?.replace(/'/g,"\\\\\'"))}')">
         ${esc(m.message||'')}
         <div class="msg-time">${(m.created_at||'').slice(11,16)}${isOut?(m.is_read?' ✓✓':' ✓'):''}</div>
       </div>
