@@ -443,7 +443,6 @@ function removeFriend(friendId, nick){
     <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
   </div>`;
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
-  document.getElementById('confirm-remove-btn',ov)
   ov.querySelector('#confirm-remove-btn').addEventListener('click',async()=>{
     ov.remove();
     try{await api('/friends/remove',{friend_id:friendId});toast('Удалён из друзей');openUserProfile(friendId);}
@@ -536,32 +535,7 @@ function unblockUser(userId){
   toast('✅ Разблокирован');
   openFriends();
 }
-
-function openBlocklist(){
-  const list=blockedUsers;
-  let html=`<button class="back" onclick="backTo('profile')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Профиль</button>
-  <div class="st">Чёрный список</div>`;
-  if(!list.length){
-    html+='<div class="empty"><div class="empty-i">✅</div>Список пуст</div>';
-  }else{
-    html+=list.map(uid=>
-      `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--br)">
-        <div class="conv-ava" style="background:var(--s3);color:var(--tx3)">🚫</div>
-        <div style="flex:1"><div style="font-weight:700;color:var(--tx2)">ID: ${uid}</div></div>
-        <button class="btn btn-ol" style="width:auto;padding:8px 14px;margin:0;font-size:13px" onclick="unblockUser(${uid})">Разблокировать</button>
-      </div>`
-    ).join('');
-  }
-  document.getElementById('friends-inner').innerHTML=html;
-  showFull('friends');
-}
-function unblockUser(userId){
-  blockedUsers=blockedUsers.filter(id=>id!==userId);
-  try{localStorage.setItem('blocked',JSON.stringify(blockedUsers));}catch(e){}
-  toast('✅ Разблокирован');
-  openBlocklist();
-}
-  
+ 
 async function acceptFriend(friendId){
   try{await api('/friends/accept',{friend_id:friendId});toast('✅ Теперь вы друзья!');openFriends();}
   catch(e){toast('❌ '+e.message);}
@@ -1697,20 +1671,6 @@ if(badge){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
     }
   }catch(e){}
 }
-
-async function checkFriendRequests(){
-  if(!uid())return;
-  try{
-    const reqs=await api('/friends/requests');
-    const hasPending=reqs.length>0;
-    if(reqs.length > prevFriendReqs && prevFriendReqs !== -1) playSound();
-prevFriendReqs = reqs.length === 0 ? 0 : reqs.length;
-    const badgeProfile=document.getElementById('badge-profile');
-    const badgeFriends=document.getElementById('badge-friend-req');
-    if(badgeProfile){if(hasPending){badgeProfile.textContent=reqs.length;badgeProfile.classList.add('on');}else badgeProfile.classList.remove('on');}
-    if(badgeFriends){badgeFriends.style.display=hasPending?'inline':'none';}
-  }catch(e){}
-}  
 
 async function showDeliveryFiles(productId){
   try{
