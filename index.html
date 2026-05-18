@@ -221,7 +221,7 @@ id="pg-wallet"></div>
   <button class="nb" id="nb-msgs" onclick="goPage('msgs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Сообщения<span class="nb-badge" id="badge-msgs"></span></button>
   <button class="nb" id="nb-wallet" onclick="goPage('wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Кошелёк</button>
   <button class="nb" id="nb-profile" onclick="goPage('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
+stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль<span class="nb-badge" id="badge-profile"></span></button>
 </nav>
 
 <audio id="snd" preload="auto"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
@@ -1297,7 +1297,10 @@ document.getElementById('pg-profile').innerHTML=`
         <div 
 class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
-      <button class="btn btn-ol" onclick="openFriends()">👥 Друзья</button>
+      <button class="btn btn-ol" onclick="openFriends()" id="friends-btn" style="position:relative">
+  👥 Друзья
+  <span id="badge-friend-req" style="display:none;position:absolute;top:10px;right:14px;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">!</span>
+</button>
       <div class="st">Мои товары</div>
       ${prodsHtml}`;
   }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -1604,6 +1607,18 @@ if(badge){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
   }catch(e){}
 }
 
+async function checkFriendRequests(){
+  if(!uid())return;
+  try{
+    const reqs=await api('/friends/requests');
+    const hasPending=reqs.length>0;
+    const badgeProfile=document.getElementById('badge-profile');
+    const badgeFriends=document.getElementById('badge-friend-req');
+    if(badgeProfile){if(hasPending){badgeProfile.textContent=reqs.length;badgeProfile.classList.add('on');}else badgeProfile.classList.remove('on');}
+    if(badgeFriends){badgeFriends.style.display=hasPending?'inline':'none';}
+  }catch(e){}
+}  
+
 async function showDeliveryFiles(productId){
   try{
     const r=await api('/products/'+productId+'/delivery_files');
@@ -1666,6 +1681,7 @@ if(uid()){
   setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');}catch(e){}},60000);
   setInterval(checkUnread,15000);checkUnread();
   setInterval(checkDmUnread,20000);checkDmUnread();
+  setInterval(checkFriendRequests, 30000); checkFriendRequests();
 }
 init();
 </script>
