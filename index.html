@@ -160,6 +160,10 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .ctx-btn.danger{color:var(--rd)}
 .ctx-btn .ctx-icon{font-size:20px;width:24px;text-align:center}
 .ctx-divider{height:1px;background:var(--br);margin:4px 8px}
+/* Mute submenu */
+.mute-submenu{position:fixed;bottom:0;left:0;right:0;z-index:302;background:var(--s2);border-radius:20px 20px 0 0;padding:16px 8px calc(16px + env(safe-area-inset-bottom));animation:slideUp .2s ease}
+.mute-submenu .ctx-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;padding:14px 16px;cursor:pointer;border-radius:12px;text-align:left}
+.mute-submenu .ctx-btn:active{background:var(--s3)}  
 /* TOAST */
 .toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:85vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -1547,6 +1551,9 @@ style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;d
         <div style="font-weight:700;font-size:14px">${esc(friendNick)}</div>
         <div style="font-size:11px;color:var(--tx3)">Личные сообщения</div>
       </div>
+      <button onclick="showDmMenu(${friendId},'${esc((friendNick||'').replace(/'/g,"\\'"))}')" style="background:none;border:none;color:var(--tx3);cursor:pointer;padding:6px;display:flex;align-items:center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+      </button>
     </div>
     <div class="msgs-area" id="dmmsgs">
       ${buildDmHtml(msgs, myId, friendId)}
@@ -1591,6 +1598,114 @@ function dmMsgTap(e, text, isOut){
     ...(isOut?[{icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
   ]);
 }
+
+ function showDmMenu(friendId, friendNick){
+  showCtxSheet([
+    {icon:'🔕',label:'Уведомления',fn:()=>showMuteSubmenu(friendId,friendNick)},
+    '---',
+    {icon:'🗑',label:'Удалить чат',danger:true,fn:()=>confirmDeleteDmChat(friendId,friendNick)},
+  ]);
+}
+
+function showMuteSubmenu(friendId, friendNick){
+  // Убираем предыдущее подменю если есть
+  document.querySelectorAll('.mute-submenu,.ctx-overlay').forEach(el=>el.remove());
+  const isMuted=mutedUsers.includes(friendId);
+  const options=isMuted
+    ?[{label:'🔔 Включить уведомления',fn:()=>unmuteUser(friendId,friendNick)}]
+    :[
+      {label:'🔕 Выключить уведомления',fn:()=>muteUser(friendId,friendNick,0)},
+      {label:'⏱ Выключить на время...',fn:()=>showMuteDuration(friendId,friendNick)},
+    ];
+  const ov=document.createElement('div');ov.className='ctx-overlay';
+  const sh=document.createElement('div');sh.className='mute-submenu';
+  sh.innerHTML=`<div style="font-size:13px;color:var(--tx3);padding:0 16px 8px;font-weight:600">УВЕДОМЛЕНИЯ</div>`+
+    options.map((o,i)=>`<button class="ctx-btn" data-i="${i}">${o.label}</button>`).join('');
+  sh.querySelectorAll('.ctx-btn').forEach(btn=>{
+    btn.onclick=()=>{const i=parseInt(btn.dataset.i);options[i].fn();ov.remove();sh.remove();};
+  });
+  ov.onclick=()=>{ov.remove();sh.remove();};
+  document.body.appendChild(ov);document.body.appendChild(sh);
+}
+
+function showMuteDuration(friendId, friendNick){
+  document.querySelectorAll('.mute-submenu,.ctx-overlay').forEach(el=>el.remove());
+  const durations=[
+    {label:'15 минут',ms:15*60*1000},{label:'30 минут',ms:30*60*1000},
+    {label:'1 час',ms:60*60*1000},{label:'2 часа',ms:2*60*60*1000},
+    {label:'3 часа',ms:3*60*60*1000},{label:'4 часа',ms:4*60*60*1000},
+    {label:'8 часов',ms:8*60*60*1000},{label:'12 часов',ms:12*60*60*1000},
+    {label:'1 день',ms:24*60*60*1000},{label:'2 дня',ms:2*24*60*60*1000},
+    {label:'3 дня',ms:3*24*60*60*1000},{label:'1 неделя',ms:7*24*60*60*1000},
+    {label:'2 недели',ms:14*24*60*60*1000},{label:'1 месяц',ms:30*24*60*60*1000},
+  ];
+  const ov=document.createElement('div');ov.className='ctx-overlay';
+  const sh=document.createElement('div');sh.className='mute-submenu';
+  sh.style.maxHeight='60vh';sh.style.overflowY='auto';
+  sh.innerHTML=`<div style="font-size:13px;color:var(--tx3);padding:0 16px 8px;font-weight:600">ВЫКЛЮЧИТЬ НА:</div>`+
+    durations.map((d,i)=>`<button class="ctx-btn" data-i="${i}">${d.label}</button>`).join('');
+  sh.querySelectorAll('.ctx-btn').forEach(btn=>{
+    btn.onclick=()=>{const d=durations[parseInt(btn.dataset.i)];muteUser(friendId,friendNick,d.ms);ov.remove();sh.remove();};
+  });
+  ov.onclick=()=>{ov.remove();sh.remove();};
+  document.body.appendChild(ov);document.body.appendChild(sh);
+}
+
+function muteUser(userId, nick, durationMs){
+  if(!mutedUsers.includes(userId))mutedUsers.push(userId);
+  try{
+    const muteData=JSON.parse(localStorage.getItem('muteData')||'{}');
+    muteData[userId]=durationMs>0?Date.now()+durationMs:0;
+    localStorage.setItem('muteData',JSON.stringify(muteData));
+    localStorage.setItem('muted',JSON.stringify(mutedUsers));
+  }catch(e){}
+  const label=durationMs>0?`на ${formatMuteDuration(durationMs)}`:'навсегда';
+  toast('🔕 '+nick+' замучен '+label);
+}
+
+function unmuteUser(userId, nick){
+  mutedUsers=mutedUsers.filter(id=>id!==userId);
+  try{
+    const muteData=JSON.parse(localStorage.getItem('muteData')||'{}');
+    delete muteData[userId];
+    localStorage.setItem('muteData',JSON.stringify(muteData));
+    localStorage.setItem('muted',JSON.stringify(mutedUsers));
+  }catch(e){}
+  toast('🔔 Уведомления включены для '+nick);
+}
+
+function formatMuteDuration(ms){
+  const m=Math.round(ms/60000);
+  if(m<60)return m+' мин';
+  if(m<1440)return Math.round(m/60)+' ч';
+  if(m<10080)return Math.round(m/1440)+' д';
+  return Math.round(m/10080)+' нед';
+}
+
+function confirmDeleteDmChat(friendId, friendNick){
+  const ov=document.createElement('div');ov.className='popup-overlay';
+  ov.innerHTML=`<div class="popup-box">
+    <div class="popup-title">Удалить чат?</div>
+    <div class="popup-text">Удалить переписку с <b>${esc(friendNick)}</b>?</div>
+    <label style="display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer;font-size:14px;justify-content:center">
+      <input type="checkbox" id="del-both-chk" style="width:18px;height:18px;accent-color:var(--ac)">
+      <span>Также удалить у собеседника</span>
+    </label>
+    <button class="btn btn-rd" id="del-chat-confirm">Удалить</button>
+    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
+  </div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  ov.querySelector('#del-chat-confirm').addEventListener('click',async()=>{
+    const both=ov.querySelector('#del-both-chk').checked;
+    ov.remove();
+    try{
+      await api('/dm/delete',{with_id:friendId,both_sides:both?1:0});
+      toast('🗑 Чат удалён');
+      closeChat();
+    }catch(e){toast('❌ '+e.message);}
+  });
+  document.body.appendChild(ov);
+} 
 
 async function dmSend(friendId){
   const inp=document.getElementById('dm-inp');const text=inp?.value?.trim();
