@@ -1587,9 +1587,10 @@ function buildDmHtml(msgs, myId, friendId){
   if(!msgs.length) return '<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
 return msgs.map(m=>{
     const isOut = m.from_id===myId;
+const replyHtml=m.reply_to_text?`<div class="msg-reply-preview${isOut?'':' in-bubble'}">↩ ${esc(m.reply_to_text?.slice(0,40))}</div>`:'';
     return`<div class="msg-row ${isOut?'out':'in'}">
-      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\\'"))||''}',${isOut})">
-        ${esc(m.message||'')}
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\'"))||''}',${isOut})">
+        ${replyHtml}${esc(m.message||'')}
         <div class="msg-time">${(m.created_at||'').slice(11,16)}${isOut?(m.is_read?' ✓✓':' ✓'):''}</div>
       </div>
     </div>`;
@@ -1726,10 +1727,12 @@ function confirmDeleteDmChat(friendId, friendNick){
 
 async function dmSend(friendId){
   const inp=document.getElementById('dm-inp');const text=inp?.value?.trim();
-  if(!text)return;inp.value='';S.replyTo=null;
+  if(!text)return;
+  const replyText=S.replyTo?.text||null;
+  inp.value='';S.replyTo=null;
   const bar=document.getElementById('reply-bar-dm');if(bar)bar.style.display='none';
   try{
-    await api('/dm/send',{to_id:friendId,message:text});
+    await api('/dm/send',{to_id:friendId,message:text,...(replyText?{reply_to_text:replyText}:{})});
     await refreshDmChat(friendId,'','');scrollChat('dmmsgs');
 }catch(e){toast('❌ '+e.message);}
 }
