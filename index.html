@@ -108,9 +108,11 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .msg-reply-preview{background:rgba(255,255,255,.1);border-left:2px solid rgba(255,255,255,.5);border-radius:6px;padding:4px 8px;margin-bottom:6px;font-size:11px;opacity:.8}
 .msg-reply-preview.in-bubble{background:rgba(0,0,0,.15);border-left-color:var(--ac2)}
 .msg-time{font-size:10px;opacity:.6;margin-top:3px;text-align:right}
-.reply-bar{background:var(--s2);border-top:1px solid var(--br);padding:8px 16px;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.reply-bar-text{flex:1;font-size:12px;color:var(--tx2)}
-.reply-bar-close{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:18px;padding:0}
+.reply-bar{background:var(--s2);border-top:2px solid var(--ac);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.reply-bar-inner{flex:1;border-left:3px solid var(--ac2);padding-left:8px;min-width:0}
+.reply-bar-label{font-size:11px;color:var(--ac2);font-weight:700;margin-bottom:2px}
+.reply-bar-text{font-size:13px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reply-bar-close{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px;padding:4px;flex-shrink:0}
 .chat-input-bar{background:rgba(8,8,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--br);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;flex-shrink:0}
 .cinput{flex:1;background:var(--s3);border:1.5px solid var(--br);border-radius:24px;padding:10px 16px;color:var(--tx);font-family:'Manrope',sans-serif;font-size:14px;outline:none}
 .cinput:focus{border-color:var(--ac)}
@@ -913,9 +915,14 @@ function onMsgTap(e,msgId,msgText,isOut,type,contextId){
 function setReply(msgId,text){
   S.replyTo={id:msgId,text};
   const bar=document.getElementById('reply-bar');
-  const barText=document.getElementById('reply-bar-text');
-  if(bar)bar.style.display='flex';
-  if(barText)barText.textContent='↩ '+text;
+  if(bar){
+    bar.style.display='flex';
+    bar.innerHTML=`<div class="reply-bar-inner">
+      <div class="reply-bar-label">↩ Ответить</div>
+      <div class="reply-bar-text">${esc(text)}</div>
+    </div>
+    <button class="reply-bar-close" onclick="clearReply()">✕</button>`;
+  }
   document.getElementById('cinput')?.focus();
 }
 function clearReply(){
@@ -1595,8 +1602,14 @@ function dmMsgTap(e, text, isOut){
       S.replyTo={text};
       const bar=document.getElementById('reply-bar-dm');
       const barText=document.getElementById('reply-bar-dm-text');
-      if(bar)bar.style.display='flex';
-      if(barText)barText.textContent='↩ '+text;
+      if(bar){
+        bar.style.display='flex';
+        bar.innerHTML=`<div class="reply-bar-inner">
+          <div class="reply-bar-label">↩ Ответить</div>
+          <div class="reply-bar-text">${esc(text)}</div>
+        </div>
+        <button class="reply-bar-close" onclick="S.replyTo=null;document.getElementById('reply-bar-dm').style.display='none'">✕</button>`;
+      }
       document.getElementById('dm-inp')?.focus();
     }},
     ...(isOut?[{icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
