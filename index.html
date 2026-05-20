@@ -982,10 +982,10 @@ async function buildGlobalChat(){
       <div style="flex:1"><div style="font-weight:700;font-size:14px">Общий чат</div><div style="font-size:11px;color:var(--tx3)">Все пользователи AnonPeak</div></div>
     </div>
     <div class="msgs-area" id="gcmsgs">${buildGcHtml(msgs,myId)}</div>
+    <div id="reply-bar" style="display:none" class="reply-bar"></div>
     <div class="chat-input-bar">
       <input class="cinput" id="gc-inp" placeholder="Написать..." onkeydown="if(event.key==='Enter')gcSend()">
-      <button class="csend" onclick="gcSend()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" 
-y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      <button class="csend" onclick="gcSend()">...
     </div>`;
   scrollChat('gcmsgs');
 }
@@ -995,7 +995,7 @@ function buildGcHtml(msgs,myId){
     const isOut=m.user_id===myId;
     return`<div class="msg-row ${isOut?'out':'in'}">
       ${!isOut?`<div class="msg-nick" onclick="openUserProfile(${m.user_id})">${esc(m.nickname)}</div>`:''}
-      <div class="msg-bubble ${isOut?'out':'in'}" onclick="gcMsgTap(${m.id},${m.user_id},'${esc(m.nickname?.replace(/'/g,"\\\\'"))}',${isOut})">${esc(m.message)}<div class="msg-time">${(m.created_at||'').slice(11,16)}</div></div>
+      <div class="msg-bubble ${isOut?'out':'in'}" onclick="gcMsgTap(${m.id},${m.user_id},'${esc(m.nickname?.replace(/'/g,"\\\\'"))}',${isOut},'${esc((m.message||'').slice(0,50).replace(/'/g,"\\\\'"))}')">` + `${esc(m.message)}
     </div>`;
   }).join('');
 }
@@ -1013,22 +1013,31 @@ if(atBot)scrollChat('gcmsgs');
 async function gcSend(){
   const inp=document.getElementById('gc-inp');const text=inp?.value?.trim();
   if(!text)return;inp.value='';
-  try{await api('/chat/send',{message:text});await refreshGlobalChat();scrollChat('gcmsgs');}
+  const replyText=S.replyTo?.text||null;
+  clearReply();
+  try{await api('/chat/send',{message:text,...(replyText?{reply_to_text:replyText}:{})});await refreshGlobalChat();scrollChat('gcmsgs');}
   catch(e){toast('❌ '+e.message);}
 }
-function gcMsgTap(msgId,userId,nick,isOut){
-  const isBlocked=blockedUsers.includes(userId);
-const isMuted=mutedUsers.includes(userId);
+function gcMsgTap(msgId,userId,nick,isOut,msgText){
   const items=[
     {icon:'👤',label:'Профиль '+nick,fn:()=>openUserProfile(userId)},
     {icon:'➕',label:'Добавить в друзья',fn:()=>addFriend(userId)},
+    {icon:'↩',label:'Ответить',fn:()=>{
+      S.replyTo={id:msgId,text:msgText};
+      const bar=document.getElementById('reply-bar');
+      if(bar){
+        bar.style.display='flex';
+        bar.innerHTML=`<div class="reply-bar-inner">
+          <div class="reply-bar-label">↩ ${esc(nick)}</div>
+          <div class="reply-bar-text">${esc(msgText)}</div>
+        </div>
+        <button class="reply-bar-close" onclick="clearReply()">✕</button>`;
+      }
+      document.getElementById('gc-inp')?.focus();
+    }},
     '---',
   ];
-if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>gcDelete(msgId)});
-  if(!isOut){
-    items.push({icon:isMuted?'🔔':'🔇',label:isMuted?'Включить уведомления':'Замутить',fn:()=>toggleMute(userId,nick)});
-    items.push({icon:isBlocked?'✅':'🚫',label:isBlocked?'Разблокировать':'Заблокировать',danger:!isBlocked,fn:()=>isBlocked?gcUnblock(userId,nick):gcBlock(userId,nick)});
-  }
+  if(isOut)items.push({icon:'🗑',label:'Удалить',danger:true,fn:()=>gcDelete(msgId)});
   showCtxSheet(items);
 }
 async function gcDelete(msgId){try{await api('/chat/delete',{msg_id:msgId});await refreshGlobalChat();}catch(e){toast('❌ '+e.message);}}
