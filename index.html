@@ -1677,6 +1677,8 @@ function muteUser(userId, nick, durationMs){
     localStorage.setItem('muteData',JSON.stringify(muteData));
     localStorage.setItem('muted',JSON.stringify(mutedUsers));
   }catch(e){}
+  const untilTs=durationMs>0?Math.floor((Date.now()+durationMs)/1000):0;
+  api('/dm/mute',{muted_id:userId,until_ts:untilTs}).catch(()=>{});
   const label=durationMs>0?`на ${formatMuteDuration(durationMs)}`:'навсегда';
   toast('🔕 '+nick+' замучен '+label);
 }
@@ -1689,6 +1691,7 @@ function unmuteUser(userId, nick){
     localStorage.setItem('muteData',JSON.stringify(muteData));
     localStorage.setItem('muted',JSON.stringify(mutedUsers));
   }catch(e){}
+  api('/dm/mute',{muted_id:userId,until_ts:-1}).catch(()=>{}); // -1 = снять мут
   toast('🔔 Уведомления включены для '+nick);
 }
 
