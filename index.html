@@ -818,8 +818,8 @@ return`<div class="conv-item" onclick="openOrderChat(${o.id})">
             </div>
           </div>`;}).join(''):''}
         ${dmConvs.map(f=>`
-          <div class="conv-item" onclick="openDmChat(${f.partner_id},'${esc(f.nickname)}','')">
-            <div class="conv-ava">👤</div>
+  <div class="conv-item" onclick="openDmChat(${f.partner_id},'${esc(f.nickname)}','${esc(f.avatar_url||'')}')">
+    <div class="conv-ava">${f.avatar_url?`<img src="${esc(f.avatar_url)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}</div>
             <div class="conv-body">
               <div class="conv-head">
                 <div class="conv-name">${esc(f.nickname)}</div>
