@@ -297,6 +297,10 @@ function goPage(name){
 ({market:renderMarket,sell:renderSell,msgs:renderMsgs,wallet:renderWallet,profile:renderProfile}[name]||function(){})();
 }
 function showFull(id){
+  // Запоминаем откуда пришли (только обычные страницы, не fullpg)
+  if(['market','sell','msgs','wallet','profile'].includes(S.page)){
+    S._prevPage=S.page;
+  }
   closeAllFull();
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.getElementById('fp-'+id)?.classList.add('on');
@@ -1475,7 +1479,7 @@ async function openUserProfile(userId){
       </button>`;
     }
     document.getElementById('userprofile-inner').innerHTML=`
-      <button class="back" onclick="closeAllFull()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <button class="back" onclick="history_back_userprofile()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
       <div class="prof-header">
         <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${u.avatar_url}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
         <div class="prof-name">${esc(u.nickname)}</div>
@@ -1838,6 +1842,15 @@ async function init(){
   setInterval(checkDmUnread,20000);checkDmUnread();
   setInterval(checkFriendRequests,15000);checkFriendRequests();
 }
+
+function history_back_userprofile(){
+  closeAllFull();
+  // Возвращаемся на страницу которая была активна
+  const prev=S._prevPage||'market';
+  document.getElementById('pg-'+prev)?.classList.add('on');
+  document.getElementById('nb-'+prev)?.classList.add('on');
+}
+  
 init();
 </script>
 </body>
