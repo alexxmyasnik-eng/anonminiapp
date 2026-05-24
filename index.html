@@ -1567,7 +1567,7 @@ if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">�
     +'<div style="font-size:11px;color:var(--tx3)">'+esc(p.seller_nick)+'</div>'
     +'<div style="font-weight:700;font-size:14px;color:var(--gr2)">'+(p.price===0?'🤝 Договорная':p.price+' ₽')+'</div>'
     +'</div></div>';
-}).join('')
+}).join('')}).join('')}</div>` // <--- ВОТ ЗДЕСЬ ИЗМЕНЕНИЯ
         :'<div class="empty"><div class="empty-i">🔍</div>Ничего не найдено</div>';
 }catch(e){if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
   },400);
