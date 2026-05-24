@@ -404,7 +404,31 @@ async function doBuy(id,price){
   if((S.user?.balance??0)<price){toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);return;}
   try{
     const r=await api('/buy',{product_id:id});
-    if(r.ok){playSound();toast('✅ Куплено! '+r.short_id);if(S.user){S.user.balance-=price;}setTimeout(()=>goPage('msgs'),1000);}
+    if(r.ok){
+  playSound();toast('✅ Куплено! '+r.short_id);
+  if(S.user){S.user.balance-=price;}
+  setTimeout(async()=>{
+    // Проверяем — есть ли уже ЛС с продавцом этого товара
+    try{
+      const prod=await api('/product/'+id);
+      const sellerId=prod.seller_id;
+      const sellerNick=prod.seller_nick;
+      // Проверяем есть ли DM переписка
+      const convs=await api('/dm/conversations').catch(()=>[]);
+      const existing=convs.find(c=>c.partner_id===sellerId);
+      if(existing){
+        // Уже общались — открыть ЛС
+        openDmChat(sellerId,sellerNick,'');
+      } else {
+        // Не общались — открыть чат заказа
+        const orders=await api('/orders');
+        const ord=orders.find(o=>o.seller_id===sellerId&&o.status==='paid');
+        if(ord)openOrderChat(ord.id);
+        else goPage('msgs');
+      }
+    }catch(e){goPage('msgs');}
+  },1000);
+}
     else{toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);}
   }catch(e){toast('❌ '+e.message);}
 }
@@ -603,7 +627,7 @@ const cat=CATEGORIES[catId];
   let extraFields='';
 
   if(group==='A'){
-    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽" oninput="updatePriceHint(this.value)"><div id="price-hint" style="font-size:12px;color:var(--tx3);margin-top:5px;padding-left:2px"></div></div>`;
     extraFields=`
   <div class="field">
     <label>Превью (фото с блюром) <span style="color:var(--rd)">*</span></label>
@@ -624,7 +648,7 @@ const cat=CATEGORIES[catId];
   </div>`;
   }
   else if(group==='B'){
-    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽"></div>`;
+    priceField=`<div class="field"><label>Цена (₽)</label><input id="s-price" type="number" inputmode="numeric" placeholder="Мин. 15 ₽" oninput="updatePriceHint(this.value)"><div id="price-hint" style="font-size:12px;color:var(--tx3);margin-top:5px;padding-left:2px"></div></div>`;
     extraFields=`<div class="info-box" style="border-color:var(--ac)">📌 Покупатель сам введёт ник для сигны при покупке</div>`;
   }
   else if(group==='C'){
@@ -1319,16 +1343,21 @@ async function renderProfile(){
     let myProds=[];
     try{const res=await api('/my_products');myProds=Array.isArray(res)?res:[];}catch(e){}
     const prodsHtml=myProds.length
-      ?`<div style="display:flex;flex-direction:column">${myProds.map(p=>`
-        <div class="my-prod">
+      ?`<div class="prods">${myProds.map(p=>{
+        const hasPreview=p.preview_url&&p.preview_url.length>0;
+        const previewSrc=hasPreview?(p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`):null;
+        const thumbHtml=hasPreview?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:22px">📦</span>`;
+        return`<div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
+          ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
+          <div class="prod-thumb" style="overflow:hidden">${thumbHtml}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-weight:700;font-size:14px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
-            <div style="font-size:11px;color:var(--tx3)">${CATEGORIES[p.category]?.name||p.category}${p.subcategory?' · '+p.subcategory:''}</div>
-            <div style="font-weight:700;font-size:13px;color:var(--gr2);margin-top:2px">${p.price} ₽${p.is_premium?' ⭐':''}</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">${CATEGORIES[p.category]?.name||p.category}${p.subcategory?' · '+p.subcategory:''}</div>
+            <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price==0?'🤝 Договорная':p.price+' ₽'}${p.is_premium?' ⭐':''}</div>
           </div>
-          <button class="my-prod-del" onclick="deleteMyProduct(${p.id},this)">🗑</button>
- 
-        </div>`).join('')}</div>`
+          <button class="my-prod-del" onclick="event.stopPropagation();deleteMyProduct(${p.id},this)">🗑</button>
+        </div>`;
+      }).join('')}</div>`
       :'<div style="color:var(--tx3);font-size:13px;padding:8px 0">У тебя пока нет товаров</div>';
     document.getElementById('pg-profile').innerHTML=`
       <div class="prof-header">
@@ -1498,9 +1527,39 @@ async function openUserProfile(userId){
         <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
     
   </div>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${actionButtons}</div>`;
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${actionButtons}</div>
+      <div class="st" style="margin-top:20px">Товары</div>
+      <div id="user-products-wrap"><div class="loader"><div class="spin"></div></div></div>`;
+    loadUserProducts(userId);
   }catch(e){document.getElementById('userprofile-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
+
+async function loadUserProducts(userId){
+  const wrap=document.getElementById('user-products-wrap');
+  if(!wrap)return;
+  try{
+    const cats=Object.keys(CATEGORIES);
+    const results=await Promise.all(cats.map(c=>
+      api('/products/'+c,{seller:userId}).catch(()=>[])
+    ));
+    const all=results.flat().sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0));
+    if(!all.length){wrap.innerHTML='<div class="empty" style="padding:20px 0"><div class="empty-i">📭</div>Товаров нет</div>';return;}
+    wrap.innerHTML=`<div class="prods">${all.map(p=>{
+      const hasPreview=p.preview_url&&p.preview_url.length>0;
+      const previewSrc=hasPreview?(p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`):null;
+      const thumbHtml=hasPreview?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover;filter:blur(6px);transform:scale(1.1)">`:`<span style="font-size:22px">📦</span>`;
+      return`<div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
+        ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
+        <div class="prod-thumb" style="overflow:hidden">${thumbHtml}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">⭐${p.seller_rating}</div>
+          <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }catch(e){const w=document.getElementById('user-products-wrap');if(w)w.innerHTML='';}
+}  
 // ── SEARCH ───────────────────────────────────────────────
 function goSearch(){
   document.getElementById('search-inner').innerHTML=`
