@@ -246,12 +246,15 @@ try{mutedUsers=JSON.parse(localStorage.getItem('muted')||'[]');}catch(e){}
 function playSound(){try{if(!mutedUsers.includes('all'))document.getElementById('snd')?.play();}catch(e){}}
 function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),ms);}
 
+const POST_ENDPOINTS=['/send_msg','/buy','/confirm_order','/topup/create','/withdraw','/support/send','/support/reply','/chat/send','/chat/delete','/dm/send','/dm/mute','/dm/delete','/friends/add','/friends/cancel','/friends/accept','/friends/remove','/products/delete','/me/update'];
 async function api(path,body=null){
   const u=uid();const params=new URLSearchParams();
   if(u)params.set('uid',String(u));
-  if(body)for(const[k,v]of Object.entries(body))if(v!==null&&v!==undefined)params.set(k,String(v));
-  const url=API+path+(params.toString()?'?'+params.toString():'');
-try{const r=await fetch(url);if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status);}return r.json();}
+  const isPost=POST_ENDPOINTS.some(ep=>path.startsWith(ep));
+  if(!isPost&&body)for(const[k,v]of Object.entries(body))if(v!==null&&v!==undefined)params.set(k,String(v));
+  const url=API+path+((!isPost&&params.toString())?'?'+params.toString():'');
+  const opts=isPost?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...(u?{uid:u}:{}),  ...(body||{})})}:{};
+try{const r=await fetch(url,opts);if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'HTTP '+r.status);}return r.json();}
   catch(e){throw new Error(e.message||'Ошибка');}
 }
 
@@ -389,10 +392,24 @@ document.getElementById('product-inner').innerHTML=`
       ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`${p.price==0
   ?
 `<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>`
-  : `<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`
+  : `<button class="btn btn-pr" onclick="confirmBuy(${p.id},${p.price},${JSON.stringify(p.title||'')||''})">🛒 Купить — ${p.price} ₽</button>`
 }`}`;
 }catch(e){document.getElementById('product-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
+
+function confirmBuy(id, price, title){
+  const ov=document.createElement('div');ov.className='popup-overlay';
+  ov.innerHTML=`<div class="popup-box">
+    <div class="popup-title">Подтвердить покупку</div>
+    <div class="popup-text" style="margin-bottom:16px">Списать <b style="color:var(--gr2)">${price} ₽</b> с баланса?</div>
+    <button class="btn btn-pr" id="buy-confirm-ok">🛒 Купить</button>
+    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
+  </div>`;
+  ov.querySelector('#buy-confirm-ok').onclick=()=>{ov.remove();doBuy(id,price);};
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
+}
+
 async function doBuy(id,price){
   if(!uid()){toast('⚠️ Нужен Telegram');return;}
   if((S.user?.balance??0)<price){toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);return;}
@@ -783,7 +800,8 @@ async function loadMsgsList(){
     const myId=uid();let total=0;orders.forEach(o=>total+=(o.unread||0));
     const lastGc=gcMsgs.length?gcMsgs[gcMsgs.length-1]:null;
 // Admin gets support panel too
-    const isAdmin=myId==780434845;
+    // Admin check via server-side flag
+    const isAdmin=S.user?.is_admin||false;
 document.getElementById('pg-msgs').innerHTML=`
       <div class="st" style="margin-top:0">Сообщения</div>
       <div class="conv-list">
@@ -857,7 +875,7 @@ document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
       <button onclick="closeChat()" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">${order.role==='buyer'?'🛒':'🏪'}</div>
-      <div style="flex:1;cursor:pointer" onclick="openUserProfile(${order.role==='buyer'?order.seller_id:order.seller_id})"><div style="font-weight:700;font-size:14px">${esc(order.partner_nick)}</div><div style="font-size:11px;color:var(--tx3)">${sl[order.status]||order.status} · ${order.amount} ₽</div></div>
+      <div style="flex:1;cursor:pointer" onclick="openUserProfile(${order.role==='buyer'?order.seller_id:order.buyer_id})"><div style="font-weight:700;font-size:14px">${esc(order.partner_nick)}</div><div style="font-size:11px;color:var(--tx3)">${sl[order.status]||order.status} · ${order.amount} ₽</div></div>
     </div>
     <div class="msgs-area" id="cmsgs">
       <div class="ord-card-chat">
@@ -1010,11 +1028,14 @@ async function refreshGlobalChat(){
 if(atBot)scrollChat('gcmsgs');
   }catch(e){}
 }
+let _gcSending=false;
 async function gcSend(){
+  if(_gcSending)return;
   const inp=document.getElementById('gc-inp');const text=inp?.value?.trim();
-  if(!text)return;inp.value='';
+  if(!text)return;inp.value='';_gcSending=true;
   try{await api('/chat/send',{message:text});await refreshGlobalChat();scrollChat('gcmsgs');}
-  catch(e){toast('❌ '+e.message);}
+  catch(e){inp.value=text;toast('❌ '+e.message);}
+  finally{_gcSending=false;}
 }
 function gcMsgTap(msgId,userId,nick,isOut){
   const isBlocked=blockedUsers.includes(userId);
@@ -1176,9 +1197,13 @@ async function renderWallet(){
   const bal=S.user?.balance??0;
 document.getElementById('pg-wallet').innerHTML=`
     <div class="wal-cards">
-      <div class="wal-card" style="grid-column:1/-1">
-        <div class="wal-card-label">Баланс</div>
-        <div class="wal-amount">${bal.toFixed(0)} ₽</div>
+      <div class="wal-card">
+        <div class="wal-card-label">Баланс (покупки)</div>
+        <div class="wal-amount" style="font-size:22px">${bal.toFixed(0)} ₽</div>
+      </div>
+      <div class="wal-card">
+        <div class="wal-card-label">Заработано (вывод)</div>
+        <div class="wal-amount" style="font-size:22px;color:var(--yl)">${(S.user?.earn_balance??0).toFixed(0)} ₽</div>
       </div>
     </div>
     <div class="wal-actions">
@@ -1288,11 +1313,11 @@ function updWd(){
 }
 async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
-  const bal2=S.user?.balance??0;
+  const bal2=S.user?.earn_balance??0;
   if(!amount||amount<100){toast('⚠️ Минимум 100 ₽');return;}
-  if(amount>bal2){toast(`❌ Доступно: ${bal2.toFixed(0)} ₽`);return;}
+  if(amount>bal2){toast(`❌ Доступно для вывода: ${bal2.toFixed(0)} ₽`);return;}
   if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
-  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.balance-=amount;S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
   catch(e){toast('❌ '+e.message);}
 }
 
@@ -1340,8 +1365,7 @@ document.getElementById('pg-profile').innerHTML=`
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">${S.user.balance.toFixed(0)} ₽</div><div class="stat-l">Баланс</div></div>
-        <div 
-class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
+        <div class="stat"><div class="stat-v" style="color:var(--yl)">${(S.user.earn_balance||0).toFixed(0)} ₽</div><div class="stat-l">Заработано</div></div>
       </div>
       <button class="btn btn-ol" id="friends-btn" onclick="openFriends()" style="position:relative">👥 Друзья<span id="badge-friend-req" style="display:none;position:absolute;top:8px;right:12px;background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">!</span></button>
       <div class="st">Мои товары</div>
@@ -1349,7 +1373,15 @@ class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг
   }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 async function deleteMyProduct(id,btn){
-  if(!confirm('Удалить товар?'))return;
+  // Using custom popup instead of confirm() which doesn't work in Telegram WebApp
+  return new Promise(resolve => {
+    const ov=document.createElement('div');ov.className='popup-overlay';
+    ov.innerHTML=`<div class="popup-box"><div class="popup-title">Удалить товар?</div><div class="popup-text">Это действие нельзя отменить.</div><button class="btn btn-rd" id="del-ok">Удалить</button><button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button></div>`;
+    ov.querySelector('#del-ok').onclick=()=>{ov.remove();resolve(true);};
+    ov.addEventListener('click',e=>{if(e.target===ov){ov.remove();resolve(false);}});
+    document.body.appendChild(ov);
+  }).then(async confirmed=>{
+  if(!confirmed)return;
   btn.disabled=true;btn.textContent='...';
   try{
     const r=await fetch(API+'/products/delete?uid='+(uid()||'')+'&product_id='+id);
@@ -1374,8 +1406,8 @@ function goSettings(){
     <div class="field"><label>Никнейм</label><input id="ep-nick" value="${esc(u.nickname||'')}" placeholder="Твой ник" maxlength="30"></div>
  
     <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?"
-min="1" max="120"></div>
-    <div class="field"><label>Пол (нельзя изменить через поддержку)</label></div>
+min="18" max="120"></div>
+    <div class="field"><label>Пол</label></div>
     <div class="g-row">
       <button class="g-btn ${S.gender==='male'?'sel':''}" id="g-male" onclick="selGender('male')">👨 Мужской</button>
       <button class="g-btn ${S.gender==='female'?'sel':''}" id="g-female" onclick="selGender('female')">👩 Женский</button>
@@ -1456,6 +1488,12 @@ if(S.user?.avatar_url?.startsWith('data:')){
 
 // ── USER PROFILE (others) ─────────────────────────────────
 async function openUserProfile(userId){
+  // Запоминаем откуда пришли
+  if(S.page&&!['userprofile'].includes(S.page)){
+    const fullPages=['chat','product','settings','topup','withdraw','search','selltype','friends','adminsup'];
+    if(fullPages.includes(S.page)) S._prevFullPage=S.page;
+    else { S._prevPage=S.page; S._prevFullPage=null; }
+  }
   document.getElementById('userprofile-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('userprofile');
   try{
@@ -1515,10 +1553,10 @@ if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">�
   srchT=setTimeout(async()=>{
     if(el)el.innerHTML='<div class="loader"><div class="spin"></div></div>';
     try{
-      let all=[];for(const c of Object.keys(CATEGORIES)){try{const p=await api('/products/'+c);if(Array.isArray(p))all=all.concat(p);}catch(e){}}
+      let all=[];try{const results=await Promise.all(Object.keys(CATEGORIES).map(c=>api('/products/'+c).catch(()=>[])));results.forEach(p=>{if(Array.isArray(p))all=all.concat(p);});}catch(e){}
       const found=all.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
       if(el)el.innerHTML=found.length
-        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
+        ?`<div class="prods">${found.map(p=>{const hasP=p.preview_url&&p.preview_url.startsWith('data:image');const thumb=hasP?'<img src="'+p.preview_url+'" style="width:100%;height:100%;object-fit:cover;filter:blur(6px);transform:scale(1.1)">':'📦';return`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb" style="overflow:hidden">${thumb}</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price===0?'🤝 Договорная':p.price+' ₽'}</div></div></div>`;}).join('')}</div>`
         :'<div class="empty"><div class="empty-i">🔍</div>Ничего не найдено</div>';
 }catch(e){if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
   },400);
@@ -1534,6 +1572,10 @@ try{
     if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
     if(total>prevUnread&&S.page!=='chat'&&S.page!=='msgs')playSound();
     prevUnread=total;
+    // Обновляем суммарный бейдж (заказы + DM)
+    const totalBadge=total+(Object.values(dmUnread).reduce((a,b)=>a+b,0));
+    const badge=document.getElementById('badge-msgs');
+    if(badge){if(totalBadge>0){badge.textContent=totalBadge>9?'9+':totalBadge;badge.classList.add('on');}else badge.classList.remove('on');}
 }catch(e){}
 }
 
@@ -1864,10 +1906,19 @@ async function init(){
 
 function history_back_userprofile(){
   closeAllFull();
-  // Возвращаемся на страницу которая была активна
+  // Если пришли из fullpg (чат, поиск и т.д.) — возвращаемся туда
+  if(S._prevFullPage){
+    document.getElementById('fp-'+S._prevFullPage)?.classList.add('on');
+    S.page=S._prevFullPage;
+    S._prevFullPage=null;
+    return;
+  }
+  // Иначе на обычную страницу
   const prev=S._prevPage||'market';
   document.getElementById('pg-'+prev)?.classList.add('on');
   document.getElementById('nb-'+prev)?.classList.add('on');
+  document.getElementById('nb-'+prev)?.classList.add('on');
+  S.page=prev;
 }
   
 init();
