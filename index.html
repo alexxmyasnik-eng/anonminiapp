@@ -1311,6 +1311,14 @@ function updWd(){
   if(a>=100){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
   else el.style.display='none';
 }
+function updatePriceHint(val){
+  const hint=document.getElementById('price-hint');
+  if(!hint)return;
+  const n=parseFloat(val);
+  if(!n||n<=0){hint.textContent='';return;}
+  const gets=Math.round(n*(1-SELL_C)*100)/100;
+  hint.innerHTML=`<span style="color:var(--gr2)">Вы получите: ${gets} ₽</span> <span style="color:var(--tx3)">(комиссия ${Math.round(SELL_C*100)}%)</span>`;
+}  
 async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
   const bal2=S.user?.balance??0;
@@ -1384,7 +1392,7 @@ async function deleteMyProduct(id,btn){
   try{
     const r=await fetch(API+'/products/delete?uid='+(uid()||'')+'&product_id='+id);
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Ошибка '+r.status);}
-    btn.closest('.my-prod').remove();toast('✅ Товар удалён');
+    btn.closest('.prod').remove();toast('✅ Товар удалён');
   }catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
 }
 
