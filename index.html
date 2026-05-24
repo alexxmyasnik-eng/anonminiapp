@@ -1577,17 +1577,19 @@ if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">�
 let prevUnread=0;
 async function checkUnread(){
   if(!uid())return;
-try{
+try {
     const orders=await api('/orders');const total=orders.reduce((s,o)=>s+(o.unread||0),0);
     const badge=document.getElementById('badge-msgs');
     if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
-    if(total>prevUnread&&S.page!=='chat'&&S.page!=='msgs')playSound();
+    if(total>prevUnread&&S.page!='chat'&&S.page!='msgs')playSound();
     prevUnread=total;
+    
     // Обновляем суммарный бейдж (заказы + DM)
     const totalBadge=total+(Object.values(dmUnread).reduce((a,b)=>a+b,0));
-    const badge=document.getElementById('badge-msgs');
+    
+    // СТРОКУ 1588 УДАЛИЛИ, сразу работаем с существующим badge:
     if(badge){if(totalBadge>0){badge.textContent=totalBadge>9?'9+':totalBadge;badge.classList.add('on');}else badge.classList.remove('on');}
-}catch(e){}
+} catch(e){}
 }
 
 
