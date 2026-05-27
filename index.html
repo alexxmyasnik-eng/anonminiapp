@@ -1391,7 +1391,7 @@ async function renderProfile(){
     document.getElementById('pg-profile').innerHTML=`
       <div class="prof-header">
         <div class="prof-ava">
-          ${S.user.avatar_url?`<img src="${avatarSrc(S.user.avatar_url)}" / src="${avatarSrc(u.avatar_url)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
+          ${S.user.avatar_url?`<img src="${avatarSrc(S.user.avatar_url)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
           <div class="prof-ava-edit" onclick="pickAvatar()">📷</div>
         </div>
         <div class="prof-name">${esc(S.user.nickname)}</div>
