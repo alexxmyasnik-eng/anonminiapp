@@ -797,14 +797,14 @@ async function doSell(){
       // Upload delivery files
       if(S.sellData.deliveryFiles?.length&&r.product_id){
         if(btn)btn.textContent=`Загружаем файлы...`;
-        for(let i=0;i<S.sellData.deliveryFiles.length;i++){
-          if(btn)btn.textContent=`Загружаем ${i+1}/${S.sellData.deliveryFiles.length}...`;
-          try{
-            await fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
-              method:'POST',body:S.sellData.deliveryFiles[i],headers:{'Content-Type':'text/plain'}
-            });
-          }catch(e){console.warn('delivery file upload failed',e);}
-        }
+        if(btn)btn.textContent=`Загружаем файлы...`;
+await Promise.allSettled(
+  S.sellData.deliveryFiles.map(f =>
+    fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
+      method:'POST',body:f,headers:{'Content-Type':'text/plain'}
+    })
+  )
+);
       }
       // Сбрасываем кеш маркетплейса после публикации
 delete _apiCache['/products/'+S.sellData.cat];
@@ -1899,14 +1899,14 @@ async function showDeliveryFiles(productId){
   try{
     const r=await api('/products/'+productId+'/delivery_files');
     if(!r.files||!r.files.length){toast('📭 Файлы ещё не добавлены продавцом');return;}
-      window.deliveryFilesCache = r.files;
+      window.deliveryFilesCache = r.files.map(f => `${API}/tg_file?file_id=${encodeURIComponent(f)}`);
     const ov=document.createElement('div');ov.className='popup-overlay';
     ov.innerHTML=`<div class="popup-box" style="max-height:80vh;overflow-y:auto;text-align:left">
       <div class="popup-title" style="margin-bottom:14px">📥 Файлы (${r.files.length})</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         ${r.files.map((src,i)=>`
           <div style="border-radius:12px;overflow:hidden;cursor:pointer" onclick="openFullImg(${i},deliveryFilesCache)">
-            <img src="${src}" style="width:100%;aspect-ratio:1;object-fit:cover">
+            <img src="${API}/tg_file?file_id=${encodeURIComponent(src)}" style="width:100%;aspect-ratio:1;object-fit:cover" loading="lazy">
           </div>`).join('')}
       </div>
       <button class="btn btn-pr" onclick="this.closest('.popup-overlay').remove()">Закрыть</button>
