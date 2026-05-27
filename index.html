@@ -1927,10 +1927,9 @@ function openFullImg(idx, files){
   function render(i){
     i=((i%files.length)+files.length)%files.length;
     ov.innerHTML=`
-      <div style="position:absolute;top:16px;right:16px;display:flex;gap:12px;z-index:10001">
-        <a href="${files[i]}" download="file_${i+1}.jpg" style="color:#fff;font-size:26px;text-decoration:none;line-height:1">⬇️</a>
-        <button id="fullimg-close" style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:20px;width:36px;height:36px;border-radius:50%;cursor:pointer;line-height:1">✕</button>
-      </div>
+      <div style="position:absolute;top:16px;right:16px;z-index:10001">
+  <button id="fullimg-close" style="background:rgba(255,255,255,.25);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;line-height:1">✕</button>
+</div>
       ${i>0?`<div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:10001">
         <button id="btn-prev" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">‹</button>
       </div>`:''}
@@ -1940,9 +1939,14 @@ function openFullImg(idx, files){
         <button id="btn-next" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">›</button>
       </div>`:''}`;
     
-    document.getElementById('fullimg-close')?.addEventListener('click', e=>{e.stopPropagation();ov.remove();});
-    document.getElementById('btn-prev')?.addEventListener('click', e=>{e.stopPropagation();render(i-1);});
-    document.getElementById('btn-next')?.addEventListener('click', e=>{e.stopPropagation();render(i+1);});
+    ov.onclick=e=>{
+  e.stopPropagation();
+  const id=e.target.closest('[id]')?.id;
+  if(id==='fullimg-close') ov.remove();
+  else if(id==='btn-prev') render(i-1);
+  else if(id==='btn-next') render(i+1);
+  else if(e.target===ov) ov.remove();
+};
   }
   
   render(idx);
