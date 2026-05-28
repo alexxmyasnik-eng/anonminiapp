@@ -169,7 +169,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .mute-submenu .ctx-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;padding:14px 16px;cursor:pointer;border-radius:12px;text-align:left}
 .mute-submenu .ctx-btn:active{background:var(--s3)}  
 /* TOAST */
-.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:85vw;text-align:center}
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:normal;max-width:85vw;text-align:center;word-break:break-word}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .loader{text-align:center;padding:50px;color:var(--tx3)}
 .spin{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--br2);border-top-color:var(--ac);animation:sp .7s linear infinite;margin:0 auto 10px}
@@ -210,6 +210,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="pg" id="pg-profile"></div>
 
 <div class="fullpg" id="fp-chat"><div class="chat-wrap" id="chat-inner"></div></div>
+<div class="fullpg" id="fp-adminwd" style="overflow-y:auto"><div id="adminwd-inner" style="padding:16px 16px 80px"></div></div>  
 <div class="fullpg" id="fp-product" style="overflow-y:auto"><div id="product-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-settings" style="overflow-y:auto"><div id="settings-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-userprofile" style="overflow-y:auto"><div id="userprofile-inner" style="padding:16px 16px 80px"></div></div>
@@ -231,6 +232,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <audio id="snd" preload="none"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
 
 <script>
+const ADMIN_ID = 780434845; // замени на свой реальный Telegram ID  
 const API='https://anonpeak-mw3g.onrender.com';
 // Добавь эту функцию в начало <script> (после const API=...)
 function avatarSrc(url){
@@ -1139,7 +1141,46 @@ async function supSend(){
 }
 
 // ── ADMIN SUPPORT PANEL ───────────────────────────────────
-async function openAdminSupport(){
+  async function openAdminWithdrawals(){
+  document.getElementById('adminwd-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('adminwd');
+  await refreshAdminWithdrawals();
+}
+async function refreshAdminWithdrawals(){
+  try{
+    const list=await api('/admin/withdrawals');
+    document.getElementById('adminwd-inner').innerHTML=`
+      <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="st">Заявки на вывод</div>
+      ${list.length?list.map(w=>`
+        <div class="tx-item" style="flex-direction:column;align-items:stretch;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="tx-icon">💸</div>
+            <div class="tx-body">
+              <div class="tx-desc">${esc(w.nickname)} (ID:${w.user_id})</div>
+              <div class="tx-date">${w.created_at.slice(0,16).replace('T',' ')}</div>
+            </div>
+            <div class="tx-amt" style="color:var(--yl)">-${w.amount.toFixed(0)} ₽</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn btn-gr" style="margin:0;padding:10px" onclick="adminApproveWd(${w.id},this)">✅ Одобрить</button>
+            <button class="btn btn-rd" style="margin:0;padding:10px" onclick="adminRejectWd(${w.id},this)">❌ Отклонить</button>
+          </div>
+        </div>`).join(''):'<div class="empty"><div class="empty-i">✅</div>Заявок нет</div>'}`;
+  }catch(e){document.getElementById('adminwd-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+}
+async function adminApproveWd(wId,btn){
+  btn.disabled=true;btn.textContent='...';
+  try{await api('/admin/withdraw/approve',{w_id:wId});toast('✅ Одобрено');await refreshAdminWithdrawals();}
+  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Одобрить';}
+}
+async function adminRejectWd(wId,btn){
+  btn.disabled=true;btn.textContent='...';
+  try{await api('/admin/withdraw/reject',{w_id:wId});toast('✅ Отклонено, средства возвращены');await refreshAdminWithdrawals();}
+  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='❌ Отклонить';}
+}
+  
+  async function openAdminSupport(){
   document.getElementById('adminsup-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('adminsup');
   try{
@@ -1231,6 +1272,7 @@ async function renderWallet(){
       <div class="wal-action p" onclick="goTopup()">ПОПОЛНИТЬ</div>
       <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
+    ${uid()===ADMIN_ID ? `<button class="btn btn-yl" onclick="openAdminWithdrawals()" style="margin-bottom:16px">🛡 Заявки на вывод</button>` : ''}
     <div class="st">История операций</div>
     <div id="wal-tx-list"><div class="loader"><div class="spin"></div></div></div>`;
   try{
@@ -1325,11 +1367,19 @@ async function confirmTopup(){
   }catch(e){toast('❌ '+e.message);if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`;}}
 }
 function copyCode(t){navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);});}
-function goWithdraw(){
+async function goWithdraw(){
   const earn=S.user?.balance??0;
+  // Проверяем кулдаун через API
+  let cooldownHtml='';
+  try{
+    // Пробуем запросить вывод с нулевой суммой чтобы узнать оставшееся время
+    const r=await fetch(API+'/withdraw/cooldown?uid='+(uid()||''));
+    if(r.ok){const d=await r.json();if(d.wait_min>0){cooldownHtml=`<div style="background:rgba(244,63,94,.1);border:1px solid var(--rd);border-radius:14px;padding:14px;text-align:center;margin-bottom:14px"><div style="font-size:13px;color:var(--rd);font-weight:700">⏳ Следующую заявку можно подать через</div><div style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:800;color:var(--rd);margin:8px 0" id="wd-countdown">${d.wait_min} мин.</div></div>`;}}
+  }catch(e){}
   document.getElementById('withdraw-inner').innerHTML=`
     <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
     <div class="st">Вывод в Telegram Stars</div>
+    ${cooldownHtml}
     <div class="info-box">Доступно: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>250 ₽</b></div>
     <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 250 ₽" max="${earn}" oninput="updWd()"></div>
     <div class="w-calc" id="w-calc" style="display:none">
@@ -1338,7 +1388,8 @@ function goWithdraw(){
       <div style="font-size:12px;color:var(--tx3)" id="w-after"></div>
     </div>
     <div class="field"><label>Ваш @username</label><input id="w-user" placeholder="@username" oninput="if(!this.value.startsWith('@'))this.value='@'+this.value.replace('@','')"></div>
-    <button class="btn btn-pr" onclick="doWithdraw()">💸 Вывести</button>`;
+    <div style="font-size:12px;color:var(--tx3);text-align:center;margin-bottom:10px">⏱ Заявку можно подавать раз в 60 минут</div>
+    <button class="btn btn-pr" id="wd-btn" onclick="doWithdraw()" ${cooldownHtml?'disabled style="opacity:.5;cursor:not-allowed"':''}>💸 Вывести</button>`;
   showFull('withdraw');
 }
 function updWd(){
@@ -1364,14 +1415,20 @@ async function doWithdraw(){
   catch(e){toast('❌ '+e.message);}
 }
 async function cancelWithdraw(wId,amount){
-  if(!confirm('Отменить заявку на вывод?'))return;
-  try{
-    await api('/withdraw/cancel',{w_id:wId});
-    toast('✅ Заявка отменена, средства возвращены');
-    if(S.user)S.user.balance=(S.user.balance??0)+amount;
-    renderWallet();
-  }catch(e){toast('❌ '+e.message);}
-}  
+  const ov=document.createElement('div');ov.className='popup-overlay';
+  ov.innerHTML=`<div class="popup-box"><div class="popup-title">Отменить вывод?</div><div class="popup-text">Средства вернутся на баланс. Повторную заявку можно будет подать через 60 минут.</div><button class="btn btn-rd" id="conf-cancel-wd">❌ Отменить заявку</button><button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Оставить</button></div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
+  document.getElementById('conf-cancel-wd').addEventListener('click',async()=>{
+    ov.remove();
+    try{
+      await api('/withdraw/cancel',{w_id:wId});
+      toast('✅ Заявка отменена, средства возвращены');
+      if(S.user)S.user.balance=(S.user.balance??0)+amount;
+      renderWallet();
+    }catch(e){toast('❌ '+e.message);}
+  });
+}
 
 // ── PROFILE ───────────────────────────────────────────────
 async function renderProfile(){
