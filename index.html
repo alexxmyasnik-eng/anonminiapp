@@ -1326,7 +1326,7 @@ async function confirmTopup(){
 }
 function copyCode(t){navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);});}
 function goWithdraw(){
-  const earn=S.user?.earn_balance??0;
+  const earn=S.user?.balance??0;
   document.getElementById('withdraw-inner').innerHTML=`
     <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
     <div class="st">Вывод в Telegram Stars</div>
@@ -1356,11 +1356,11 @@ function updatePriceHint(val){
 }  
 async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
-  const earn=S.user?.earn_balance??0;
+  const earn=S.user?.balance??0;
   if(!amount||amount<250){toast('⚠️ Минимум 250 ₽');return;}
   if(amount>earn){toast(`❌ Доступно: ${earn.toFixed(0)} ₽`);return;}
   if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
-  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка подана! ${r.stars} ⭐`);if(S.user){S.user.earn_balance=Math.max(0,(S.user.earn_balance??0)-amount);}setTimeout(()=>backTo('wallet'),1000);}}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка подана! ${r.stars} ⭐`);if(S.user){S.user.balance=Math.max(0,(S.user.balance??0)-amount);}setTimeout(()=>backTo('wallet'),1000);}}
   catch(e){toast('❌ '+e.message);}
 }
 async function cancelWithdraw(wId,amount){
@@ -1368,7 +1368,7 @@ async function cancelWithdraw(wId,amount){
   try{
     await api('/withdraw/cancel',{w_id:wId});
     toast('✅ Заявка отменена, средства возвращены');
-    if(S.user)S.user.earn_balance=(S.user.earn_balance??0)+amount;
+    if(S.user)S.user.balance=(S.user.balance??0)+amount;
     renderWallet();
   }catch(e){toast('❌ '+e.message);}
 }  
