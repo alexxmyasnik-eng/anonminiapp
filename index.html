@@ -220,6 +220,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="fullpg" id="fp-selltype" style="overflow-y:auto"><div id="selltype-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-friends" style="overflow-y:auto"><div id="friends-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-adminsup" style="overflow-y:auto"><div id="adminsup-inner" style="padding:16px 16px 80px"></div></div>
+<div class="fullpg" id="fp-adminpanel" style="overflow-y:auto"><div id="adminpanel-inner" style="padding:16px 16px 80px"></div></div>
 
 <nav class="nav">
   <button class="nb on" id="nb-market" onclick="goPage('market')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Маркет</button>
@@ -232,7 +233,8 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <audio id="snd" preload="none"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
 
 <script>
-const ADMIN_ID = 780434845; // замени на свой реальный Telegram ID  
+const ADMIN_ID = 780434845;
+// замени на свой реальный Telegram ID  
 const API='https://anonpeak-mw3g.onrender.com';
 // Добавь эту функцию в начало <script> (после const API=...)
 function avatarSrc(url){
@@ -259,7 +261,7 @@ const S={page:'market',user:null,cat:null,sub:null,chatInterval:null,gcInterval:
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 const uid=()=>tg?.initDataUnsafe?.user?.id||null;
 const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=250;
-let blockedUsers=[],mutedUsers=[],sellTypeSelected='normal';
+let blockedUsers=[],mutedUsers=[],sellTypeSelected='';
 try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
 try{mutedUsers=JSON.parse(localStorage.getItem('muted')||'[]');}catch(e){}
 
@@ -400,6 +402,7 @@ async function openProduct(id){
     const p=await api('/product/'+id);const isMine=uid()&&p.seller_id===uid();
     document.getElementById('product-inner').innerHTML=`
       <button class="back" onclick="backTo('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      ${isMine?`<div style="margin-bottom:10px;text-align:center">${p.status==='pending'?'<span style="background:rgba(245,158,11,.2);color:var(--yl);border:1px solid var(--yl);border-radius:10px;padding:4px 12px;font-size:12px;font-weight:700">⏳ На модерации</span>':p.status==='sold'?'<span style="background:rgba(244,63,94,.2);color:var(--rd);border:1px solid var(--rd);border-radius:10px;padding:4px 12px;font-size:12px;font-weight:700">✅ Продан</span>':'<span style="background:rgba(16,185,129,.2);color:var(--gr2);border:1px solid var(--gr2);border-radius:10px;padding:4px 12px;font-size:12px;font-weight:700">🟢 Продаётся</span>'}</div>`:''}
       ${p.preview_url&&p.preview_url.length>0
         ?`<div style="width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;margin-bottom:16px;position:relative">
             <img src="${p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`}" style="width:100%;height:100%;object-fit:cover;${isMine?'':'filter:blur(14px);transform:scale(1.08)'}">
@@ -414,43 +417,68 @@ async function openProduct(id){
       <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов) →</div>
       <div style="color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px">${esc(p.description||'Без описания')}</div>
       <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
-      ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`${p.price==0
+      ${isMine?`${p.status==='sold'?`<button class="btn btn-pr" onclick="doRelist(${p.id})">🔄 Выставить повторно</button>`:`<button class="btn btn-ol" onclick="openEditProduct(${p.id},'${esc(p.title)}','${esc(p.description)}',${p.price})">✏️ Редактировать товар</button>`}<div class="btn btn-ol" style="cursor:default;opacity:.5">Это ваш товар</div>`:`${p.price==0
   ?
-  `<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>`
+`<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>`
   : `<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`
 }`}`;
   }catch(e){document.getElementById('product-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
+
+function openEditProduct(id,title,desc,price){
+  const overlay=document.createElement('div');overlay.className='popup-overlay';
+  overlay.innerHTML=`<div class="popup-box" style="text-align:left">
+    <div class="popup-title" style="margin-bottom:16px">✏️ Редактировать товар</div>
+    <div class="field"><label>Название</label><input id="ep-title" value="${esc(title)}" maxlength="100"></div>
+    <div class="field"><label>Описание</label><textarea id="ep-desc">${esc(desc)}</textarea></div>
+    <div class="field"><label>Цена (₽)</label><input id="ep-price" type="number" min="0" value="${price}"></div>
+    <button class="btn btn-pr" onclick="saveEditProduct(${id},this.closest('.popup-overlay'))">💾 Сохранить</button>
+    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+async function saveEditProduct(id,overlay){
+  const title=document.getElementById('ep-title').value.trim();
+  const desc=document.getElementById('ep-desc').value.trim();
+  const price=parseFloat(document.getElementById('ep-price').value)||0;
+  if(!title){toast('⚠️ Введи название');return;}
+  try{
+    await api('/products/update',{product_id:id,title,description:desc,price});
+    toast('✅ Товар обновлён');overlay.remove();openProduct(id);
+    Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
+  }catch(e){toast('❌ '+e.message);}
+}
+
 async function doBuy(id,price){
   if(!uid()){toast('⚠️ Нужен Telegram');return;}
   if((S.user?.balance??0)<price){toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);return;}
   try{
     const r=await api('/buy',{product_id:id});
     if(r.ok){
-  playSound();toast('✅ Куплено! '+r.short_id);
-  if(S.user){S.user.balance-=price;}
-  setTimeout(async()=>{
-    // Проверяем — есть ли уже ЛС с продавцом этого товара
-    try{
-      const prod=await api('/product/'+id);
-      const sellerId=prod.seller_id;
-      const sellerNick=prod.seller_nick;
-      // Проверяем есть ли DM переписка
-      const convs=await api('/dm/conversations').catch(()=>[]);
-      const existing=convs.find(c=>c.partner_id===sellerId);
-      if(existing){
-        // Уже общались — открыть ЛС
-        openDmChat(sellerId,sellerNick,'');
-      } else {
-        // Не общались — открыть чат заказа
-        const orders=await api('/orders');
-        const ord=orders.find(o=>o.seller_id===sellerId&&o.status==='paid');
-        if(ord)openOrderChat(ord.id);
-        else goPage('msgs');
-      }
-    }catch(e){goPage('msgs');}
-  },1000);
-}
+      playSound();toast('✅ Куплено! '+r.short_id);
+      if(S.user){S.user.balance-=price;}
+      setTimeout(async()=>{
+        // Проверяем — есть ли уже ЛС с продавцом этого товара
+        try{
+          const prod=await api('/product/'+id);
+          const sellerId=prod.seller_id;
+          const sellerNick=prod.seller_nick;
+          // Проверяем есть ли DM переписка
+          const convs=await api('/dm/conversations').catch(()=>[]);
+          const existing=convs.find(c=>c.partner_id===sellerId);
+          if(existing){
+            // Уже общались — открыть ЛС
+            openDmChat(sellerId,sellerNick,'');
+          } else {
+            // Не общались — открыть чат заказа
+            const orders=await api('/orders');
+            const ord=orders.find(o=>o.seller_id===sellerId&&o.status==='paid');
+            if(ord)openOrderChat(ord.id);
+            else goPage('msgs');
+          }
+        }catch(e){goPage('msgs');}
+      },1000);
+    }
     else{toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);}
   }catch(e){toast('❌ '+e.message);}
 }
@@ -577,7 +605,7 @@ async function acceptFriend(friendId){
 let sellSubSelected='';
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
-  S.sellData=null;sellTypeSelected='normal';sellSubSelected='';
+  S.sellData=null;sellTypeSelected='';sellSubSelected='';
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Выбери категорию</div>
     <div class="cats">
@@ -691,7 +719,7 @@ const cat=CATEGORIES[catId];
     ${priceField}
     ${extraFields}
     <button class="btn btn-pr" id="sell-next-btn">Далее →</button>`;
-  // Сразу после innerHTML= присвоения добавь:
+// Сразу после innerHTML= присвоения добавь:
 document.getElementById('sell-next-btn').addEventListener('click', ()=>goSellType(catId, sub, group));
 }
 
@@ -754,7 +782,7 @@ function goSellType(catId, sub, group){
     <button class="back" onclick="openSellForm('${catId}','${sub.replace(/'/g,"\\\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тикет размещения</div>
     <div class="sell-type-wrap">
-      <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
+      <div class="sell-type-card" id="stype-n" onclick="selSellType('normal')">
         <div style="font-size:28px;margin-bottom:8px">📦</div>
         <div style="font-weight:700;font-size:14px;margin-bottom:4px">Обычный</div>
         <div style="font-size:11px;color:var(--tx3);line-height:1.5">Показывается среди других. Новые — выше старых.</div>
@@ -779,6 +807,7 @@ let sellPublishing=false;
 async function doSell(){
   if(sellPublishing)return;
   if(!S.sellData){toast('⚠️ Заполни форму');backTo('sell');return;}
+  if(!sellTypeSelected){toast('⚠️ Выбери тип размещения');return;}
   const isPrem=sellTypeSelected==='prem';
   if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
   sellPublishing=true;
@@ -799,23 +828,54 @@ async function doSell(){
       // Upload delivery files
       if(S.sellData.deliveryFiles?.length&&r.product_id){
         if(btn)btn.textContent=`Загружаем файлы...`;
-        if(btn)btn.textContent=`Загружаем файлы...`;
-await Promise.allSettled(
-  S.sellData.deliveryFiles.map(f =>
-    fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
-      method:'POST',body:f,headers:{'Content-Type':'text/plain'}
-    })
-  )
-);
+        await Promise.allSettled(
+          S.sellData.deliveryFiles.map(f =>
+            fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
+              method:'POST',body:f,headers:{'Content-Type':'text/plain'}
+            })
+          )
+        );
       }
       // Сбрасываем кеш маркетплейса после публикации
-delete _apiCache['/products/'+S.sellData.cat];
-      toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);
+      delete _apiCache['/products/'+S.sellData.cat];
+      toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='';setTimeout(()=>goPage('market'),800);
     }
   }catch(e){
     toast('❌ '+e.message);
     if(btn){btn.disabled=false;btn.textContent='📦 Опубликовать';}
   }finally{sellPublishing=false;}
+}
+
+function doRelist(id){
+  const overlay=document.createElement('div');overlay.className='popup-overlay';
+  overlay.innerHTML=`<div class="popup-box">
+    <div class="popup-title" style="margin-bottom:16px">🔄 Выставить повторно</div>
+    <div class="sell-type-wrap">
+      <div class="sell-type-card on" id="rl-n" onclick="document.getElementById('rl-n').classList.add('on');document.getElementById('rl-p').classList.remove('on')">
+        <div style="font-size:28px;margin-bottom:8px">📦</div>
+        <div style="font-weight:700;font-size:14px">Обычный</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--gr2)">Бесплатно</div>
+      </div>
+      <div class="sell-type-card prem" id="rl-p" onclick="document.getElementById('rl-p').classList.add('on');document.getElementById('rl-n').classList.remove('on')">
+        <div style="font-size:28px;margin-bottom:8px">⭐</div>
+        <div style="font-weight:700;font-size:14px">Премиум</div>
+        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--yl)">−${PREM_P} ₽</div>
+      </div>
+    </div>
+    <button class="btn btn-pr" onclick="confirmRelist(${id},this.closest('.popup-overlay'))">🔄 Выставить</button>
+    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+async function confirmRelist(id,overlay){
+  const isPrem=document.getElementById('rl-p').classList.contains('on');
+  try{
+    await api('/products/relist',{product_id:id,is_premium:isPrem});
+    toast('✅ Товар отправлен на модерацию');overlay.remove();
+    Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
+    openProduct(id);
+  }catch(e){toast('❌ '+e.message);}
 }
 
 // ── MSGS ─────────────────────────────────────────────────
@@ -844,7 +904,7 @@ async function loadMsgsList(){
         <div class="conv-item" onclick="openGlobalChat()">
           <div class="conv-ava gc">💬</div>
           <div class="conv-body">
-         <div class="conv-head"><div class="conv-name">Общий чат</div><div class="conv-time">${lastGc?(lastGc.created_at||'').slice(11,16):''}</div></div>
+            <div class="conv-head"><div class="conv-name">Общий чат</div><div class="conv-time">${lastGc?(lastGc.created_at||'').slice(11,16):''}</div></div>
             <div class="conv-preview">${lastGc?esc(lastGc.nickname)+': '+esc(lastGc.message?.slice(0,30)):'Начни общение!'}</div>
           </div>
         </div>
@@ -854,16 +914,15 @@ async function loadMsgsList(){
         </div>
        
   ${orders.length?orders.map(o=>{
-          const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
-          return`<div class="conv-item" onclick="openOrderChat(${o.id})">
+            const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
+            return`<div class="conv-item" onclick="openOrderChat(${o.id})">
             <div class="conv-ava">${o.role==='buyer'?'🛒':'🏪'}</div>
             <div class="conv-body">
               <div class="conv-head">
                 <div class="conv-name">${esc(o.partner_nick)}</div>
                 <div>${o.unread>0?`<span class="conv-unread">${o.unread}</span>`:''}</div>
               </div>
-         
-     <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
+              <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
           </div>`;}).join(''):''}
         ${dmConvs.map(f=>`
@@ -871,13 +930,13 @@ async function loadMsgsList(){
             <div class="conv-ava">👤</div>
             <div class="conv-body">
               <div class="conv-head">
-                 <div class="conv-name">${esc(f.nickname)}</div>
+                <div class="conv-name">${esc(f.nickname)}</div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <span class="conv-time">${fmtTime(f.created_at)}</span>
                   ${f.unread>0?`<span class="conv-unread">${f.unread}</span>`:''}
                 </div>
               </div>
-               <div class="conv-preview">${f.is_out?'Вы: ':''}${esc((f.last_message||'').slice(0,35))}</div>
+              <div class="conv-preview">${f.is_out?'Вы: ':''}${esc((f.last_message||'').slice(0,35))}</div>
             </div>
           </div>`).join('')}
       </div>`;
@@ -913,8 +972,7 @@ async function buildOrderChat(order){
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><span style="font-size:22px">📦</span><div><div style="font-weight:600;font-size:13px">${esc(order.product_title)}</div><div style="font-size:11px;color:var(--tx3)">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div></div></div>
         <div style="font-weight:700;font-size:14px;color:var(--gr2)">${order.amount} ₽ · ${sl[order.status]||order.status}</div>
       </div>
-    
-   ${renderMsgsList(msgs,myId,'order',order.id)}
+      ${renderMsgsList(msgs,myId,'order',order.id)}
     </div>
     ${order.role==='buyer'&&['paid','seller_confirmed','done'].includes(order.status)?`
   <div style="padding:8px 16px;flex-shrink:0">
@@ -1101,8 +1159,7 @@ async function buildSupportChat(){
   const msgs=await api('/support/messages');const myId=uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(S.supInterval);S.supInterval=null;closeChat();"
-style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button onclick="clearInterval(S.supInterval);S.supInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🎧</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">Поддержка</div><div style="font-size:11px;color:var(--tx3)">Обычно отвечаем быстро</div></div>
     </div>
@@ -1180,7 +1237,65 @@ async function adminRejectWd(wId,btn){
   catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='❌ Отклонить';}
 }
   
-  async function openAdminSupport(){
+function openAdminPanel(){
+  document.getElementById('adminpanel-inner').innerHTML=`
+    <button class="back" onclick="closeFull('adminpanel')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+    <div class="st">Панель администратора</div>
+    <button class="btn btn-yl" onclick="openAdminWithdrawals()">💸 Заявки на вывод</button>
+    <button class="btn btn-ol" onclick="openAdminSupport()">🎧 Тикеты поддержки</button>
+    <button class="btn btn-ol" onclick="openAdminModeration()">🔍 Модерация товаров</button>
+    <button class="btn btn-pr" onclick="openAdminTopup()">💰 Пополнить баланс пользователю</button>`;
+  showFull('adminpanel');
+}
+
+async function openAdminModeration(){
+  document.getElementById('adminpanel-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('adminpanel');
+  try{
+    const list=await api('/admin/moderation');
+    document.getElementById('adminpanel-inner').innerHTML=`
+      <button class="back" onclick="openAdminPanel()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="st">Модерация товаров (${list.length})</div>
+      ${list.length===0?'<div class="empty"><div class="empty-i">✅</div>Нет товаров на модерации</div>':
+      list.map(p=>`<div style="background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:10px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">${esc(p.title)}</div>
+        <div style="font-size:12px;color:var(--tx3);margin-bottom:8px">👤 ${esc(p.seller_nick)} · ${p.price==0?'Договорная':p.price+' ₽'}</div>
+        <button class="btn btn-gr" style="margin:0 0 8px;padding:10px" onclick="adminApproveProduct(${p.id},this)">✅ Одобрить</button>
+        <button class="btn btn-rd" style="margin:0;padding:10px" onclick="adminRejectProduct(${p.id},this)">❌ Отклонить</button>
+      </div>`).join('')}`;
+  }catch(e){toast('❌ '+e.message);}
+}
+async function adminApproveProduct(id,btn){
+  btn.disabled=true;btn.textContent='...';
+  try{await api('/admin/moderation/approve',{product_id:id});toast('✅ Товар одобрен');openAdminModeration();}
+  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Одобрить';}
+}
+async function adminRejectProduct(id,btn){
+  const reason=prompt('Причина отклонения:','Не соответствует правилам');if(!reason)return;
+  btn.disabled=true;btn.textContent='...';
+  try{await api('/admin/moderation/reject',{product_id:id,reason});toast('✅ Отклонено');openAdminModeration();}
+  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='❌ Отклонить';}
+}
+function openAdminTopup(){
+  const overlay=document.createElement('div');overlay.className='popup-overlay';
+  overlay.innerHTML=`<div class="popup-box" style="text-align:left">
+    <div class="popup-title" style="margin-bottom:16px">💰 Пополнить баланс</div>
+    <div class="field"><label>Telegram ID пользователя</label><input id="at-uid" type="number" placeholder="123456789"></div>
+    <div class="field"><label>Сумма (₽)</label><input id="at-amt" type="number" min="1" placeholder="100"></div>
+    <button class="btn btn-pr" onclick="doAdminTopup(this.closest('.popup-overlay'))">💰 Пополнить</button>
+    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+async function doAdminTopup(overlay){
+  const toUid=parseInt(document.getElementById('at-uid').value)||0;
+  const amt=parseFloat(document.getElementById('at-amt').value)||0;
+  if(!toUid||!amt){toast('⚠️ Заполни поля');return;}
+  try{await api('/admin/topup',{to_uid:toUid,amount:amt});toast('✅ Баланс пополнен');overlay.remove();}
+  catch(e){toast('❌ '+e.message);}
+}
+
+async function openAdminSupport(){
   document.getElementById('adminsup-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('adminsup');
   try{
@@ -1193,8 +1308,7 @@ async function adminRejectWd(wId,btn){
           <div class="conv-ava sup">👤</div>
           <div class="conv-body">
             <div class="conv-head"><div class="conv-name">${esc(t.nickname)}</div><div class="conv-time">${(t.last_time||'').slice(11,16)}</div></div>
-          
-   <div class="conv-preview">${esc(t.last_message?.slice(0,40))}</div>
+            <div class="conv-preview">${esc(t.last_message?.slice(0,40))}</div>
           </div>
         </div>`).join(''):'<div class="empty" style="padding:20px"><div class="empty-i">🎧</div>Тикетов нет</div>'}`;
   }catch(e){document.getElementById('adminsup-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -1217,8 +1331,7 @@ async function buildAdminChat(userId,nick){
   const myId=uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(adminChatInterval);adminChatInterval=null;closeChat();openAdminSupport();"
-style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button onclick="clearInterval(adminChatInterval);adminChatInterval=null;closeChat();openAdminSupport();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">👤</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">${esc(nick)}</div><div style="font-size:11px;color:var(--tx3)">ID: ${userId}</div></div>
     </div>
@@ -1272,7 +1385,7 @@ async function renderWallet(){
       <div class="wal-action p" onclick="goTopup()">ПОПОЛНИТЬ</div>
       <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
-    ${uid()===ADMIN_ID ? `<button class="btn btn-yl" onclick="openAdminWithdrawals()" style="margin-bottom:16px">🛡 Заявки на вывод</button>` : ''}
+    ${uid()===ADMIN_ID ? `<button class="btn btn-yl" onclick="openAdminPanel()" style="margin-bottom:16px">🛡 Панель администратора</button>` : ''}
     <div class="st">История операций</div>
     <div id="wal-tx-list"><div class="loader"><div class="spin"></div></div></div>`;
   try{
@@ -1318,8 +1431,7 @@ async function renderWallet(){
           <div class="tx-date">${dt}</div>
         </div>
         <div class="tx-amt" style="color:${color}">${sign}${t.amount.toFixed(0)} ₽</div>
-     
-  </div>`;
+      </div>`;
     });
     document.getElementById('wal-tx-list').innerHTML=html||'<div style="color:var(--tx3);font-size:13px;padding:12px 0;text-align:center">Операций пока нет</div>';
   }catch(e){document.getElementById('wal-tx-list').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -1361,8 +1473,7 @@ async function confirmTopup(){
         <a href="${r.da_link}" target="_blank" class="btn btn-pr" style="text-decoration:none;margin-bottom:16px">Открыть DonationAlerts →</a>
         <div style="font-size:13px;color:var(--tx3);margin-bottom:4px">2️⃣ В поле «Сообщение» вставь код:</div>
         <div class="pay-code" onclick="copyCode('${r.code}')">${r.code} 📋</div>
-      
-   <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
+        <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
       </div>`;
   }catch(e){toast('❌ '+e.message);if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`;}}
 }
@@ -1479,8 +1590,7 @@ async function renderProfile(){
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">${S.user.balance.toFixed(0)} ₽</div><div class="stat-l">Баланс</div></div>
-        <div 
-class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
+        <div class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
       <button class="btn btn-ol" id="friends-btn" onclick="openFriends()" style="position:relative">👥 Друзья<span id="badge-friend-req" style="display:none;position:absolute;top:8px;right:12px;background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">!</span></button>
       <div class="st">Мои товары</div>
@@ -1506,15 +1616,14 @@ function goSettings(){
     <div class="st">Настройки профиля</div>
     <div style="text-align:center;margin-bottom:20px">
       <div class="prof-ava" style="cursor:pointer" onclick="pickAvatarSettings()">
-        ${u.avatar_url?`<img src="${avatarSrc(S.user.avatar_url)}" / src="${avatarSrc(u.avatar_url)}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
+        ${u.avatar_url?`<img src="${avatarSrc(u.avatar_url)}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
         <div class="prof-ava-edit">📷</div>
       </div>
       <div style="font-size:12px;color:var(--tx3);margin-top:8px">Нажми чтобы изменить фото</div>
     </div>
     <div class="field"><label>Никнейм</label><input id="ep-nick" value="${esc(u.nickname||'')}" placeholder="Твой ник" maxlength="30"></div>
  
-    <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?"
-min="1" max="120"></div>
+    <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?" min="1" max="120"></div>
     <div class="field"><label>Пол (нельзя изменить через поддержку)</label></div>
     <div class="g-row">
       <button class="g-btn ${S.gender==='male'?'sel':''}" id="g-male" onclick="selGender('male')">👨 Мужской</button>
@@ -1537,7 +1646,8 @@ function pickAvatar(){
         if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
         const c=document.createElement('canvas');c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=c.toDataURL('image/jpeg',0.5); // снизили качество 0.7→0.5
+        const dataUrl=c.toDataURL('image/jpeg',0.5);
+        // снизили качество 0.7→0.5
         try{
           await apiPostAvatar(dataUrl);
           if(S.user)S.user.avatar_url=dataUrl;
@@ -1565,7 +1675,8 @@ function pickAvatarSettings(){
         if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
         const c=document.createElement('canvas');c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=c.toDataURL('image/jpeg',0.5); // снизили качество 0.7→0.5
+        const dataUrl=c.toDataURL('image/jpeg',0.5);
+        // снизили качество 0.7→0.5
         if(S.user)S.user.avatar_url=dataUrl;
         const ava=document.querySelector('#settings-inner .prof-ava');
         if(ava)ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="prof-ava-edit" onclick="pickAvatarSettings()">📷</div>`;
@@ -1628,15 +1739,14 @@ async function openUserProfile(userId){
     document.getElementById('userprofile-inner').innerHTML=`
       <button class="back" onclick="history_back_userprofile()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
       <div class="prof-header">
-        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${avatarSrc(S.user.avatar_url)}" / src="${avatarSrc(u.avatar_url)}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
+        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${avatarSrc(u.avatar_url)}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
         <div class="prof-name">${esc(u.nickname)}</div>
         ${sub?`<div class="prof-sub">${sub}</div>`:''}
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">⭐ ${u.rating}</div><div class="stat-l">Рейтинг</div></div>
         <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
-    
-  </div>
+      </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${actionButtons}</div>
       <div class="st" style="margin-top:20px">Товары</div>
       <div id="user-products-wrap"><div class="loader"><div class="spin"></div></div></div>`;
@@ -1713,12 +1823,12 @@ async function checkNotifications(){
   if(!uid()) return;
   try{
     const n = await api('/notifications');
-
     // Бейдж на Messages (заказы + DM вместе)
     const totalMsgs = (n.orders_unread||0) + (n.dm_unread||0);
     const badgeMsgs = document.getElementById('badge-msgs');
     if(badgeMsgs){
-      if(totalMsgs>0){ badgeMsgs.textContent=totalMsgs>9?'9+':totalMsgs; badgeMsgs.classList.add('on'); }
+      if(totalMsgs>0){ badgeMsgs.textContent=totalMsgs>9?'9+':totalMsgs; badgeMsgs.classList.add('on');
+      }
       else badgeMsgs.classList.remove('on');
     }
     if(totalMsgs > prevUnread && S.page!=='chat' && S.page!=='msgs') playSound();
@@ -1739,8 +1849,10 @@ async function checkNotifications(){
       if(count>0){
         if(!dot){ dot=document.createElement('span'); dot.className='friends-req-dot';
           dot.style.cssText='display:inline-block;width:8px;height:8px;background:var(--rd);border-radius:50%;margin-left:6px;vertical-align:middle';
-          friendsBtn.appendChild(dot); }
-      } else { if(dot) dot.remove(); }
+          friendsBtn.appendChild(dot);
+        }
+      } else { if(dot) dot.remove();
+      }
     }
 
     // dmUnread обновляем для совместимости с openDmChat
@@ -1766,8 +1878,7 @@ async function buildDmChat(friendId, friendNick, friendAvatar){
   const myId = uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(dmInterval);dmInterval=null;closeChat();"
-style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button onclick="clearInterval(dmInterval);dmInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">${friendAvatar?`<img src="${esc(friendAvatar)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}</div>
       <div style="flex:1;cursor:pointer" onclick="openUserProfile(${friendId})">
         <div style="font-weight:700;font-size:14px">${esc(friendNick)}</div>
@@ -1777,14 +1888,12 @@ style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;d
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
       </button>
     </div>
-    
- <div class="msgs-area" id="dmmsgs">
+    <div class="msgs-area" id="dmmsgs">
       ${buildDmHtml(msgs, myId, friendId)}
     </div>
     <div id="reply-bar-dm" style="display:none" class="reply-bar">
       <div class="reply-bar-text" id="reply-bar-dm-text">Ответ</div>
       <button class="reply-bar-close" onclick="S.replyTo=null;document.getElementById('reply-bar-dm').style.display='none'">✕</button>
- 
     </div>
     <div class="chat-input-bar">
       <input class="cinput" id="dm-inp" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')dmSend(${friendId})">
@@ -1823,8 +1932,7 @@ function dmMsgTap(e, text, isOut){
         </div>
         <button class="reply-bar-close" onclick="S.replyTo=null;document.getElementById('reply-bar-dm').style.display='none'">✕</button>`;
       }
- 
-     document.getElementById('dm-inp')?.focus();
+      document.getElementById('dm-inp')?.focus();
     }},
     ...(isOut?[{icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
   ]);
@@ -1957,7 +2065,7 @@ async function refreshDmChat(friendId, nick, ava){
   if(S.page!=='chat'){clearInterval(dmInterval);dmInterval=null;return;}
   try{
     const msgs=await api('/dm/messages',{with_id:friendId});const myId=uid();
-  const el=document.getElementById('dmmsgs');if(!el)return;
+    const el=document.getElementById('dmmsgs');if(!el)return;
 const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
     const prev=el.querySelectorAll('.msg-bubble').length;
     el.innerHTML=buildDmHtml(msgs,myId,friendId);
@@ -2003,7 +2111,6 @@ function openFullImg(idx, files){
   const ov=document.createElement('div');
   ov.id='fullimg-overlay';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;justify-content:center';
-  
   function render(i){
     i=((i%files.length)+files.length)%files.length;
     ov.innerHTML=`
@@ -2018,7 +2125,6 @@ function openFullImg(idx, files){
       ${i<files.length-1?`<div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);z-index:10001">
         <button id="btn-next" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">›</button>
       </div>`:''}`;
-    
     ov.onclick=e=>{
   e.stopPropagation();
   const id=e.target.closest('[id]')?.id;
@@ -2038,7 +2144,6 @@ function shiftImg(){} // больше не нужна, оставляем пус
 
 // ── INIT ─────────────────────────────────────────────────
 let prevFriendReqs=-1;
- 
 async function init(){
   renderMarket();
   if(uid()){
