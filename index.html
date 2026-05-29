@@ -185,6 +185,21 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .my-prod{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
 .my-prod-del{background:rgba(244,63,94,.15);border:1px solid var(--rd);border-radius:10px;padding:8px 10px;color:var(--rd);font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:700}
 .my-prod-del:active{transform:scale(.93)}
+.prof-prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.prof-prod-card{background:var(--s2);border:1px solid var(--br);border-radius:18px;overflow:hidden;cursor:pointer;transition:all .12s;position:relative}
+.prof-prod-card:active{transform:scale(.97)}
+.prof-prod-card.sold{opacity:.7}
+.prof-prod-img{width:100%;aspect-ratio:1/1;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;position:relative}
+.prof-prod-img img{width:100%;height:100%;object-fit:cover}
+.prof-prod-status{position:absolute;top:8px;right:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px}
+.prof-prod-status.active{background:var(--gr);color:#fff}
+.prof-prod-status.sold{background:var(--rd);color:#fff}
+.prof-prod-status.pending{background:var(--yl);color:#000}
+.prof-prod-body{padding:10px}
+.prof-prod-cat{font-size:10px;color:var(--tx3);margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.prof-prod-cat span{background:rgba(123,92,240,.2);color:var(--ac2);border-radius:6px;padding:1px 6px;font-weight:700}
+.prof-prod-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.prof-prod-price{font-size:15px;font-weight:800;color:var(--gr2)}
 .tx-item{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .tx-icon{font-size:20px;flex-shrink:0}
 .tx-body{flex:1;min-width:0}
@@ -1563,19 +1578,26 @@ async function renderProfile(){
     let myProds=[];
     try{const res=await api('/my_products');myProds=Array.isArray(res)?res:[];}catch(e){}
     const prodsHtml=myProds.length
-      ?`<div class="prods">${myProds.map(p=>{
+      ?`<div class="prof-prod-grid">${myProds.map(p=>{
         const hasPreview=p.preview_url&&p.preview_url.length>0;
         const previewSrc=hasPreview?(p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`):null;
-        const thumbHtml=hasPreview?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:22px">📦</span>`;
-        return`<div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
-          ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
-          <div class="prod-thumb" style="overflow:hidden">${thumbHtml}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
-            <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">${CATEGORIES[p.category]?.name||p.category}${p.subcategory?' · '+p.subcategory:''}</div>
-            <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price==0?'🤝 Договорная':p.price+' ₽'}${p.is_premium?' ⭐':''}</div>
+        const imgHtml=hasPreview?`<img src="${previewSrc}">`:`<span>📦</span>`;
+        const isSold=p.status==='sold';
+        const isPending=p.status==='pending';
+        const statusLabel=isSold?`<div class="prof-prod-status sold">ПРОДАН</div>`:isPending?`<div class="prof-prod-status pending">⏳ МОДЕРАЦИЯ</div>`:`<div class="prof-prod-status active">● ПРОДАЁТСЯ</div>`;
+        const catName=CATEGORIES[p.category]?.name||p.category;
+        const subName=p.subcategory||'';
+        return`<div class="prof-prod-card${isSold?' sold':''}" onclick="openProduct(${p.id})">
+          <div class="prof-prod-img">
+            ${imgHtml}
+            ${statusLabel}
+            ${p.is_premium?'<div class="prem-badge" style="top:8px;left:8px;right:auto">⭐ ТОП</div>':''}
           </div>
-          <button class="my-prod-del" onclick="event.stopPropagation();deleteMyProduct(${p.id},this)">🗑</button>
+          <div class="prof-prod-body">
+            <div class="prof-prod-cat"><span>${catName}</span>${subName?`<span>${subName}</span>`:''}</div>
+            <div class="prof-prod-title">${esc(p.title)}</div>
+            <div class="prof-prod-price">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
+          </div>
         </div>`;
       }).join('')}</div>`
       :'<div style="color:var(--tx3);font-size:13px;padding:8px 0">У тебя пока нет товаров</div>';
