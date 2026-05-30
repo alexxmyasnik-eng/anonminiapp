@@ -1941,9 +1941,7 @@ function buildDmHtml(msgs, myId, friendId){
       const parts = (m.message||'').split(' · ');
       const title = cachedOrder ? (cachedOrder.product_title||'Товар') : (parts[1]||'Товар');
       const statusKey = cachedOrder ? cachedOrder.status : 'paid';
-      const displayPrice = cachedOrder
-        ${hasFiles&&isBuyer&&(cachedOrder.status==='done'||cachedOrder.status==='seller_confirmed')?`<button class="btn btn-ol" style="margin-top:10px;width:100%;font-size:13px" onclick="showDeliveryFiles(${cachedOrder.product_id})">📦 Получить файлы</button>`:''}
-        : (parts[2]||'');
+      const displayPrice = cachedOrder ? Number(cachedOrder.amount).toFixed(2) : (parts[2]||'');
       const hasFiles = cachedOrder && (() => {
         try{ return JSON.parse(cachedOrder.delivery_files||'[]').length > 0; }catch(e){return false;}
       })();
