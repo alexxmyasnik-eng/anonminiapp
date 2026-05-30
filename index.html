@@ -443,20 +443,33 @@ async function openProduct(id){
 }
 
 function deleteMyProduct(id){
-  const ov=document.createElement('div');ov.className='popup-overlay';
-  ov.innerHTML=`<div class="popup-box">
-    <div class="popup-title">Удалить товар?</div>
-    <div class="popup-text">Товар будет удалён безвозвратно.</div>
-    <button class="btn btn-rd" id="confirm-del-btn">Удалить</button>
-    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
-  </div>`;
+  const ov=document.createElement('div');
+  ov.className='popup-overlay';
+  ov.innerHTML=`
+    <div class="popup-box">
+      <div class="popup-title">🗑️ Удалить товар?</div>
+      <div class="popup-text" style="color:var(--tx2);margin-bottom:16px">Товар будет удалён безвозвратно.</div>
+      <button class="btn btn-rd" id="confirm-del-btn">Удалить</button>
+      <button class="btn btn-ol" id="cancel-del-btn">Отмена</button>
+    </div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#cancel-del-btn').addEventListener('click',()=>ov.remove());
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
   ov.querySelector('#confirm-del-btn').addEventListener('click',async()=>{
-    ov.remove();
-    try{await api('/products/delete',{product_id:id});toast('✅ Товар удалён');backTo('market');}
-    catch(e){toast('❌ '+e.message);}
+    ov.querySelector('#confirm-del-btn').disabled=true;
+    ov.querySelector('#confirm-del-btn').textContent='Удаление...';
+    try{
+      await api('/products/delete',{product_id:id,uid:uid()});
+      ov.remove();
+      toast('✅ Товар удалён');
+      S.cat=null;S.sub=null;
+      renderMarket();
+      backTo('market');
+    }catch(e){
+      ov.remove();
+      toast('❌ '+e.message);
+    }
   });
-  document.body.appendChild(ov);
 }
   
 function openEditProduct(id,title,desc,price){
