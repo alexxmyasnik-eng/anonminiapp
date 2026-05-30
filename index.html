@@ -396,7 +396,7 @@ async function renderProducts(catId,activeSub){
         const hasPreview=p.preview_url&&p.preview_url.length>0;
         const previewSrc=hasPreview?(p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`):null;
         const thumbHtml=hasPreview
-          ?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover;${p.seller_id===uid()?'':'filter:blur(6px);transform:scale(1.1)'}">`
+          ?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover;${String(p.seller_id)===String(uid())?'':'filter:blur(2px);transform:scale(1.1)'}">`
           :`<span style="font-size:22px">${catGroupA.includes(p.category)?'📸':'📦'}</span>`;
         return`
         <div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
