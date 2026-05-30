@@ -432,7 +432,8 @@ async function openProduct(id){
       <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов) →</div>
       <div style="color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px">${esc(p.description||'Без описания')}</div>
       <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
-      ${isMine?`${p.status==='sold'?`<button class="btn btn-pr" onclick="doRelist(${p.id})">🔄 Выставить повторно</button>`:`<button class="btn btn-ol" onclick="openEditProduct(${p.id},'${esc(p.title)}','${esc(p.description)}',${p.price})">✏️ Редактировать товар</button>`}<div class="btn btn-ol" style="cursor:default;opacity:.5">Это ваш товар</div>`:`${p.price==0
+      ${isMine?`${p.status==='sold'?`<button class="btn btn-pr" onclick="doRelist(${p.id})">🔄 Выставить повторно</button>`:`<button class="btn btn-ol" onclick="openEditProduct(${p.id},'${esc(p.title)}','${esc(p.description)}',${p.price})">✏️ Редактировать товар</button>`}<div class="btn btn-ol" style="cursor:default;opacity:.5">Это ваш товар</div>
+<button class="btn btn-rd" onclick="deleteMyProduct(${p.id})">🗑️ Удалить товар</button>`:`${p.price==0
   ?
 `<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>`
   : `<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`
@@ -440,6 +441,23 @@ async function openProduct(id){
   }catch(e){document.getElementById('product-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
 
+function deleteMyProduct(id){
+  const ov=document.createElement('div');ov.className='popup-overlay';
+  ov.innerHTML=`<div class="popup-box">
+    <div class="popup-title">Удалить товар?</div>
+    <div class="popup-text">Товар будет удалён безвозвратно.</div>
+    <button class="btn btn-rd" id="confirm-del-btn">Удалить</button>
+    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
+  </div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  ov.querySelector('#confirm-del-btn').addEventListener('click',async()=>{
+    ov.remove();
+    try{await api('/products/delete',{product_id:id});toast('✅ Товар удалён');backTo('market');}
+    catch(e){toast('❌ '+e.message);}
+  });
+  document.body.appendChild(ov);
+}
+  
 function openEditProduct(id,title,desc,price){
   const overlay=document.createElement('div');overlay.className='popup-overlay';
   overlay.innerHTML=`<div class="popup-box" style="text-align:left">
