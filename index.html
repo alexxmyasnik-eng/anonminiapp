@@ -852,7 +852,7 @@ async function doSell(){
         );
       }
       // Сбрасываем кеш маркетплейса после публикации
-      delete _apiCache['/products/'+S.sellData.cat];
+      Object.keys(_apiCache).filter(k=>k.startsWith('/products/'+S.sellData.cat)).forEach(k=>delete _apiCache[k]);
       delete _apiCache['/my_products'];
       toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='';setTimeout(()=>goPage('market'),800);
     }
