@@ -2117,7 +2117,7 @@ async function showDeliveryFiles(productId){
   try{
     const r=await api('/products/'+productId+'/delivery_files');
     if(!r.files||!r.files.length){toast('📭 Файлы ещё не добавлены продавцом');return;}
-      window.deliveryFilesCache = r.files.map(f => `${API}/tg_file?file_id=${encodeURIComponent(f)}`);
+      window.deliveryFilesCache = r.files.map((f, i) => `${API}/products/${productId}/file/${i}?uid=${uid()}`);
     const ov=document.createElement('div');ov.className='popup-overlay';
     ov.innerHTML=`<div class="popup-box" style="max-height:80vh;overflow-y:auto;text-align:left">
       <div class="popup-title" style="margin-bottom:14px">📥 Файлы (${r.files.length})</div>
