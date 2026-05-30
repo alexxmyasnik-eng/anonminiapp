@@ -1652,16 +1652,6 @@ async function renderProfile(){
       ${prodsHtml}`;
   }catch(e){document.getElementById('pg-profile').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
-async function deleteMyProduct(id,btn){
-  if(!confirm('Удалить товар?'))return;
-  btn.disabled=true;btn.textContent='...';
-  try{
-    const r=await fetch(API+'/products/delete?uid='+(uid()||'')+'&product_id='+id);
-    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Ошибка '+r.status);}
-    btn.closest('.prod').remove();toast('✅ Товар удалён');
-Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
-  }catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
-}
 
 // ── SETTINGS ─────────────────────────────────────────────
 function goSettings(){
