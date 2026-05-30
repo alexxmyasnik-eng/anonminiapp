@@ -887,7 +887,6 @@ function doRelist(id){
 async function confirmRelist(id,overlay){
   const isPrem=document.getElementById('rl-p').classList.contains('on');
   try{
-    alert('DEBUG: product_id='+id+' uid='+uid()+' isPrem='+isPrem);
     await api('/products/relist',{product_id:id,is_premium:isPrem?1:0});
     toast('✅ Товар отправлен на модерацию');overlay.remove();
     Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
