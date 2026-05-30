@@ -386,8 +386,8 @@ async function renderProducts(catId,activeSub){
   el.innerHTML=`<button class="back" onclick="S.cat=null;S.sub=null;renderMarket()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>${cat.name}</button>${subsHtml}<div class="loader"><div class="spin"></div></div>`;
   requestAnimationFrame(()=>{const a=el.querySelector('.sub-tab.on');if(a)a.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});});
   try{
-    const subParam = activeSub && activeSub !== 'Все' ? '&sub=' + encodeURIComponent(activeSub) : '';
-    const prods = await api('/products/' + catId + (subParam ? '?' + subParam.slice(1) : ''));
+    const subParam = activeSub && activeSub !== 'Все' ? activeSub : '';
+    const prods = await api('/products/' + catId, subParam ? {sub: subParam} : null);
     const spin=el.querySelector('.loader');if(!spin)return;
     spin.outerHTML=Array.isArray(prods)&&prods.length
       ?`<div class="prods">${prods.map(p=>{
