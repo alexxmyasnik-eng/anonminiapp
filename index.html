@@ -169,7 +169,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .mute-submenu .ctx-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;padding:14px 16px;cursor:pointer;border-radius:12px;text-align:left}
 .mute-submenu .ctx-btn:active{background:var(--s3)}  
 /* TOAST */
-.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:normal;max-width:85vw;text-align:center;word-break:break-word}
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:85vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .loader{text-align:center;padding:50px;color:var(--tx3)}
 .spin{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--br2);border-top-color:var(--ac);animation:sp .7s linear infinite;margin:0 auto 10px}
@@ -185,21 +185,6 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .my-prod{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
 .my-prod-del{background:rgba(244,63,94,.15);border:1px solid var(--rd);border-radius:10px;padding:8px 10px;color:var(--rd);font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:700}
 .my-prod-del:active{transform:scale(.93)}
-.prof-prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.prof-prod-card{background:var(--s2);border:1px solid var(--br);border-radius:18px;overflow:hidden;cursor:pointer;transition:all .12s;position:relative}
-.prof-prod-card:active{transform:scale(.97)}
-.prof-prod-card.sold{opacity:.7}
-.prof-prod-img{width:100%;aspect-ratio:1/1;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;position:relative}
-.prof-prod-img img{width:100%;height:100%;object-fit:cover}
-.prof-prod-status{position:absolute;top:8px;right:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px}
-.prof-prod-status.active{background:var(--gr);color:#fff}
-.prof-prod-status.sold{background:var(--rd);color:#fff}
-.prof-prod-status.pending{background:var(--yl);color:#000}
-.prof-prod-body{padding:10px}
-.prof-prod-cat{font-size:10px;color:var(--tx3);margin-bottom:2px;display:flex;align-items:center;gap:4px}
-.prof-prod-cat span{background:rgba(123,92,240,.2);color:var(--ac2);border-radius:6px;padding:1px 6px;font-weight:700}
-.prof-prod-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-.prof-prod-price{font-size:15px;font-weight:800;color:var(--gr2)}
 .tx-item{background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .tx-icon{font-size:20px;flex-shrink:0}
 .tx-body{flex:1;min-width:0}
@@ -225,7 +210,6 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="pg" id="pg-profile"></div>
 
 <div class="fullpg" id="fp-chat"><div class="chat-wrap" id="chat-inner"></div></div>
-<div class="fullpg" id="fp-adminwd" style="overflow-y:auto"><div id="adminwd-inner" style="padding:16px 16px 80px"></div></div>  
 <div class="fullpg" id="fp-product" style="overflow-y:auto"><div id="product-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-settings" style="overflow-y:auto"><div id="settings-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-userprofile" style="overflow-y:auto"><div id="userprofile-inner" style="padding:16px 16px 80px"></div></div>
@@ -235,7 +219,6 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="fullpg" id="fp-selltype" style="overflow-y:auto"><div id="selltype-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-friends" style="overflow-y:auto"><div id="friends-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-adminsup" style="overflow-y:auto"><div id="adminsup-inner" style="padding:16px 16px 80px"></div></div>
-<div class="fullpg" id="fp-adminpanel" style="overflow-y:auto"><div id="adminpanel-inner" style="padding:16px 16px 80px"></div></div>
 
 <nav class="nav">
   <button class="nb on" id="nb-market" onclick="goPage('market')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Маркет</button>
@@ -248,18 +231,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <audio id="snd" preload="none"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
 
 <script>
-const ADMIN_ID = 780434845;
-// замени на свой реальный Telegram ID  
-const API='https://anonpeak-mw3g.onrender.com';
-// Добавь эту функцию в начало <script> (после const API=...)
-function avatarSrc(url){
-  if(!url) return '';
-  if(url.startsWith('tg://')){
-    const fileId=url.slice(5);
-    return `${API}/tg_file?file_id=${encodeURIComponent(fileId)}`;
-  }
-  return url;
-}  
+const API='https://anonpeak.onrender.com';
 fetch(API+'/health',{method:'GET'}).catch(()=>{});  
 const _apiCache={};
 async function apiCached(path, ttlMs=30000){
@@ -275,8 +247,8 @@ if(tg){tg.ready();tg.expand();}
 const S={page:'market',user:null,cat:null,sub:null,chatInterval:null,gcInterval:null,supInterval:null,gender:'',selAmt:0,sellData:null,replyTo:null};
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 const uid=()=>tg?.initDataUnsafe?.user?.id||null;
-const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=250;
-let blockedUsers=[],mutedUsers=[],sellTypeSelected='';
+const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=100;
+let blockedUsers=[],mutedUsers=[],sellTypeSelected='normal';
 try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
 try{mutedUsers=JSON.parse(localStorage.getItem('muted')||'[]');}catch(e){}
 
@@ -294,21 +266,10 @@ async function api(path,body=null){
 
 // POST for avatar (binary data)
 async function apiPostAvatar(dataUrl){
-  // Сжимаем до 200px перед отправкой
-  const img=new Image();
-  img.src=dataUrl;
-  await new Promise(r=>img.onload=r);
-  const c2=document.createElement('canvas');
-  const size=Math.min(img.width,img.height,200);
-  c2.width=c2.height=size;
-  c2.getContext('2d').drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,size,size);
-  const small=c2.toDataURL('image/jpeg',0.6);
-  const r=await fetch(`${API}/me/set_avatar?uid=${uid()}`,{method:'POST',body:small,headers:{'Content-Type':'text/plain'}});
-  if(!r.ok) throw new Error('avatar upload failed');
-  const data=await r.json();
-  // Если бот вернул file_id — используем tg://
-  if(data.file_id && S.user) S.user.avatar_url=`tg://${data.file_id}`;
-  return data;
+  const u=uid();if(!u)throw new Error('Нет uid');
+  const r=await fetch(`${API}/me/set_avatar?uid=${u}`,{method:'POST',body:dataUrl,headers:{'Content-Type':'text/plain'}});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Error');}
+  return r.json();
 }
 
 // ── POPUP ─────────────────────────────────────────────────
@@ -417,7 +378,6 @@ async function openProduct(id){
     const p=await api('/product/'+id);const isMine=uid()&&p.seller_id===uid();
     document.getElementById('product-inner').innerHTML=`
       <button class="back" onclick="backTo('market')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      ${isMine?`<div style="margin-bottom:10px;text-align:center">${p.status==='pending'?'<span style="background:rgba(245,158,11,.2);color:var(--yl);border:1px solid var(--yl);border-radius:10px;padding:4px 12px;font-size:12px;font-weight:700">⏳ На модерации</span>':p.status==='sold'?'<span style="background:rgba(244,63,94,.2);color:var(--rd);border:1px solid var(--rd);border-radius:10px;padding:4px 12px;font-size:12px;font-weight:700">✅ Продан</span>':'<span style="background:rgba(16,185,129,.2);color:var(--gr2);border:1px solid var(--gr2);border-radius:10px;padding:4px 12px;font-size:12px;font-weight:700">🟢 Продаётся</span>'}</div>`:''}
       ${p.preview_url&&p.preview_url.length>0
         ?`<div style="width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;margin-bottom:16px;position:relative">
             <img src="${p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`}" style="width:100%;height:100%;object-fit:cover;${isMine?'':'filter:blur(14px);transform:scale(1.08)'}">
@@ -432,68 +392,43 @@ async function openProduct(id){
       <div style="color:var(--tx3);font-size:13px;margin-bottom:8px;cursor:pointer" onclick="openUserProfile(${p.seller_id})">👤 ${esc(p.seller_nick)} · ⭐${p.seller_rating} (${p.seller_reviews} отзывов) →</div>
       <div style="color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:16px">${esc(p.description||'Без описания')}</div>
       <div style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:800;color:var(--gr2);margin-bottom:20px">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
-      ${isMine?`${p.status==='sold'?`<button class="btn btn-pr" onclick="doRelist(${p.id})">🔄 Выставить повторно</button>`:`<button class="btn btn-ol" onclick="openEditProduct(${p.id},'${esc(p.title)}','${esc(p.description)}',${p.price})">✏️ Редактировать товар</button>`}<div class="btn btn-ol" style="cursor:default;opacity:.5">Это ваш товар</div>`:`${p.price==0
+      ${isMine?`<div class="btn btn-ol" style="cursor:default">Это ваш товар</div>`:`${p.price==0
   ?
-`<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>`
+  `<button class="btn btn-yl" onclick="doBuy(${p.id},0)">💬 Предложить сценарий</button>`
   : `<button class="btn btn-pr" onclick="doBuy(${p.id},${p.price})">🛒 Купить — ${p.price} ₽</button>`
 }`}`;
   }catch(e){document.getElementById('product-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
 }
-
-function openEditProduct(id,title,desc,price){
-  const overlay=document.createElement('div');overlay.className='popup-overlay';
-  overlay.innerHTML=`<div class="popup-box" style="text-align:left">
-    <div class="popup-title" style="margin-bottom:16px">✏️ Редактировать товар</div>
-    <div class="field"><label>Название</label><input id="ep-title" value="${esc(title)}" maxlength="100"></div>
-    <div class="field"><label>Описание</label><textarea id="ep-desc">${esc(desc)}</textarea></div>
-    <div class="field"><label>Цена (₽)</label><input id="ep-price" type="number" min="0" value="${price}"></div>
-    <button class="btn btn-pr" onclick="saveEditProduct(${id},this.closest('.popup-overlay'))">💾 Сохранить</button>
-    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
-  </div>`;
-  document.body.appendChild(overlay);
-}
-async function saveEditProduct(id,overlay){
-  const title=document.getElementById('ep-title').value.trim();
-  const desc=document.getElementById('ep-desc').value.trim();
-  const price=parseFloat(document.getElementById('ep-price').value)||0;
-  if(!title){toast('⚠️ Введи название');return;}
-  try{
-    await api('/products/update',{product_id:id,title,description:desc,price});
-    toast('✅ Товар обновлён');overlay.remove();openProduct(id);
-    Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
-  }catch(e){toast('❌ '+e.message);}
-}
-
 async function doBuy(id,price){
   if(!uid()){toast('⚠️ Нужен Telegram');return;}
   if((S.user?.balance??0)<price){toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);return;}
   try{
     const r=await api('/buy',{product_id:id});
     if(r.ok){
-      playSound();toast('✅ Куплено! '+r.short_id);
-      if(S.user){S.user.balance-=price;}
-      setTimeout(async()=>{
-        // Проверяем — есть ли уже ЛС с продавцом этого товара
-        try{
-          const prod=await api('/product/'+id);
-          const sellerId=prod.seller_id;
-          const sellerNick=prod.seller_nick;
-          // Проверяем есть ли DM переписка
-          const convs=await api('/dm/conversations').catch(()=>[]);
-          const existing=convs.find(c=>c.partner_id===sellerId);
-          if(existing){
-            // Уже общались — открыть ЛС
-            openDmChat(sellerId,sellerNick,'');
-          } else {
-            // Не общались — открыть чат заказа
-            const orders=await api('/orders');
-            const ord=orders.find(o=>o.seller_id===sellerId&&o.status==='paid');
-            if(ord)openOrderChat(ord.id);
-            else goPage('msgs');
-          }
-        }catch(e){goPage('msgs');}
-      },1000);
-    }
+  playSound();toast('✅ Куплено! '+r.short_id);
+  if(S.user){S.user.balance-=price;}
+  setTimeout(async()=>{
+    // Проверяем — есть ли уже ЛС с продавцом этого товара
+    try{
+      const prod=await api('/product/'+id);
+      const sellerId=prod.seller_id;
+      const sellerNick=prod.seller_nick;
+      // Проверяем есть ли DM переписка
+      const convs=await api('/dm/conversations').catch(()=>[]);
+      const existing=convs.find(c=>c.partner_id===sellerId);
+      if(existing){
+        // Уже общались — открыть ЛС
+        openDmChat(sellerId,sellerNick,'');
+      } else {
+        // Не общались — открыть чат заказа
+        const orders=await api('/orders');
+        const ord=orders.find(o=>o.seller_id===sellerId&&o.status==='paid');
+        if(ord)openOrderChat(ord.id);
+        else goPage('msgs');
+      }
+    }catch(e){goPage('msgs');}
+  },1000);
+}
     else{toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);}
   }catch(e){toast('❌ '+e.message);}
 }
@@ -620,7 +555,7 @@ async function acceptFriend(friendId){
 let sellSubSelected='';
 function renderSell(){
   if(!uid()){document.getElementById('pg-sell').innerHTML='<div class="empty"><div class="empty-i">🔐</div>Нужно открыть через Telegram</div>';return;}
-  S.sellData=null;sellTypeSelected='';sellSubSelected='';
+  S.sellData=null;sellTypeSelected='normal';sellSubSelected='';
   document.getElementById('pg-sell').innerHTML=`
     <div class="st">Выбери категорию</div>
     <div class="cats">
@@ -734,7 +669,7 @@ const cat=CATEGORIES[catId];
     ${priceField}
     ${extraFields}
     <button class="btn btn-pr" id="sell-next-btn">Далее →</button>`;
-// Сразу после innerHTML= присвоения добавь:
+  // Сразу после innerHTML= присвоения добавь:
 document.getElementById('sell-next-btn').addEventListener('click', ()=>goSellType(catId, sub, group));
 }
 
@@ -797,7 +732,7 @@ function goSellType(catId, sub, group){
     <button class="back" onclick="openSellForm('${catId}','${sub.replace(/'/g,"\\\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
     <div class="st">Тикет размещения</div>
     <div class="sell-type-wrap">
-      <div class="sell-type-card" id="stype-n" onclick="selSellType('normal')">
+      <div class="sell-type-card on" id="stype-n" onclick="selSellType('normal')">
         <div style="font-size:28px;margin-bottom:8px">📦</div>
         <div style="font-weight:700;font-size:14px;margin-bottom:4px">Обычный</div>
         <div style="font-size:11px;color:var(--tx3);line-height:1.5">Показывается среди других. Новые — выше старых.</div>
@@ -822,7 +757,6 @@ let sellPublishing=false;
 async function doSell(){
   if(sellPublishing)return;
   if(!S.sellData){toast('⚠️ Заполни форму');backTo('sell');return;}
-  if(!sellTypeSelected){toast('⚠️ Выбери тип размещения');return;}
   const isPrem=sellTypeSelected==='prem';
   if(isPrem&&(S.user?.balance??0)<PREM_P){toast(`❌ Нужно ${PREM_P} ₽ для премиум`);setTimeout(()=>goPage('wallet'),800);return;}
   sellPublishing=true;
@@ -843,55 +777,22 @@ async function doSell(){
       // Upload delivery files
       if(S.sellData.deliveryFiles?.length&&r.product_id){
         if(btn)btn.textContent=`Загружаем файлы...`;
-        await Promise.allSettled(
-          S.sellData.deliveryFiles.map(f =>
-            fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
-              method:'POST',body:f,headers:{'Content-Type':'text/plain'}
-            })
-          )
-        );
+        for(let i=0;i<S.sellData.deliveryFiles.length;i++){
+          if(btn)btn.textContent=`Загружаем ${i+1}/${S.sellData.deliveryFiles.length}...`;
+          try{
+            await fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
+              method:'POST',body:S.sellData.deliveryFiles[i],headers:{'Content-Type':'text/plain'}
+            });
+          }catch(e){console.warn('delivery file upload failed',e);}
+        }
       }
-      // Сбрасываем кеш маркетплейса после публикации
-      Object.keys(_apiCache).filter(k=>k.startsWith('/products/'+S.sellData.cat)).forEach(k=>delete _apiCache[k]);
-      delete _apiCache['/my_products'];
-      toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='';setTimeout(()=>goPage('market'),800);
+      
+      toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);
     }
   }catch(e){
     toast('❌ '+e.message);
     if(btn){btn.disabled=false;btn.textContent='📦 Опубликовать';}
   }finally{sellPublishing=false;}
-}
-
-function doRelist(id){
-  const overlay=document.createElement('div');overlay.className='popup-overlay';
-  overlay.innerHTML=`<div class="popup-box">
-    <div class="popup-title" style="margin-bottom:16px">🔄 Выставить повторно</div>
-    <div class="sell-type-wrap">
-      <div class="sell-type-card on" id="rl-n" onclick="document.getElementById('rl-n').classList.add('on');document.getElementById('rl-p').classList.remove('on')">
-        <div style="font-size:28px;margin-bottom:8px">📦</div>
-        <div style="font-weight:700;font-size:14px">Обычный</div>
-        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--gr2)">Бесплатно</div>
-      </div>
-      <div class="sell-type-card prem" id="rl-p" onclick="document.getElementById('rl-p').classList.add('on');document.getElementById('rl-n').classList.remove('on')">
-        <div style="font-size:28px;margin-bottom:8px">⭐</div>
-        <div style="font-weight:700;font-size:14px">Премиум</div>
-        <div style="font-size:12px;font-weight:700;margin-top:8px;color:var(--yl)">−${PREM_P} ₽</div>
-      </div>
-    </div>
-    <button class="btn btn-pr" onclick="confirmRelist(${id},this.closest('.popup-overlay'))">🔄 Выставить</button>
-    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
-  </div>`;
-  document.body.appendChild(overlay);
-}
-
-async function confirmRelist(id,overlay){
-  const isPrem=document.getElementById('rl-p').classList.contains('on');
-  try{
-    await api('/products/relist',{product_id:id,is_premium:isPrem?1:0});
-    toast('✅ Товар отправлен на модерацию');overlay.remove();
-    Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
-    openProduct(id);
-  }catch(e){toast('❌ '+e.message);}
 }
 
 // ── MSGS ─────────────────────────────────────────────────
@@ -920,7 +821,7 @@ async function loadMsgsList(){
         <div class="conv-item" onclick="openGlobalChat()">
           <div class="conv-ava gc">💬</div>
           <div class="conv-body">
-            <div class="conv-head"><div class="conv-name">Общий чат</div><div class="conv-time">${lastGc?(lastGc.created_at||'').slice(11,16):''}</div></div>
+         <div class="conv-head"><div class="conv-name">Общий чат</div><div class="conv-time">${lastGc?(lastGc.created_at||'').slice(11,16):''}</div></div>
             <div class="conv-preview">${lastGc?esc(lastGc.nickname)+': '+esc(lastGc.message?.slice(0,30)):'Начни общение!'}</div>
           </div>
         </div>
@@ -930,15 +831,16 @@ async function loadMsgsList(){
         </div>
        
   ${orders.length?orders.map(o=>{
-            const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
-            return`<div class="conv-item" onclick="openOrderChat(${o.id})">
+          const sl={paid:'Оплачен',done:'Завершён',pending_payment:'Ожидает',seller_confirmed:'Выдан'};
+          return`<div class="conv-item" onclick="openOrderChat(${o.id})">
             <div class="conv-ava">${o.role==='buyer'?'🛒':'🏪'}</div>
             <div class="conv-body">
               <div class="conv-head">
                 <div class="conv-name">${esc(o.partner_nick)}</div>
                 <div>${o.unread>0?`<span class="conv-unread">${o.unread}</span>`:''}</div>
               </div>
-              <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
+         
+     <div class="conv-preview"><span style="color:var(--ac2);font-size:10px">${sl[o.status]||o.status}</span> · ${esc(o.product_title?.slice(0,20))} · ${o.amount} ₽</div>
             </div>
           </div>`;}).join(''):''}
         ${dmConvs.map(f=>`
@@ -946,13 +848,13 @@ async function loadMsgsList(){
             <div class="conv-ava">👤</div>
             <div class="conv-body">
               <div class="conv-head">
-                <div class="conv-name">${esc(f.nickname)}</div>
+                 <div class="conv-name">${esc(f.nickname)}</div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <span class="conv-time">${fmtTime(f.created_at)}</span>
                   ${f.unread>0?`<span class="conv-unread">${f.unread}</span>`:''}
                 </div>
               </div>
-              <div class="conv-preview">${f.is_out?'Вы: ':''}${esc((f.last_message||'').slice(0,35))}</div>
+               <div class="conv-preview">${f.is_out?'Вы: ':''}${esc((f.last_message||'').slice(0,35))}</div>
             </div>
           </div>`).join('')}
       </div>`;
@@ -988,7 +890,8 @@ async function buildOrderChat(order){
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px"><span style="font-size:22px">📦</span><div><div style="font-weight:600;font-size:13px">${esc(order.product_title)}</div><div style="font-size:11px;color:var(--tx3)">${order.role==='buyer'?'Вы покупатель':'Вы продавец'} · ${esc(order.short_id)}</div></div></div>
         <div style="font-weight:700;font-size:14px;color:var(--gr2)">${order.amount} ₽ · ${sl[order.status]||order.status}</div>
       </div>
-      ${renderMsgsList(msgs,myId,'order',order.id)}
+    
+   ${renderMsgsList(msgs,myId,'order',order.id)}
     </div>
     ${order.role==='buyer'&&['paid','seller_confirmed','done'].includes(order.status)?`
   <div style="padding:8px 16px;flex-shrink:0">
@@ -1175,7 +1078,8 @@ async function buildSupportChat(){
   const msgs=await api('/support/messages');const myId=uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(S.supInterval);S.supInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button onclick="clearInterval(S.supInterval);S.supInterval=null;closeChat();"
+style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🎧</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">Поддержка</div><div style="font-size:11px;color:var(--tx3)">Обычно отвечаем быстро</div></div>
     </div>
@@ -1214,103 +1118,6 @@ async function supSend(){
 }
 
 // ── ADMIN SUPPORT PANEL ───────────────────────────────────
-  async function openAdminWithdrawals(){
-  document.getElementById('adminwd-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
-  showFull('adminwd');
-  await refreshAdminWithdrawals();
-}
-async function refreshAdminWithdrawals(){
-  try{
-    const list=await api('/admin/withdrawals');
-    document.getElementById('adminwd-inner').innerHTML=`
-      <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="st">Заявки на вывод</div>
-      ${list.length?list.map(w=>`
-        <div class="tx-item" style="flex-direction:column;align-items:stretch;gap:10px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="tx-icon">💸</div>
-            <div class="tx-body">
-              <div class="tx-desc">${esc(w.nickname)} (ID:${w.user_id})</div>
-              <div class="tx-date">${w.created_at.slice(0,16).replace('T',' ')}</div>
-            </div>
-            <div class="tx-amt" style="color:var(--yl)">-${w.amount.toFixed(0)} ₽</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button class="btn btn-gr" style="margin:0;padding:10px" onclick="adminApproveWd(${w.id},this)">✅ Одобрить</button>
-            <button class="btn btn-rd" style="margin:0;padding:10px" onclick="adminRejectWd(${w.id},this)">❌ Отклонить</button>
-          </div>
-        </div>`).join(''):'<div class="empty"><div class="empty-i">✅</div>Заявок нет</div>'}`;
-  }catch(e){document.getElementById('adminwd-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
-}
-async function adminApproveWd(wId,btn){
-  btn.disabled=true;btn.textContent='...';
-  try{await api('/admin/withdraw/approve',{w_id:wId});toast('✅ Одобрено');await refreshAdminWithdrawals();}
-  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Одобрить';}
-}
-async function adminRejectWd(wId,btn){
-  btn.disabled=true;btn.textContent='...';
-  try{await api('/admin/withdraw/reject',{w_id:wId});toast('✅ Отклонено, средства возвращены');await refreshAdminWithdrawals();}
-  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='❌ Отклонить';}
-}
-  
-function openAdminPanel(){
-  document.getElementById('adminpanel-inner').innerHTML=`
-    <button class="back" onclick="closeFull('adminpanel')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-    <div class="st">Панель администратора</div>
-    <button class="btn btn-yl" onclick="openAdminWithdrawals()">💸 Заявки на вывод</button>
-    <button class="btn btn-ol" onclick="openAdminSupport()">🎧 Тикеты поддержки</button>
-    <button class="btn btn-ol" onclick="openAdminModeration()">🔍 Модерация товаров</button>
-    <button class="btn btn-pr" onclick="openAdminTopup()">💰 Пополнить баланс пользователю</button>`;
-  showFull('adminpanel');
-}
-
-async function openAdminModeration(){
-  document.getElementById('adminpanel-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
-  showFull('adminpanel');
-  try{
-    const list=await api('/admin/moderation');
-    document.getElementById('adminpanel-inner').innerHTML=`
-      <button class="back" onclick="openAdminPanel()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
-      <div class="st">Модерация товаров (${list.length})</div>
-      ${list.length===0?'<div class="empty"><div class="empty-i">✅</div>Нет товаров на модерации</div>':
-      list.map(p=>`<div style="background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:10px">
-        <div style="font-weight:700;font-size:14px;margin-bottom:4px">${esc(p.title)}</div>
-        <div style="font-size:12px;color:var(--tx3);margin-bottom:8px">👤 ${esc(p.seller_nick)} · ${p.price==0?'Договорная':p.price+' ₽'}</div>
-        <button class="btn btn-gr" style="margin:0 0 8px;padding:10px" onclick="adminApproveProduct(${p.id},this)">✅ Одобрить</button>
-        <button class="btn btn-rd" style="margin:0;padding:10px" onclick="adminRejectProduct(${p.id},this)">❌ Отклонить</button>
-      </div>`).join('')}`;
-  }catch(e){toast('❌ '+e.message);}
-}
-async function adminApproveProduct(id,btn){
-  btn.disabled=true;btn.textContent='...';
-  try{await api('/admin/moderation/approve',{product_id:id});toast('✅ Товар одобрен');openAdminModeration();}
-  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Одобрить';}
-}
-async function adminRejectProduct(id,btn){
-  const reason=prompt('Причина отклонения:','Не соответствует правилам');if(!reason)return;
-  btn.disabled=true;btn.textContent='...';
-  try{await api('/admin/moderation/reject',{product_id:id,reason});toast('✅ Отклонено');openAdminModeration();}
-  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='❌ Отклонить';}
-}
-function openAdminTopup(){
-  const overlay=document.createElement('div');overlay.className='popup-overlay';
-  overlay.innerHTML=`<div class="popup-box" style="text-align:left">
-    <div class="popup-title" style="margin-bottom:16px">💰 Пополнить баланс</div>
-    <div class="field"><label>Telegram ID пользователя</label><input id="at-uid" type="number" placeholder="123456789"></div>
-    <div class="field"><label>Сумма (₽)</label><input id="at-amt" type="number" min="1" placeholder="100"></div>
-    <button class="btn btn-pr" onclick="doAdminTopup(this.closest('.popup-overlay'))">💰 Пополнить</button>
-    <button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Отмена</button>
-  </div>`;
-  document.body.appendChild(overlay);
-}
-async function doAdminTopup(overlay){
-  const toUid=parseInt(document.getElementById('at-uid').value)||0;
-  const amt=parseFloat(document.getElementById('at-amt').value)||0;
-  if(!toUid||!amt){toast('⚠️ Заполни поля');return;}
-  try{await api('/admin/topup',{to_uid:toUid,amount:amt});toast('✅ Баланс пополнен');overlay.remove();}
-  catch(e){toast('❌ '+e.message);}
-}
-
 async function openAdminSupport(){
   document.getElementById('adminsup-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('adminsup');
@@ -1324,7 +1131,8 @@ async function openAdminSupport(){
           <div class="conv-ava sup">👤</div>
           <div class="conv-body">
             <div class="conv-head"><div class="conv-name">${esc(t.nickname)}</div><div class="conv-time">${(t.last_time||'').slice(11,16)}</div></div>
-            <div class="conv-preview">${esc(t.last_message?.slice(0,40))}</div>
+          
+   <div class="conv-preview">${esc(t.last_message?.slice(0,40))}</div>
           </div>
         </div>`).join(''):'<div class="empty" style="padding:20px"><div class="empty-i">🎧</div>Тикетов нет</div>'}`;
   }catch(e){document.getElementById('adminsup-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -1347,7 +1155,8 @@ async function buildAdminChat(userId,nick){
   const myId=uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(adminChatInterval);adminChatInterval=null;closeChat();openAdminSupport();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button onclick="clearInterval(adminChatInterval);adminChatInterval=null;closeChat();openAdminSupport();"
+style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">👤</div>
       <div style="flex:1"><div style="font-weight:700;font-size:14px">${esc(nick)}</div><div style="font-size:11px;color:var(--tx3)">ID: ${userId}</div></div>
     </div>
@@ -1401,30 +1210,14 @@ async function renderWallet(){
       <div class="wal-action p" onclick="goTopup()">ПОПОЛНИТЬ</div>
       <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
-    ${uid()===ADMIN_ID ? `<button class="btn btn-yl" onclick="openAdminPanel()" style="margin-bottom:16px">🛡 Панель администратора</button>` : ''}
     <div class="st">История операций</div>
     <div id="wal-tx-list"><div class="loader"><div class="spin"></div></div></div>`;
   try{
     const data=await api('/transactions');
     const frozen=data.frozen||[];const txs=data.transactions||[];
-    const txIcon={topup:'💰',sale:'✅',frozen:'❄️',withdraw:'💸',purchase:'🛒',default:'📋'};
-    const txColor={topup:'var(--gr2)',sale:'var(--gr2)',frozen:'#60a5fa',withdraw:'var(--rd)',purchase:'var(--rd)',default:'var(--tx)'};
+    const txIcon={topup:'💰',sale:'✅',frozen:'❄️',withdraw:'💸',default:'📋'};
+    const txColor={topup:'var(--gr2)',sale:'var(--gr2)',frozen:'#60a5fa',withdraw:'var(--rd)',default:'var(--tx)'};
     let html='';
-    // Pending withdrawals
-    (data.pending_withdrawals||[]).forEach(w=>{
-      const dt=w.created_at.slice(0,16).replace('T',' ');
-      html+=`<div class="tx-item" style="border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.05)">
-        <div class="tx-icon">⏳</div>
-        <div class="tx-body">
-          <div class="tx-desc">Вывод на рассмотрении</div>
-          <div class="tx-date">${dt}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <div class="tx-amt" style="color:var(--yl)">-${w.amount.toFixed(0)} ₽</div>
-          <button onclick="cancelWithdraw(${w.id},${w.amount})" style="font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid var(--rd);background:none;color:var(--rd);cursor:pointer">Отменить</button>
-        </div>
-      </div>`;
-    });
     frozen.forEach(f=>{
       html+=`<div class="tx-item tx-frozen">
         <div class="tx-icon">❄️</div>
@@ -1447,7 +1240,8 @@ async function renderWallet(){
           <div class="tx-date">${dt}</div>
         </div>
         <div class="tx-amt" style="color:${color}">${sign}${t.amount.toFixed(0)} ₽</div>
-      </div>`;
+     
+  </div>`;
     });
     document.getElementById('wal-tx-list').innerHTML=html||'<div style="color:var(--tx3);font-size:13px;padding:12px 0;text-align:center">Операций пока нет</div>';
   }catch(e){document.getElementById('wal-tx-list').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
@@ -1489,39 +1283,32 @@ async function confirmTopup(){
         <a href="${r.da_link}" target="_blank" class="btn btn-pr" style="text-decoration:none;margin-bottom:16px">Открыть DonationAlerts →</a>
         <div style="font-size:13px;color:var(--tx3);margin-bottom:4px">2️⃣ В поле «Сообщение» вставь код:</div>
         <div class="pay-code" onclick="copyCode('${r.code}')">${r.code} 📋</div>
-        <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
+      
+   <div style="font-size:12px;color:var(--gr2);font-weight:600;text-align:center;margin-top:12px">✅ Баланс пополнится автоматически за 15 сек</div>
       </div>`;
   }catch(e){toast('❌ '+e.message);if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`;}}
 }
 function copyCode(t){navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);});}
-async function goWithdraw(){
-  const earn=S.user?.balance??0;
-  // Проверяем кулдаун через API
-  let cooldownHtml='';
-  try{
-    // Пробуем запросить вывод с нулевой суммой чтобы узнать оставшееся время
-    const r=await fetch(API+'/withdraw/cooldown?uid='+(uid()||''));
-    if(r.ok){const d=await r.json();if(d.wait_min>0){cooldownHtml=`<div style="background:rgba(244,63,94,.1);border:1px solid var(--rd);border-radius:14px;padding:14px;text-align:center;margin-bottom:14px"><div style="font-size:13px;color:var(--rd);font-weight:700">⏳ Следующую заявку можно подать через</div><div style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:800;color:var(--rd);margin:8px 0" id="wd-countdown">${d.wait_min} мин.</div></div>`;}}
-  }catch(e){}
+function goWithdraw(){
+  const earn=S.user?.earn_balance??0;
   document.getElementById('withdraw-inner').innerHTML=`
     <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
     <div class="st">Вывод в Telegram Stars</div>
-    ${cooldownHtml}
-    <div class="info-box">Доступно: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>250 ₽</b></div>
-    <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 250 ₽" max="${earn}" oninput="updWd()"></div>
+    <div class="info-box">Доступно: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин.
+    <b>100 ₽</b></div>
+    <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 100 ₽" max="${earn}" oninput="updWd()"></div>
     <div class="w-calc" id="w-calc" style="display:none">
       <div style="font-size:12px;color:var(--tx3);margin-bottom:4px">Вы получите</div>
       <div class="w-stars" id="w-stars">0 ⭐</div>
       <div style="font-size:12px;color:var(--tx3)" id="w-after"></div>
     </div>
     <div class="field"><label>Ваш @username</label><input id="w-user" placeholder="@username" oninput="if(!this.value.startsWith('@'))this.value='@'+this.value.replace('@','')"></div>
-    <div style="font-size:12px;color:var(--tx3);text-align:center;margin-bottom:10px">⏱ Заявку можно подавать раз в 60 минут</div>
-    <button class="btn btn-pr" id="wd-btn" onclick="doWithdraw()" ${cooldownHtml?'disabled style="opacity:.5;cursor:not-allowed"':''}>💸 Вывести</button>`;
+    <button class="btn btn-pr" onclick="doWithdraw()">💸 Вывести</button>`;
   showFull('withdraw');
 }
 function updWd(){
   const a=parseFloat(document.getElementById('w-amt')?.value||'0');const el=document.getElementById('w-calc');if(!el)return;
-  if(a>=250){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
+  if(a>=100){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
   else el.style.display='none';
 }
 function updatePriceHint(val){
@@ -1534,27 +1321,12 @@ function updatePriceHint(val){
 }  
 async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
-  const earn=S.user?.balance??0;
-  if(!amount||amount<250){toast('⚠️ Минимум 250 ₽');return;}
-  if(amount>earn){toast(`❌ Доступно: ${earn.toFixed(0)} ₽`);return;}
+  const bal2=S.user?.balance??0;
+  if(!amount||amount<100){toast('⚠️ Минимум 100 ₽');return;}
+  if(amount>bal2){toast(`❌ Доступно: ${bal2.toFixed(0)} ₽`);return;}
   if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
-  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка подана! ${r.stars} ⭐`);if(S.user){S.user.balance=Math.max(0,(S.user.balance??0)-amount);}setTimeout(()=>backTo('wallet'),1000);}}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.balance-=amount;S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
   catch(e){toast('❌ '+e.message);}
-}
-async function cancelWithdraw(wId,amount){
-  const ov=document.createElement('div');ov.className='popup-overlay';
-  ov.innerHTML=`<div class="popup-box"><div class="popup-title">Отменить вывод?</div><div class="popup-text">Средства вернутся на баланс. Повторную заявку можно будет подать через 60 минут.</div><button class="btn btn-rd" id="conf-cancel-wd">❌ Отменить заявку</button><button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Оставить</button></div>`;
-  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
-  document.body.appendChild(ov);
-  document.getElementById('conf-cancel-wd').addEventListener('click',async()=>{
-    ov.remove();
-    try{
-      await api('/withdraw/cancel',{w_id:wId});
-      toast('✅ Заявка отменена, средства возвращены');
-      if(S.user)S.user.balance=(S.user.balance??0)+amount;
-      renderWallet();
-    }catch(e){toast('❌ '+e.message);}
-  });
 }
 
 // ── PROFILE ───────────────────────────────────────────────
@@ -1579,33 +1351,26 @@ async function renderProfile(){
     let myProds=[];
     try{const res=await api('/my_products');myProds=Array.isArray(res)?res:[];}catch(e){}
     const prodsHtml=myProds.length
-      ?`<div class="prof-prod-grid">${myProds.map(p=>{
+      ?`<div class="prods">${myProds.map(p=>{
         const hasPreview=p.preview_url&&p.preview_url.length>0;
         const previewSrc=hasPreview?(p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`):null;
-        const imgHtml=hasPreview?`<img src="${previewSrc}">`:`<span>📦</span>`;
-        const isSold=p.status==='sold';
-        const isPending=p.status==='pending';
-        const statusLabel=isSold?`<div class="prof-prod-status sold">ПРОДАН</div>`:isPending?`<div class="prof-prod-status pending">⏳ МОДЕРАЦИЯ</div>`:`<div class="prof-prod-status active">● ПРОДАЁТСЯ</div>`;
-        const catName=CATEGORIES[p.category]?.name||p.category;
-        const subName=p.subcategory||'';
-        return`<div class="prof-prod-card${isSold?' sold':''}" onclick="openProduct(${p.id})">
-          <div class="prof-prod-img">
-            ${imgHtml}
-            ${statusLabel}
-            ${p.is_premium?'<div class="prem-badge" style="top:8px;left:8px;right:auto">⭐ ТОП</div>':''}
+        const thumbHtml=hasPreview?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-size:22px">📦</span>`;
+        return`<div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
+          ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
+          <div class="prod-thumb" style="overflow:hidden">${thumbHtml}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">${CATEGORIES[p.category]?.name||p.category}${p.subcategory?' · '+p.subcategory:''}</div>
+            <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price==0?'🤝 Договорная':p.price+' ₽'}${p.is_premium?' ⭐':''}</div>
           </div>
-          <div class="prof-prod-body">
-            <div class="prof-prod-cat"><span>${catName}</span>${subName?`<span>${subName}</span>`:''}</div>
-            <div class="prof-prod-title">${esc(p.title)}</div>
-            <div class="prof-prod-price">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
-          </div>
+          <button class="my-prod-del" onclick="event.stopPropagation();deleteMyProduct(${p.id},this)">🗑</button>
         </div>`;
       }).join('')}</div>`
       :'<div style="color:var(--tx3);font-size:13px;padding:8px 0">У тебя пока нет товаров</div>';
     document.getElementById('pg-profile').innerHTML=`
       <div class="prof-header">
         <div class="prof-ava">
-          ${S.user.avatar_url?`<img src="${avatarSrc(S.user.avatar_url)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
+          ${S.user.avatar_url?`<img src="${S.user.avatar_url}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
           <div class="prof-ava-edit" onclick="pickAvatar()">📷</div>
         </div>
         <div class="prof-name">${esc(S.user.nickname)}</div>
@@ -1613,7 +1378,8 @@ async function renderProfile(){
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">${S.user.balance.toFixed(0)} ₽</div><div class="stat-l">Баланс</div></div>
-        <div class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
+        <div 
+class="stat"><div class="stat-v">⭐ —</div><div class="stat-l">Рейтинг</div></div>
       </div>
       <button class="btn btn-ol" id="friends-btn" onclick="openFriends()" style="position:relative">👥 Друзья<span id="badge-friend-req" style="display:none;position:absolute;top:8px;right:12px;background:var(--rd);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">!</span></button>
       <div class="st">Мои товары</div>
@@ -1627,7 +1393,6 @@ async function deleteMyProduct(id,btn){
     const r=await fetch(API+'/products/delete?uid='+(uid()||'')+'&product_id='+id);
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Ошибка '+r.status);}
     btn.closest('.prod').remove();toast('✅ Товар удалён');
-Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
   }catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
 }
 
@@ -1639,14 +1404,15 @@ function goSettings(){
     <div class="st">Настройки профиля</div>
     <div style="text-align:center;margin-bottom:20px">
       <div class="prof-ava" style="cursor:pointer" onclick="pickAvatarSettings()">
-        ${u.avatar_url?`<img src="${avatarSrc(u.avatar_url)}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
+        ${u.avatar_url?`<img src="${u.avatar_url}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
         <div class="prof-ava-edit">📷</div>
       </div>
       <div style="font-size:12px;color:var(--tx3);margin-top:8px">Нажми чтобы изменить фото</div>
     </div>
     <div class="field"><label>Никнейм</label><input id="ep-nick" value="${esc(u.nickname||'')}" placeholder="Твой ник" maxlength="30"></div>
  
-    <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?" min="1" max="120"></div>
+    <div class="field"><label>Возраст</label><input id="ep-age" type="number" inputmode="numeric" value="${u.age||''}" placeholder="Лет?"
+min="1" max="120"></div>
     <div class="field"><label>Пол (нельзя изменить через поддержку)</label></div>
     <div class="g-row">
       <button class="g-btn ${S.gender==='male'?'sel':''}" id="g-male" onclick="selGender('male')">👨 Мужской</button>
@@ -1669,8 +1435,7 @@ function pickAvatar(){
         if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
         const c=document.createElement('canvas');c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=c.toDataURL('image/jpeg',0.5);
-        // снизили качество 0.7→0.5
+        const dataUrl=c.toDataURL('image/jpeg',0.7);
         try{
           await apiPostAvatar(dataUrl);
           if(S.user)S.user.avatar_url=dataUrl;
@@ -1698,8 +1463,7 @@ function pickAvatarSettings(){
         if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
         const c=document.createElement('canvas');c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=c.toDataURL('image/jpeg',0.5);
-        // снизили качество 0.7→0.5
+        const dataUrl=c.toDataURL('image/jpeg',0.7);
         if(S.user)S.user.avatar_url=dataUrl;
         const ava=document.querySelector('#settings-inner .prof-ava');
         if(ava)ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="prof-ava-edit" onclick="pickAvatarSettings()">📷</div>`;
@@ -1762,14 +1526,15 @@ async function openUserProfile(userId){
     document.getElementById('userprofile-inner').innerHTML=`
       <button class="back" onclick="history_back_userprofile()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
       <div class="prof-header">
-        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${avatarSrc(u.avatar_url)}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
+        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${u.avatar_url}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
         <div class="prof-name">${esc(u.nickname)}</div>
         ${sub?`<div class="prof-sub">${sub}</div>`:''}
       </div>
       <div class="stats">
         <div class="stat"><div class="stat-v">⭐ ${u.rating}</div><div class="stat-l">Рейтинг</div></div>
         <div class="stat"><div class="stat-v">${u.reviews}</div><div class="stat-l">Отзывов</div></div>
-      </div>
+    
+  </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">${actionButtons}</div>
       <div class="st" style="margin-top:20px">Товары</div>
       <div id="user-products-wrap"><div class="loader"><div class="spin"></div></div></div>`;
@@ -1787,24 +1552,17 @@ async function loadUserProducts(userId){
     ));
     const all=results.flat().sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0));
     if(!all.length){wrap.innerHTML='<div class="empty" style="padding:20px 0"><div class="empty-i">📭</div>Товаров нет</div>';return;}
-    wrap.innerHTML=`<div class="prof-prod-grid">${all.map(p=>{
+    wrap.innerHTML=`<div class="prods">${all.map(p=>{
       const hasPreview=p.preview_url&&p.preview_url.length>0;
       const previewSrc=hasPreview?(p.preview_url.startsWith('data:')?p.preview_url:`${API}/tg_file?file_id=${encodeURIComponent(p.preview_url)}`):null;
-      const imgHtml=hasPreview?`<img src="${previewSrc}" style="filter:blur(6px);transform:scale(1.1)">`:`<span>📦</span>`;
-      const isSold=p.status==='sold';
-      const statusLabel=isSold?`<div class="prof-prod-status sold">ПРОДАН</div>`:``;
-      const catName=CATEGORIES[p.category]?.name||p.category;
-      const subName=p.subcategory||'';
-      return`<div class="prof-prod-card${isSold?' sold':''}" onclick="openProduct(${p.id})">
-        <div class="prof-prod-img">
-          ${imgHtml}
-          ${statusLabel}
-          ${p.is_premium?'<div class="prem-badge" style="top:8px;left:8px;right:auto">⭐ ТОП</div>':''}
-        </div>
-        <div class="prof-prod-body">
-          <div class="prof-prod-cat"><span>${catName}</span>${subName?`<span>${subName}</span>`:''}</div>
-          <div class="prof-prod-title">${esc(p.title)}</div>
-          <div class="prof-prod-price">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
+      const thumbHtml=hasPreview?`<img src="${previewSrc}" style="width:100%;height:100%;object-fit:cover;filter:blur(6px);transform:scale(1.1)">`:`<span style="font-size:22px">📦</span>`;
+      return`<div class="prod${p.is_premium?' premium':''}" onclick="openProduct(${p.id})">
+        ${p.is_premium?'<div class="prem-badge">⭐ ТОП</div>':''}
+        <div class="prod-thumb" style="overflow:hidden">${thumbHtml}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.title)}</div>
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">⭐${p.seller_rating}</div>
+          <div style="font-weight:700;font-size:15px;color:var(--gr2)">${p.price==0?'🤝 Договорная':p.price+' ₽'}</div>
         </div>
       </div>`;
     }).join('')}</div>`;
@@ -1821,72 +1579,30 @@ function goSearch(){
 }
 let srchT=null;
 async function doSearch(q){
-  clearTimeout(srchT);
-  const el=document.getElementById('srch-res');
-  if(!q||q.length<2){
-    if(el)el.innerHTML='<div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div>';
-    return;
-  }
+  clearTimeout(srchT);const el=document.getElementById('srch-res');
+  if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div>';return;}
   srchT=setTimeout(async()=>{
     if(el)el.innerHTML='<div class="loader"><div class="spin"></div></div>';
     try{
-      const found=await apiCached('/search?q='+encodeURIComponent(q.trim()), 120000);
+      let all=[];for(const c of Object.keys(CATEGORIES)){try{const p=await api('/products/'+c);if(Array.isArray(p))all=all.concat(p);}catch(e){}}
+      const found=all.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
       if(el)el.innerHTML=found.length
-        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})">
-            <div class="prod-thumb">📦</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div>
-              <div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div>
-              <div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div>
-            </div>
-          </div>`).join('')}</div>`
+        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
         :'<div class="empty"><div class="empty-i">🔍</div>Ничего не найдено</div>';
-    }catch(e){
-      if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;
-    }
-  }, 400);
+  }catch(e){if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+  },400);
 }
 
 // ── UNREAD ────────────────────────────────────────────────
 let prevUnread=0;
-async function checkNotifications(){
-  if(!uid()) return;
+async function checkUnread(){
+  if(!uid())return;
   try{
-    const n = await api('/notifications');
-    // Бейдж на Messages (заказы + DM вместе)
-    const totalMsgs = (n.orders_unread||0) + (n.dm_unread||0);
-    const badgeMsgs = document.getElementById('badge-msgs');
-    if(badgeMsgs){
-      if(totalMsgs>0){ badgeMsgs.textContent=totalMsgs>9?'9+':totalMsgs; badgeMsgs.classList.add('on');
-      }
-      else badgeMsgs.classList.remove('on');
-    }
-    if(totalMsgs > prevUnread && S.page!=='chat' && S.page!=='msgs') playSound();
-    prevUnread = totalMsgs;
-
-    // Бейдж на Profile (заявки в друзья)
-    const count = n.friend_requests||0;
-    if(count > prevFriendReqs && prevFriendReqs >= 0) playSound();
-    prevFriendReqs = count;
-    const badgeProfile = document.getElementById('badge-profile');
-    if(badgeProfile){
-      if(count>0){ badgeProfile.textContent=count; badgeProfile.classList.add('on'); }
-      else badgeProfile.classList.remove('on');
-    }
-    const friendsBtn = document.getElementById('friends-btn');
-    if(friendsBtn){
-      let dot = friendsBtn.querySelector('.friends-req-dot');
-      if(count>0){
-        if(!dot){ dot=document.createElement('span'); dot.className='friends-req-dot';
-          dot.style.cssText='display:inline-block;width:8px;height:8px;background:var(--rd);border-radius:50%;margin-left:6px;vertical-align:middle';
-          friendsBtn.appendChild(dot);
-        }
-      } else { if(dot) dot.remove();
-      }
-    }
-
-    // dmUnread обновляем для совместимости с openDmChat
-    dmUnread = {};
+    const orders=await api('/orders');const total=orders.reduce((s,o)=>s+(o.unread||0),0);
+    const badge=document.getElementById('badge-msgs');
+    if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
+    if(total>prevUnread&&S.page!=='chat'&&S.page!=='msgs')playSound();
+    prevUnread=total;
   }catch(e){}
 }
 
@@ -1908,7 +1624,8 @@ async function buildDmChat(friendId, friendNick, friendAvatar){
   const myId = uid();
   document.getElementById('chat-inner').innerHTML=`
     <div class="chat-hdr">
-      <button onclick="clearInterval(dmInterval);dmInterval=null;closeChat();" style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button onclick="clearInterval(dmInterval);dmInterval=null;closeChat();"
+style="background:none;border:none;color:var(--ac2);cursor:pointer;padding:4px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="chat-hdr-ava">${friendAvatar?`<img src="${esc(friendAvatar)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}</div>
       <div style="flex:1;cursor:pointer" onclick="openUserProfile(${friendId})">
         <div style="font-weight:700;font-size:14px">${esc(friendNick)}</div>
@@ -1918,12 +1635,14 @@ async function buildDmChat(friendId, friendNick, friendAvatar){
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
       </button>
     </div>
-    <div class="msgs-area" id="dmmsgs">
+    
+ <div class="msgs-area" id="dmmsgs">
       ${buildDmHtml(msgs, myId, friendId)}
     </div>
     <div id="reply-bar-dm" style="display:none" class="reply-bar">
       <div class="reply-bar-text" id="reply-bar-dm-text">Ответ</div>
       <button class="reply-bar-close" onclick="S.replyTo=null;document.getElementById('reply-bar-dm').style.display='none'">✕</button>
+ 
     </div>
     <div class="chat-input-bar">
       <input class="cinput" id="dm-inp" placeholder="Сообщение..." onkeydown="if(event.key==='Enter')dmSend(${friendId})">
@@ -1962,7 +1681,8 @@ function dmMsgTap(e, text, isOut){
         </div>
         <button class="reply-bar-close" onclick="S.replyTo=null;document.getElementById('reply-bar-dm').style.display='none'">✕</button>`;
       }
-      document.getElementById('dm-inp')?.focus();
+ 
+     document.getElementById('dm-inp')?.focus();
     }},
     ...(isOut?[{icon:'🗑',label:'Удалить',danger:true,fn:()=>toast('Удаление в разработке')}]:[]),
   ]);
@@ -2095,7 +1815,7 @@ async function refreshDmChat(friendId, nick, ava){
   if(S.page!=='chat'){clearInterval(dmInterval);dmInterval=null;return;}
   try{
     const msgs=await api('/dm/messages',{with_id:friendId});const myId=uid();
-    const el=document.getElementById('dmmsgs');if(!el)return;
+  const el=document.getElementById('dmmsgs');if(!el)return;
 const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
     const prev=el.querySelectorAll('.msg-bubble').length;
     el.innerHTML=buildDmHtml(msgs,myId,friendId);
@@ -2113,18 +1833,34 @@ function updateDmBadges(){
   }
 }
 
+async function checkDmUnread(){
+  if(!uid())return;
+let from_admin = false;
+  try{
+    const res=await api('/dm/unread_count');
+    dmUnread=res;
+    const total=Object.values(res).reduce((a,b)=>a+b,0);
+    if(total>0){
+      const badge=document.getElementById('badge-msgs');
+  if(badge){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
+    }
+  }catch(e){}
+}
+
+
+
 async function showDeliveryFiles(productId){
   try{
     const r=await api('/products/'+productId+'/delivery_files');
     if(!r.files||!r.files.length){toast('📭 Файлы ещё не добавлены продавцом');return;}
-      window.deliveryFilesCache = r.files.map(f => `${API}/tg_file?file_id=${encodeURIComponent(f)}`);
+      window.deliveryFilesCache = r.files;
     const ov=document.createElement('div');ov.className='popup-overlay';
     ov.innerHTML=`<div class="popup-box" style="max-height:80vh;overflow-y:auto;text-align:left">
       <div class="popup-title" style="margin-bottom:14px">📥 Файлы (${r.files.length})</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         ${r.files.map((src,i)=>`
           <div style="border-radius:12px;overflow:hidden;cursor:pointer" onclick="openFullImg(${i},deliveryFilesCache)">
-            <img src="${API}/tg_file?file_id=${encodeURIComponent(src)}" style="width:100%;aspect-ratio:1;object-fit:cover" loading="lazy">
+            <img src="${src}" style="width:100%;aspect-ratio:1;object-fit:cover">
           </div>`).join('')}
       </div>
       <button class="btn btn-pr" onclick="this.closest('.popup-overlay').remove()">Закрыть</button>
@@ -2135,54 +1871,70 @@ async function showDeliveryFiles(productId){
 }
 
 function openFullImg(idx, files){
-  // Удаляем старый если есть
-  document.getElementById('fullimg-overlay')?.remove();
-  
+  const i=idx;
   const ov=document.createElement('div');
-  ov.id='fullimg-overlay';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;justify-content:center';
-  function render(i){
-    i=((i%files.length)+files.length)%files.length;
-    ov.innerHTML=`
-      <div style="position:absolute;top:16px;right:16px;z-index:10001">
-  <button id="fullimg-close" style="background:rgba(255,255,255,.25);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;line-height:1">✕</button>
-</div>
-      ${i>0?`<div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:10001">
-        <button id="btn-prev" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">‹</button>
-      </div>`:''}
-      <img id="fullimg" src="${files[i]}" style="max-width:100vw;max-height:85vh;object-fit:contain;border-radius:8px">
-      <div style="color:rgba(255,255,255,.5);font-size:13px;margin-top:10px">${i+1} / ${files.length}</div>
-      ${i<files.length-1?`<div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);z-index:10001">
-        <button id="btn-next" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">›</button>
-      </div>`:''}`;
-    ov.onclick=e=>{
-  e.stopPropagation();
-  const id=e.target.closest('[id]')?.id;
-  if(id==='fullimg-close') ov.remove();
-  else if(id==='btn-prev') render(i-1);
-  else if(id==='btn-next') render(i+1);
-  else if(e.target===ov) ov.remove();
-};
-  }
-  
-  render(idx);
-  ov.addEventListener('click', e=>{if(e.target===ov)ov.remove();});
+  ov.innerHTML=`
+    <div style="position:absolute;top:16px;right:16px;display:flex;gap:12px;z-index:1">
+      <a href="${files[i]}" download="file_${i+1}.jpg" style="color:#fff;font-size:22px;text-decoration:none">⬇️</a>
+      <button onclick="this.closest('div[style]').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">✕</button>
+    </div>
+    <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)">
+      <button onclick="shiftImg(this,${i}-1)" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer">‹</button>
+    </div>
+    <img id="fullimg" src="${files[i]}" style="max-width:100vw;max-height:90vh;object-fit:contain;border-radius:8px">
+    <div id="img-counter" style="color:rgba(255,255,255,.5);font-size:13px;margin-top:10px">${i+1} / ${files.length}</div>
+    <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%)">
+      <button onclick="shiftImg(this,${i}+1)" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer">›</button>
+    </div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
   document.body.appendChild(ov);
 }
 
-function shiftImg(){} // больше не нужна, оставляем пустой чтобы не было ошибок      
+function shiftImg(btn, newIdx){
+  const files=window.deliveryFilesCache||[];
+  const i=((newIdx%files.length)+files.length)%files.length;
+  const ov=btn.closest('div[style]');
+  ov.querySelector('#fullimg').src=files[i];
+  ov.querySelector('#img-counter').textContent=`${i+1} / ${files.length}`;
+  // обновить кнопки стрелок
+  ov.querySelectorAll('button[onclick^="shiftImg"]')[0].setAttribute('onclick',`shiftImg(this,${i}-1)`);
+  ov.querySelectorAll('button[onclick^="shiftImg"]')[1].setAttribute('onclick',`shiftImg(this,${i}+1)`);
+}      
 
 // ── INIT ─────────────────────────────────────────────────
 let prevFriendReqs=-1;
+  async function checkFriendRequests(){
+  if(!uid())return;
+  try{
+    const reqs=await api('/friends/requests');
+    const count=reqs.length;
+    if(count>prevFriendReqs&&prevFriendReqs>=0)playSound();
+    prevFriendReqs=count;
+    const badge=document.getElementById('badge-profile');
+  if(badge){if(count>0){badge.textContent=count;badge.classList.add('on');}else badge.classList.remove('on');}
+    // Обновляем кнопку "Друзья" если сейчас открыт профиль
+    const friendsBtn=document.getElementById('friends-btn');
+  if(friendsBtn){
+      let dot=friendsBtn.querySelector('.friends-req-dot');
+      if(count>0){if(!dot){dot=document.createElement('span');dot.className='friends-req-dot';dot.style.cssText='display:inline-block;width:8px;height:8px;background:var(--rd);border-radius:50%;margin-left:6px;vertical-align:middle';friendsBtn.appendChild(dot);}
+      }else{if(dot)dot.remove();}
+    }
+  }catch(e){}
+}
 async function init(){
   renderMarket();
   if(uid()){
     // Не блокируем UI — всё фоном
     api('/me').then(u=>{S.user=u;}).catch(()=>{});
-    checkNotifications();
+    checkUnread();
+    checkDmUnread();
+    checkFriendRequests();
   }
   setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');}catch(e){}},60000);
-  setInterval(checkNotifications, 20000);
+  setInterval(checkUnread,15000);
+  setInterval(checkDmUnread,20000);
+  setInterval(checkFriendRequests,15000);
 }
 
 function history_back_userprofile(){
