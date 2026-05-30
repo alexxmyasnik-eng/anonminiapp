@@ -1954,9 +1954,35 @@ async function buildDmChat(friendId, friendNick, friendAvatar){
 
 function buildDmHtml(msgs, myId, friendId){
   if(!msgs.length) return '<div style="text-align:center;color:var(--tx3);font-size:13px;padding:20px">Начни переписку 👋</div>';
+  const sl={paid:'🟡 Оплачен',done:'✅ Завершён',pending_payment:'⏳ Ожидает',seller_confirmed:'📦 Выдан'};
   return msgs.map(m=>{
-    const isOut = m.from_id===myId;
-const replyHtml=m.reply_to_text?`<div class="msg-reply-preview${isOut?'':' in-bubble'}">↩ ${esc(m.reply_to_text?.slice(0,40))}</div>`:'';
+    // Системное сообщение о заказе — рендерим как карточку
+    if(m.from_id===0 && m.order_id){
+      const isOut = String(m.to_id)===String(myId);
+      const isBuyer = !isOut; // to_id=покупатель при from_id=0
+      const parts = (m.message||'').split(' · ');
+      const title = parts[1]||'Товар';
+      const price = parts[2]||'';
+      const statusRaw = (parts[3]||'').replace('Статус: ','');
+      const statusMap={'Оплачен':'paid','Завершён':'done','Выдан':'seller_confirmed','Ожидает':'pending_payment'};
+      const statusKey=statusMap[statusRaw]||'paid';
+      return`<div style="margin:6px 12px;background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;cursor:pointer" onclick="openOrderChat(${m.order_id})">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px">${isBuyer?'🛒':'🏪'}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(title)}</div>
+            <div style="font-size:11px;color:var(--tx3);margin-top:2px">${isBuyer?'Вы покупатель':'Вы продавец'}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-weight:700;font-size:13px;color:var(--gr2)">${price}</div>
+            <div style="font-size:10px;color:var(--tx3);margin-top:2px">${sl[statusKey]||statusRaw}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+    // Обычное сообщение
+    const isOut = m.from_id===myId||String(m.from_id)===String(myId);
+    const replyHtml=m.reply_to_text?`<div class="msg-reply-preview${isOut?'':' in-bubble'}">↩ ${esc(m.reply_to_text?.slice(0,40))}</div>`:'';
     return`<div class="msg-row ${isOut?'out':'in'}">
       <div class="msg-bubble ${isOut?'out':'in'}" onclick="dmMsgTap(event,'${esc(m.message?.slice(0,50)?.replace(/'/g,"\\\\'"))||''}',${isOut})">
         ${replyHtml}${esc(m.message||'')}
@@ -2140,7 +2166,7 @@ async function refreshDmChat(friendId, nick, ava){
         </div>
       </div>`;
     }).join('');
-    el.innerHTML=ordersHtml+buildDmHtml(msgs,myId,friendId);
+    el.innerHTML=buildDmHtml(msgs,myId,friendId);
     if(msgs.length>prev)playSound();
     if(atBot)scrollChat('dmmsgs');
   }catch(e){}
