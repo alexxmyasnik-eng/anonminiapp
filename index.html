@@ -2112,11 +2112,35 @@ async function dmSend(friendId){
 async function refreshDmChat(friendId, nick, ava){
   if(S.page!=='chat'){clearInterval(dmInterval);dmInterval=null;return;}
   try{
-    const msgs=await api('/dm/messages',{with_id:friendId});const myId=uid();
+    const [msgs, orders]=await Promise.all([
+      api('/dm/messages',{with_id:friendId}),
+      api('/orders').catch(()=>[])
+    ]);
+    const myId=uid();
     const el=document.getElementById('dmmsgs');if(!el)return;
-const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
+    const atBot=el.scrollHeight-el.scrollTop-el.offsetHeight<80;
     const prev=el.querySelectorAll('.msg-bubble').length;
-    el.innerHTML=buildDmHtml(msgs,myId,friendId);
+    const relOrders=orders.filter(o=>
+      String(o.seller_id)===String(friendId)||String(o.buyer_id)===String(friendId)
+    );
+    const sl={paid:'🟡 Оплачен',done:'✅ Завершён',pending_payment:'⏳ Ожидает',seller_confirmed:'📦 Выдан'};
+    const ordersHtml=relOrders.map(o=>{
+      const isBuyer=String(o.buyer_id)===String(myId);
+      return`<div style="margin:8px 12px;background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;cursor:pointer" onclick="openOrderChat(${o.id})">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px">${isBuyer?'🛒':'🏪'}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(o.product_title||'Товар')}</div>
+            <div style="font-size:11px;color:var(--tx3);margin-top:2px">${isBuyer?'Вы покупатель':'Вы продавец'} · ${esc(o.short_id)}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-weight:700;font-size:13px;color:var(--gr2)">${o.amount} ₽</div>
+            <div style="font-size:10px;color:var(--tx3);margin-top:2px">${sl[o.status]||o.status}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    el.innerHTML=ordersHtml+buildDmHtml(msgs,myId,friendId);
     if(msgs.length>prev)playSound();
     if(atBot)scrollChat('dmmsgs');
   }catch(e){}
