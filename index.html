@@ -1935,21 +1935,21 @@ function buildDmHtml(msgs, myId, friendId){
   return msgs.map(m=>{
     // Системное сообщение о заказе — рендерим как карточку
     if(m.from_id===0 && m.order_id){
-      const isOut = String(m.to_id)===String(myId);
-      const isBuyer = !isOut;
+      const sl={paid:'🟡 Оплачен',done:'✅ Завершён',pending_payment:'⏳ Ожидает',seller_confirmed:'📦 Выдан'};
+      const cachedOrder = (window._ordersCache||[]).find(o=>String(o.id)===String(m.order_id));
+      const isBuyer = cachedOrder ? String(cachedOrder.buyer_id)===String(myId) : false;
       const parts = (m.message||'').split(' · ');
-      const title = parts[1]||'Товар';
-      const statusRaw = (parts[3]||'').replace('Статус: ','');
-      const statusMap={'Оплачен':'paid','Завершён':'done','Выдан':'seller_confirmed','Ожидает':'pending_payment'};
-      const statusKey=statusMap[statusRaw]||'paid';
-      // Цена: для продавца без комиссии, для покупателя полная
-      const priceStr = parts[2]||'';
-      // Ищем заказ в кэше чтобы показать правильную цену и delivery_files
-      const cachedOrder = (window._ordersCache||[]).find(o=>o.id===m.order_id);
+      const title = cachedOrder ? (cachedOrder.product_title||'Товар') : (parts[1]||'Товар');
+      const statusKey = cachedOrder ? cachedOrder.status : 'paid';
       const displayPrice = cachedOrder
-        ? (isBuyer ? cachedOrder.amount : (cachedOrder.amount - cachedOrder.commission).toFixed(2))
-        : priceStr;
-      const hasFiles = cachedOrder && cachedOrder.delivery_files && cachedOrder.delivery_files !== '[]' && JSON.parse(cachedOrder.delivery_files||'[]').length > 0;
+        ? (isBuyer
+            ? Number(cachedOrder.amount).toFixed(2)
+            : (Number(cachedOrder.amount) - Number(cachedOrder.commission)).toFixed(2))
+        : (parts[2]||'');
+      const hasFiles = cachedOrder && (() => {
+        try{ return JSON.parse(cachedOrder.delivery_files||'[]').length > 0; }catch(e){return false;}
+      })();
+      const canConfirm = isBuyer && cachedOrder && cachedOrder.status==='paid';
       return`<div style="margin:6px 12px;background:var(--s2);border:1px solid var(--br);border-radius:14px;padding:12px;">
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:24px">${isBuyer?'🛒':'🏪'}</span>
@@ -1959,10 +1959,11 @@ function buildDmHtml(msgs, myId, friendId){
           </div>
           <div style="text-align:right;flex-shrink:0">
             <div style="font-weight:700;font-size:13px;color:var(--gr2)">${displayPrice} ₽</div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:2px">${sl[statusKey]||statusRaw}</div>
+            <div style="font-size:10px;color:var(--tx3);margin-top:2px">${sl[statusKey]||statusKey}</div>
           </div>
         </div>
         ${hasFiles&&isBuyer?`<button class="btn btn-ol" style="margin-top:10px;width:100%;font-size:13px" onclick="showDeliveryFiles(${cachedOrder.product_id})">📦 Получить файлы</button>`:''}
+        ${canConfirm?`<button class="btn btn-gr" style="margin-top:8px;width:100%;font-size:13px" onclick="confirmOrderFromDm(${cachedOrder.id})">✅ Подтвердить получение</button>`:''}
       </div>`;
     }
     // Обычное сообщение
@@ -1977,6 +1978,30 @@ function buildDmHtml(msgs, myId, friendId){
   }).join('');
 }
 
+async function confirmOrderFromDm(orderId){
+  const ov=document.createElement('div');ov.className='popup-overlay';
+  ov.innerHTML=`<div class="popup-box">
+    <div class="popup-title">Подтвердить получение?</div>
+    <div class="popup-text" style="color:var(--tx2);margin-bottom:16px">Деньги перейдут продавцу. Отменить нельзя.</div>
+    <button class="btn btn-gr" id="confirm-ord-btn">Подтвердить</button>
+    <button class="btn btn-ol" id="cancel-ord-btn">Отмена</button>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#cancel-ord-btn').addEventListener('click',()=>ov.remove());
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  ov.querySelector('#confirm-ord-btn').addEventListener('click',async()=>{
+    ov.querySelector('#confirm-ord-btn').disabled=true;
+    ov.querySelector('#confirm-ord-btn').textContent='...';
+    try{
+      await api('/confirm_order',{order_id:orderId});
+      ov.remove();
+      toast('✅ Заказ подтверждён!');
+      const orders=await api('/orders').catch(()=>[]);
+      window._ordersCache=orders;
+    }catch(e){ov.remove();toast('❌ '+e.message);}
+  });
+}
+  
 function dmMsgTap(e, text, isOut){
   showCtxSheet([
     {icon:'↩',label:'Ответить',fn:()=>{
