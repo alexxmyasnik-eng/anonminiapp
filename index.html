@@ -1942,9 +1942,7 @@ function buildDmHtml(msgs, myId, friendId){
       const title = cachedOrder ? (cachedOrder.product_title||'Товар') : (parts[1]||'Товар');
       const statusKey = cachedOrder ? cachedOrder.status : 'paid';
       const displayPrice = cachedOrder
-        ? (isBuyer
-            ? Number(cachedOrder.amount).toFixed(2)
-            : (Number(cachedOrder.amount) - Number(cachedOrder.commission)).toFixed(2))
+        ${hasFiles&&isBuyer&&(cachedOrder.status==='done'||cachedOrder.status==='seller_confirmed')?`<button class="btn btn-ol" style="margin-top:10px;width:100%;font-size:13px" onclick="showDeliveryFiles(${cachedOrder.product_id})">📦 Получить файлы</button>`:''}
         : (parts[2]||'');
       const hasFiles = cachedOrder && (() => {
         try{ return JSON.parse(cachedOrder.delivery_files||'[]').length > 0; }catch(e){return false;}
@@ -1962,7 +1960,7 @@ function buildDmHtml(msgs, myId, friendId){
             <div style="font-size:10px;color:var(--tx3);margin-top:2px">${sl[statusKey]||statusKey}</div>
           </div>
         </div>
-        ${hasFiles&&isBuyer?`<button class="btn btn-ol" style="margin-top:10px;width:100%;font-size:13px" onclick="showDeliveryFiles(${cachedOrder.product_id})">📦 Получить файлы</button>`:''}
+        ${hasFiles&&isBuyer&&(cachedOrder.status==='done'||cachedOrder.status==='seller_confirmed')?`<button class="btn btn-ol" style="margin-top:10px;width:100%;font-size:13px" onclick="showDeliveryFiles(${cachedOrder.product_id})">📦 Получить файлы</button>`:''}
         ${canConfirm?`<button class="btn btn-gr" style="margin-top:8px;width:100%;font-size:13px" onclick="confirmOrderFromDm(${cachedOrder.id})">✅ Подтвердить получение</button>`:''}
       </div>`;
     }
