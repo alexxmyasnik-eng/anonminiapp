@@ -505,26 +505,9 @@ async function doBuy(id,price){
     if(r.ok){
       playSound();toast('✅ Куплено! '+r.short_id);
       if(S.user){S.user.balance-=price;}
-      setTimeout(async()=>{
-        // Проверяем — есть ли уже ЛС с продавцом этого товара
-        try{
-          const prod=await api('/product/'+id);
-          const sellerId=prod.seller_id;
-          const sellerNick=prod.seller_nick;
-          // Проверяем есть ли DM переписка
-          const convs=await api('/dm/conversations').catch(()=>[]);
-          const existing=convs.find(c=>c.partner_id===sellerId);
-          if(existing){
-            // Уже общались — открыть ЛС
-            openDmChat(sellerId,sellerNick,'');
-          } else {
-            // Не общались — открыть чат заказа
-            const orders=await api('/orders');
-            const ord=orders.find(o=>o.seller_id===sellerId&&o.status==='paid');
-            if(ord)openOrderChat(ord.id);
-            else goPage('msgs');
-          }
-        }catch(e){goPage('msgs');}
+      setTimeout(()=>{
+        if(r.seller_id) openDmChat(r.seller_id,'','');
+        else goPage('msgs');
       },1000);
     }
     else{toast('❌ Недостаточно средств');setTimeout(()=>goPage('wallet'),800);}
