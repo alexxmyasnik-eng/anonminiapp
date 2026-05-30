@@ -169,7 +169,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 .mute-submenu .ctx-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;color:var(--tx);font-family:'Manrope',sans-serif;font-size:15px;padding:14px 16px;cursor:pointer;border-radius:12px;text-align:left}
 .mute-submenu .ctx-btn:active{background:var(--s3)}  
 /* TOAST */
-.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:85vw;text-align:center}
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s3);border:1px solid var(--br2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .25s;pointer-events:none;white-space:normal;max-width:85vw;text-align:center;word-break:break-word}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .loader{text-align:center;padding:50px;color:var(--tx3)}
 .spin{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--br2);border-top-color:var(--ac);animation:sp .7s linear infinite;margin:0 auto 10px}
@@ -210,6 +210,7 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <div class="pg" id="pg-profile"></div>
 
 <div class="fullpg" id="fp-chat"><div class="chat-wrap" id="chat-inner"></div></div>
+<div class="fullpg" id="fp-adminwd" style="overflow-y:auto"><div id="adminwd-inner" style="padding:16px 16px 80px"></div></div>  
 <div class="fullpg" id="fp-product" style="overflow-y:auto"><div id="product-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-settings" style="overflow-y:auto"><div id="settings-inner" style="padding:16px 16px 80px"></div></div>
 <div class="fullpg" id="fp-userprofile" style="overflow-y:auto"><div id="userprofile-inner" style="padding:16px 16px 80px"></div></div>
@@ -231,7 +232,17 @@ body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--tx);min-h
 <audio id="snd" preload="none"><source src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
 
 <script>
-const API='https://anonpeak.onrender.com';
+const ADMIN_ID = 780434845; // замени на свой реальный Telegram ID  
+const API='https://anonpeak-mw3g.onrender.com';
+// Добавь эту функцию в начало <script> (после const API=...)
+function avatarSrc(url){
+  if(!url) return '';
+  if(url.startsWith('tg://')){
+    const fileId=url.slice(5);
+    return `${API}/tg_file?file_id=${encodeURIComponent(fileId)}`;
+  }
+  return url;
+}  
 fetch(API+'/health',{method:'GET'}).catch(()=>{});  
 const _apiCache={};
 async function apiCached(path, ttlMs=30000){
@@ -247,7 +258,7 @@ if(tg){tg.ready();tg.expand();}
 const S={page:'market',user:null,cat:null,sub:null,chatInterval:null,gcInterval:null,supInterval:null,gender:'',selAmt:0,sellData:null,replyTo:null};
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 const uid=()=>tg?.initDataUnsafe?.user?.id||null;
-const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=100;
+const SELL_C=0.16,WD_C=0.05,STAR_R=1.4,PREM_P=9,MIN_WD=250;
 let blockedUsers=[],mutedUsers=[],sellTypeSelected='normal';
 try{blockedUsers=JSON.parse(localStorage.getItem('blocked')||'[]');}catch(e){}
 try{mutedUsers=JSON.parse(localStorage.getItem('muted')||'[]');}catch(e){}
@@ -266,10 +277,21 @@ async function api(path,body=null){
 
 // POST for avatar (binary data)
 async function apiPostAvatar(dataUrl){
-  const u=uid();if(!u)throw new Error('Нет uid');
-  const r=await fetch(`${API}/me/set_avatar?uid=${u}`,{method:'POST',body:dataUrl,headers:{'Content-Type':'text/plain'}});
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Error');}
-  return r.json();
+  // Сжимаем до 200px перед отправкой
+  const img=new Image();
+  img.src=dataUrl;
+  await new Promise(r=>img.onload=r);
+  const c2=document.createElement('canvas');
+  const size=Math.min(img.width,img.height,200);
+  c2.width=c2.height=size;
+  c2.getContext('2d').drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,size,size);
+  const small=c2.toDataURL('image/jpeg',0.6);
+  const r=await fetch(`${API}/me/set_avatar?uid=${uid()}`,{method:'POST',body:small,headers:{'Content-Type':'text/plain'}});
+  if(!r.ok) throw new Error('avatar upload failed');
+  const data=await r.json();
+  // Если бот вернул file_id — используем tg://
+  if(data.file_id && S.user) S.user.avatar_url=`tg://${data.file_id}`;
+  return data;
 }
 
 // ── POPUP ─────────────────────────────────────────────────
@@ -777,16 +799,17 @@ async function doSell(){
       // Upload delivery files
       if(S.sellData.deliveryFiles?.length&&r.product_id){
         if(btn)btn.textContent=`Загружаем файлы...`;
-        for(let i=0;i<S.sellData.deliveryFiles.length;i++){
-          if(btn)btn.textContent=`Загружаем ${i+1}/${S.sellData.deliveryFiles.length}...`;
-          try{
-            await fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
-              method:'POST',body:S.sellData.deliveryFiles[i],headers:{'Content-Type':'text/plain'}
-            });
-          }catch(e){console.warn('delivery file upload failed',e);}
-        }
+        if(btn)btn.textContent=`Загружаем файлы...`;
+await Promise.allSettled(
+  S.sellData.deliveryFiles.map(f =>
+    fetch(`${API}/products/${r.product_id}/add_delivery_file?uid=${uid()}`,{
+      method:'POST',body:f,headers:{'Content-Type':'text/plain'}
+    })
+  )
+);
       }
-      
+      // Сбрасываем кеш маркетплейса после публикации
+delete _apiCache['/products/'+S.sellData.cat];
       toast('✅ Опубликовано!');if(isPrem&&S.user)S.user.balance-=PREM_P;S.sellData=null;sellTypeSelected='normal';setTimeout(()=>goPage('market'),800);
     }
   }catch(e){
@@ -1118,7 +1141,46 @@ async function supSend(){
 }
 
 // ── ADMIN SUPPORT PANEL ───────────────────────────────────
-async function openAdminSupport(){
+  async function openAdminWithdrawals(){
+  document.getElementById('adminwd-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
+  showFull('adminwd');
+  await refreshAdminWithdrawals();
+}
+async function refreshAdminWithdrawals(){
+  try{
+    const list=await api('/admin/withdrawals');
+    document.getElementById('adminwd-inner').innerHTML=`
+      <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
+      <div class="st">Заявки на вывод</div>
+      ${list.length?list.map(w=>`
+        <div class="tx-item" style="flex-direction:column;align-items:stretch;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="tx-icon">💸</div>
+            <div class="tx-body">
+              <div class="tx-desc">${esc(w.nickname)} (ID:${w.user_id})</div>
+              <div class="tx-date">${w.created_at.slice(0,16).replace('T',' ')}</div>
+            </div>
+            <div class="tx-amt" style="color:var(--yl)">-${w.amount.toFixed(0)} ₽</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn btn-gr" style="margin:0;padding:10px" onclick="adminApproveWd(${w.id},this)">✅ Одобрить</button>
+            <button class="btn btn-rd" style="margin:0;padding:10px" onclick="adminRejectWd(${w.id},this)">❌ Отклонить</button>
+          </div>
+        </div>`).join(''):'<div class="empty"><div class="empty-i">✅</div>Заявок нет</div>'}`;
+  }catch(e){document.getElementById('adminwd-inner').innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
+}
+async function adminApproveWd(wId,btn){
+  btn.disabled=true;btn.textContent='...';
+  try{await api('/admin/withdraw/approve',{w_id:wId});toast('✅ Одобрено');await refreshAdminWithdrawals();}
+  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Одобрить';}
+}
+async function adminRejectWd(wId,btn){
+  btn.disabled=true;btn.textContent='...';
+  try{await api('/admin/withdraw/reject',{w_id:wId});toast('✅ Отклонено, средства возвращены');await refreshAdminWithdrawals();}
+  catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='❌ Отклонить';}
+}
+  
+  async function openAdminSupport(){
   document.getElementById('adminsup-inner').innerHTML='<div class="loader"><div class="spin"></div></div>';
   showFull('adminsup');
   try{
@@ -1210,14 +1272,30 @@ async function renderWallet(){
       <div class="wal-action p" onclick="goTopup()">ПОПОЛНИТЬ</div>
       <div class="wal-action" onclick="goWithdraw()">ВЫВОД</div>
     </div>
+    ${uid()===ADMIN_ID ? `<button class="btn btn-yl" onclick="openAdminWithdrawals()" style="margin-bottom:16px">🛡 Заявки на вывод</button>` : ''}
     <div class="st">История операций</div>
     <div id="wal-tx-list"><div class="loader"><div class="spin"></div></div></div>`;
   try{
     const data=await api('/transactions');
     const frozen=data.frozen||[];const txs=data.transactions||[];
-    const txIcon={topup:'💰',sale:'✅',frozen:'❄️',withdraw:'💸',default:'📋'};
-    const txColor={topup:'var(--gr2)',sale:'var(--gr2)',frozen:'#60a5fa',withdraw:'var(--rd)',default:'var(--tx)'};
+    const txIcon={topup:'💰',sale:'✅',frozen:'❄️',withdraw:'💸',purchase:'🛒',default:'📋'};
+    const txColor={topup:'var(--gr2)',sale:'var(--gr2)',frozen:'#60a5fa',withdraw:'var(--rd)',purchase:'var(--rd)',default:'var(--tx)'};
     let html='';
+    // Pending withdrawals
+    (data.pending_withdrawals||[]).forEach(w=>{
+      const dt=w.created_at.slice(0,16).replace('T',' ');
+      html+=`<div class="tx-item" style="border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.05)">
+        <div class="tx-icon">⏳</div>
+        <div class="tx-body">
+          <div class="tx-desc">Вывод на рассмотрении</div>
+          <div class="tx-date">${dt}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="tx-amt" style="color:var(--yl)">-${w.amount.toFixed(0)} ₽</div>
+          <button onclick="cancelWithdraw(${w.id},${w.amount})" style="font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid var(--rd);background:none;color:var(--rd);cursor:pointer">Отменить</button>
+        </div>
+      </div>`;
+    });
     frozen.forEach(f=>{
       html+=`<div class="tx-item tx-frozen">
         <div class="tx-icon">❄️</div>
@@ -1289,26 +1367,34 @@ async function confirmTopup(){
   }catch(e){toast('❌ '+e.message);if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent=`Перейти к оплате ${S.selAmt} ₽ →`;}}
 }
 function copyCode(t){navigator.clipboard?.writeText(t).then(()=>toast('✅ Скопировано!')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');toast('✅ Скопировано!');}catch(e){}document.body.removeChild(ta);});}
-function goWithdraw(){
-  const earn=S.user?.earn_balance??0;
+async function goWithdraw(){
+  const earn=S.user?.balance??0;
+  // Проверяем кулдаун через API
+  let cooldownHtml='';
+  try{
+    // Пробуем запросить вывод с нулевой суммой чтобы узнать оставшееся время
+    const r=await fetch(API+'/withdraw/cooldown?uid='+(uid()||''));
+    if(r.ok){const d=await r.json();if(d.wait_min>0){cooldownHtml=`<div style="background:rgba(244,63,94,.1);border:1px solid var(--rd);border-radius:14px;padding:14px;text-align:center;margin-bottom:14px"><div style="font-size:13px;color:var(--rd);font-weight:700">⏳ Следующую заявку можно подать через</div><div style="font-family:'Unbounded',sans-serif;font-size:24px;font-weight:800;color:var(--rd);margin:8px 0" id="wd-countdown">${d.wait_min} мин.</div></div>`;}}
+  }catch(e){}
   document.getElementById('withdraw-inner').innerHTML=`
     <button class="back" onclick="backTo('wallet')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Кошелёк</button>
     <div class="st">Вывод в Telegram Stars</div>
-    <div class="info-box">Доступно: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин.
-    <b>100 ₽</b></div>
-    <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 100 ₽" max="${earn}" oninput="updWd()"></div>
+    ${cooldownHtml}
+    <div class="info-box">Доступно: <b style="color:var(--yl)">${earn.toFixed(0)} ₽</b><br>Комиссия: <b>5%</b> · Курс: <b>1.4 ₽ = 1 ⭐</b> · Мин. <b>250 ₽</b></div>
+    <div class="field"><label>Сумма (₽)</label><input id="w-amt" type="number" inputmode="numeric" placeholder="Мин. 250 ₽" max="${earn}" oninput="updWd()"></div>
     <div class="w-calc" id="w-calc" style="display:none">
       <div style="font-size:12px;color:var(--tx3);margin-bottom:4px">Вы получите</div>
       <div class="w-stars" id="w-stars">0 ⭐</div>
       <div style="font-size:12px;color:var(--tx3)" id="w-after"></div>
     </div>
     <div class="field"><label>Ваш @username</label><input id="w-user" placeholder="@username" oninput="if(!this.value.startsWith('@'))this.value='@'+this.value.replace('@','')"></div>
-    <button class="btn btn-pr" onclick="doWithdraw()">💸 Вывести</button>`;
+    <div style="font-size:12px;color:var(--tx3);text-align:center;margin-bottom:10px">⏱ Заявку можно подавать раз в 60 минут</div>
+    <button class="btn btn-pr" id="wd-btn" onclick="doWithdraw()" ${cooldownHtml?'disabled style="opacity:.5;cursor:not-allowed"':''}>💸 Вывести</button>`;
   showFull('withdraw');
 }
 function updWd(){
   const a=parseFloat(document.getElementById('w-amt')?.value||'0');const el=document.getElementById('w-calc');if(!el)return;
-  if(a>=100){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
+  if(a>=250){const after=a*(1-WD_C);const stars=Math.ceil(after/STAR_R);el.style.display='block';document.getElementById('w-stars').textContent=stars+' ⭐';document.getElementById('w-after').textContent=`${a.toFixed(0)} ₽ − 5% = ${after.toFixed(0)} ₽ → ${stars} звёзд`;}
   else el.style.display='none';
 }
 function updatePriceHint(val){
@@ -1321,12 +1407,27 @@ function updatePriceHint(val){
 }  
 async function doWithdraw(){
   const amount=parseFloat(document.getElementById('w-amt')?.value||'0');const username=document.getElementById('w-user')?.value?.trim();
-  const bal2=S.user?.balance??0;
-  if(!amount||amount<100){toast('⚠️ Минимум 100 ₽');return;}
-  if(amount>bal2){toast(`❌ Доступно: ${bal2.toFixed(0)} ₽`);return;}
+  const earn=S.user?.balance??0;
+  if(!amount||amount<250){toast('⚠️ Минимум 250 ₽');return;}
+  if(amount>earn){toast(`❌ Доступно: ${earn.toFixed(0)} ₽`);return;}
   if(!username||!username.startsWith('@')){toast('⚠️ Укажи @username');return;}
-  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка! ${r.stars} ⭐`);if(S.user){S.user.balance-=amount;S.user.balance-=amount;}setTimeout(()=>backTo('wallet'),1000);}}
+  try{const r=await api('/withdraw',{amount,username});if(r.ok){toast(`✅ Заявка подана! ${r.stars} ⭐`);if(S.user){S.user.balance=Math.max(0,(S.user.balance??0)-amount);}setTimeout(()=>backTo('wallet'),1000);}}
   catch(e){toast('❌ '+e.message);}
+}
+async function cancelWithdraw(wId,amount){
+  const ov=document.createElement('div');ov.className='popup-overlay';
+  ov.innerHTML=`<div class="popup-box"><div class="popup-title">Отменить вывод?</div><div class="popup-text">Средства вернутся на баланс. Повторную заявку можно будет подать через 60 минут.</div><button class="btn btn-rd" id="conf-cancel-wd">❌ Отменить заявку</button><button class="btn btn-ol" onclick="this.closest('.popup-overlay').remove()">Оставить</button></div>`;
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
+  document.getElementById('conf-cancel-wd').addEventListener('click',async()=>{
+    ov.remove();
+    try{
+      await api('/withdraw/cancel',{w_id:wId});
+      toast('✅ Заявка отменена, средства возвращены');
+      if(S.user)S.user.balance=(S.user.balance??0)+amount;
+      renderWallet();
+    }catch(e){toast('❌ '+e.message);}
+  });
 }
 
 // ── PROFILE ───────────────────────────────────────────────
@@ -1370,7 +1471,7 @@ async function renderProfile(){
     document.getElementById('pg-profile').innerHTML=`
       <div class="prof-header">
         <div class="prof-ava">
-          ${S.user.avatar_url?`<img src="${S.user.avatar_url}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
+          ${S.user.avatar_url?`<img src="${avatarSrc(S.user.avatar_url)}" onerror="this.parentNode.innerHTML='👤'">`:'👤'}
           <div class="prof-ava-edit" onclick="pickAvatar()">📷</div>
         </div>
         <div class="prof-name">${esc(S.user.nickname)}</div>
@@ -1393,6 +1494,7 @@ async function deleteMyProduct(id,btn){
     const r=await fetch(API+'/products/delete?uid='+(uid()||'')+'&product_id='+id);
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||'Ошибка '+r.status);}
     btn.closest('.prod').remove();toast('✅ Товар удалён');
+Object.keys(_apiCache).filter(k=>k.startsWith('/products/')).forEach(k=>delete _apiCache[k]);
   }catch(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🗑';}
 }
 
@@ -1404,7 +1506,7 @@ function goSettings(){
     <div class="st">Настройки профиля</div>
     <div style="text-align:center;margin-bottom:20px">
       <div class="prof-ava" style="cursor:pointer" onclick="pickAvatarSettings()">
-        ${u.avatar_url?`<img src="${u.avatar_url}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
+        ${u.avatar_url?`<img src="${avatarSrc(S.user.avatar_url)}" / src="${avatarSrc(u.avatar_url)}" id="settings-ava-img" onerror="this.parentNode.innerHTML='👤<div class=prof-ava-edit onclick=pickAvatarSettings()>📷</div>'">`:'👤'}
         <div class="prof-ava-edit">📷</div>
       </div>
       <div style="font-size:12px;color:var(--tx3);margin-top:8px">Нажми чтобы изменить фото</div>
@@ -1435,7 +1537,7 @@ function pickAvatar(){
         if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
         const c=document.createElement('canvas');c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=c.toDataURL('image/jpeg',0.7);
+        const dataUrl=c.toDataURL('image/jpeg',0.5); // снизили качество 0.7→0.5
         try{
           await apiPostAvatar(dataUrl);
           if(S.user)S.user.avatar_url=dataUrl;
@@ -1463,7 +1565,7 @@ function pickAvatarSettings(){
         if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}
         const c=document.createElement('canvas');c.width=w;c.height=h;
         c.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=c.toDataURL('image/jpeg',0.7);
+        const dataUrl=c.toDataURL('image/jpeg',0.5); // снизили качество 0.7→0.5
         if(S.user)S.user.avatar_url=dataUrl;
         const ava=document.querySelector('#settings-inner .prof-ava');
         if(ava)ava.innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div class="prof-ava-edit" onclick="pickAvatarSettings()">📷</div>`;
@@ -1526,7 +1628,7 @@ async function openUserProfile(userId){
     document.getElementById('userprofile-inner').innerHTML=`
       <button class="back" onclick="history_back_userprofile()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>Назад</button>
       <div class="prof-header">
-        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${u.avatar_url}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
+        <div class="prof-ava">${u.avatar_url&&!u.avatar_url.startsWith('http')?`<img src="${avatarSrc(S.user.avatar_url)}" / src="${avatarSrc(u.avatar_url)}">`:(u.avatar_url?`<img src="${esc(u.avatar_url)}">`:'👤')}</div>
         <div class="prof-name">${esc(u.nickname)}</div>
         ${sub?`<div class="prof-sub">${sub}</div>`:''}
       </div>
@@ -1579,30 +1681,70 @@ function goSearch(){
 }
 let srchT=null;
 async function doSearch(q){
-  clearTimeout(srchT);const el=document.getElementById('srch-res');
-  if(!q||q.length<2){if(el)el.innerHTML='<div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div>';return;}
+  clearTimeout(srchT);
+  const el=document.getElementById('srch-res');
+  if(!q||q.length<2){
+    if(el)el.innerHTML='<div class="empty"><div class="empty-i">🔍</div>Начни вводить...</div>';
+    return;
+  }
   srchT=setTimeout(async()=>{
     if(el)el.innerHTML='<div class="loader"><div class="spin"></div></div>';
     try{
-      let all=[];for(const c of Object.keys(CATEGORIES)){try{const p=await api('/products/'+c);if(Array.isArray(p))all=all.concat(p);}catch(e){}}
-      const found=all.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
+      const found=await apiCached('/search?q='+encodeURIComponent(q.trim()), 120000);
       if(el)el.innerHTML=found.length
-        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})"><div class="prod-thumb">📦</div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div><div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div><div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div></div></div>`).join('')}</div>`
+        ?`<div class="prods">${found.map(p=>`<div class="prod" onclick="openProduct(${p.id})">
+            <div class="prod-thumb">📦</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:14px;margin-bottom:3px">${esc(p.title)}</div>
+              <div style="font-size:11px;color:var(--tx3)">${esc(p.seller_nick)}</div>
+              <div style="font-weight:700;font-size:14px;color:var(--gr2)">${p.price} ₽</div>
+            </div>
+          </div>`).join('')}</div>`
         :'<div class="empty"><div class="empty-i">🔍</div>Ничего не найдено</div>';
-  }catch(e){if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;}
-  },400);
+    }catch(e){
+      if(el)el.innerHTML=`<div class="empty"><div class="empty-i">⚠️</div>${e.message}</div>`;
+    }
+  }, 400);
 }
 
 // ── UNREAD ────────────────────────────────────────────────
 let prevUnread=0;
-async function checkUnread(){
-  if(!uid())return;
+async function checkNotifications(){
+  if(!uid()) return;
   try{
-    const orders=await api('/orders');const total=orders.reduce((s,o)=>s+(o.unread||0),0);
-    const badge=document.getElementById('badge-msgs');
-    if(badge){if(total>0){badge.textContent=total>9?'9+':total;badge.classList.add('on');}else badge.classList.remove('on');}
-    if(total>prevUnread&&S.page!=='chat'&&S.page!=='msgs')playSound();
-    prevUnread=total;
+    const n = await api('/notifications');
+
+    // Бейдж на Messages (заказы + DM вместе)
+    const totalMsgs = (n.orders_unread||0) + (n.dm_unread||0);
+    const badgeMsgs = document.getElementById('badge-msgs');
+    if(badgeMsgs){
+      if(totalMsgs>0){ badgeMsgs.textContent=totalMsgs>9?'9+':totalMsgs; badgeMsgs.classList.add('on'); }
+      else badgeMsgs.classList.remove('on');
+    }
+    if(totalMsgs > prevUnread && S.page!=='chat' && S.page!=='msgs') playSound();
+    prevUnread = totalMsgs;
+
+    // Бейдж на Profile (заявки в друзья)
+    const count = n.friend_requests||0;
+    if(count > prevFriendReqs && prevFriendReqs >= 0) playSound();
+    prevFriendReqs = count;
+    const badgeProfile = document.getElementById('badge-profile');
+    if(badgeProfile){
+      if(count>0){ badgeProfile.textContent=count; badgeProfile.classList.add('on'); }
+      else badgeProfile.classList.remove('on');
+    }
+    const friendsBtn = document.getElementById('friends-btn');
+    if(friendsBtn){
+      let dot = friendsBtn.querySelector('.friends-req-dot');
+      if(count>0){
+        if(!dot){ dot=document.createElement('span'); dot.className='friends-req-dot';
+          dot.style.cssText='display:inline-block;width:8px;height:8px;background:var(--rd);border-radius:50%;margin-left:6px;vertical-align:middle';
+          friendsBtn.appendChild(dot); }
+      } else { if(dot) dot.remove(); }
+    }
+
+    // dmUnread обновляем для совместимости с openDmChat
+    dmUnread = {};
   }catch(e){}
 }
 
@@ -1833,34 +1975,18 @@ function updateDmBadges(){
   }
 }
 
-async function checkDmUnread(){
-  if(!uid())return;
-let from_admin = false;
-  try{
-    const res=await api('/dm/unread_count');
-    dmUnread=res;
-    const total=Object.values(res).reduce((a,b)=>a+b,0);
-    if(total>0){
-      const badge=document.getElementById('badge-msgs');
-  if(badge){badge.textContent=total>9?'9+':total;badge.classList.add('on');}
-    }
-  }catch(e){}
-}
-
-
-
 async function showDeliveryFiles(productId){
   try{
     const r=await api('/products/'+productId+'/delivery_files');
     if(!r.files||!r.files.length){toast('📭 Файлы ещё не добавлены продавцом');return;}
-      window.deliveryFilesCache = r.files;
+      window.deliveryFilesCache = r.files.map(f => `${API}/tg_file?file_id=${encodeURIComponent(f)}`);
     const ov=document.createElement('div');ov.className='popup-overlay';
     ov.innerHTML=`<div class="popup-box" style="max-height:80vh;overflow-y:auto;text-align:left">
       <div class="popup-title" style="margin-bottom:14px">📥 Файлы (${r.files.length})</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         ${r.files.map((src,i)=>`
           <div style="border-radius:12px;overflow:hidden;cursor:pointer" onclick="openFullImg(${i},deliveryFilesCache)">
-            <img src="${src}" style="width:100%;aspect-ratio:1;object-fit:cover">
+            <img src="${API}/tg_file?file_id=${encodeURIComponent(src)}" style="width:100%;aspect-ratio:1;object-fit:cover" loading="lazy">
           </div>`).join('')}
       </div>
       <button class="btn btn-pr" onclick="this.closest('.popup-overlay').remove()">Закрыть</button>
@@ -1871,70 +1997,57 @@ async function showDeliveryFiles(productId){
 }
 
 function openFullImg(idx, files){
-  const i=idx;
+  // Удаляем старый если есть
+  document.getElementById('fullimg-overlay')?.remove();
+  
   const ov=document.createElement('div');
+  ov.id='fullimg-overlay';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);display:flex;flex-direction:column;align-items:center;justify-content:center';
-  ov.innerHTML=`
-    <div style="position:absolute;top:16px;right:16px;display:flex;gap:12px;z-index:1">
-      <a href="${files[i]}" download="file_${i+1}.jpg" style="color:#fff;font-size:22px;text-decoration:none">⬇️</a>
-      <button onclick="this.closest('div[style]').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer">✕</button>
-    </div>
-    <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%)">
-      <button onclick="shiftImg(this,${i}-1)" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer">‹</button>
-    </div>
-    <img id="fullimg" src="${files[i]}" style="max-width:100vw;max-height:90vh;object-fit:contain;border-radius:8px">
-    <div id="img-counter" style="color:rgba(255,255,255,.5);font-size:13px;margin-top:10px">${i+1} / ${files.length}</div>
-    <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%)">
-      <button onclick="shiftImg(this,${i}+1)" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:24px;width:40px;height:40px;border-radius:50%;cursor:pointer">›</button>
-    </div>`;
-  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  
+  function render(i){
+    i=((i%files.length)+files.length)%files.length;
+    ov.innerHTML=`
+      <div style="position:absolute;top:16px;right:16px;z-index:10001">
+  <button id="fullimg-close" style="background:rgba(255,255,255,.25);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;line-height:1">✕</button>
+</div>
+      ${i>0?`<div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:10001">
+        <button id="btn-prev" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">‹</button>
+      </div>`:''}
+      <img id="fullimg" src="${files[i]}" style="max-width:100vw;max-height:85vh;object-fit:contain;border-radius:8px">
+      <div style="color:rgba(255,255,255,.5);font-size:13px;margin-top:10px">${i+1} / ${files.length}</div>
+      ${i<files.length-1?`<div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);z-index:10001">
+        <button id="btn-next" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">›</button>
+      </div>`:''}`;
+    
+    ov.onclick=e=>{
+  e.stopPropagation();
+  const id=e.target.closest('[id]')?.id;
+  if(id==='fullimg-close') ov.remove();
+  else if(id==='btn-prev') render(i-1);
+  else if(id==='btn-next') render(i+1);
+  else if(e.target===ov) ov.remove();
+};
+  }
+  
+  render(idx);
+  ov.addEventListener('click', e=>{if(e.target===ov)ov.remove();});
   document.body.appendChild(ov);
 }
 
-function shiftImg(btn, newIdx){
-  const files=window.deliveryFilesCache||[];
-  const i=((newIdx%files.length)+files.length)%files.length;
-  const ov=btn.closest('div[style]');
-  ov.querySelector('#fullimg').src=files[i];
-  ov.querySelector('#img-counter').textContent=`${i+1} / ${files.length}`;
-  // обновить кнопки стрелок
-  ov.querySelectorAll('button[onclick^="shiftImg"]')[0].setAttribute('onclick',`shiftImg(this,${i}-1)`);
-  ov.querySelectorAll('button[onclick^="shiftImg"]')[1].setAttribute('onclick',`shiftImg(this,${i}+1)`);
-}      
+function shiftImg(){} // больше не нужна, оставляем пустой чтобы не было ошибок      
 
 // ── INIT ─────────────────────────────────────────────────
 let prevFriendReqs=-1;
-  async function checkFriendRequests(){
-  if(!uid())return;
-  try{
-    const reqs=await api('/friends/requests');
-    const count=reqs.length;
-    if(count>prevFriendReqs&&prevFriendReqs>=0)playSound();
-    prevFriendReqs=count;
-    const badge=document.getElementById('badge-profile');
-  if(badge){if(count>0){badge.textContent=count;badge.classList.add('on');}else badge.classList.remove('on');}
-    // Обновляем кнопку "Друзья" если сейчас открыт профиль
-    const friendsBtn=document.getElementById('friends-btn');
-  if(friendsBtn){
-      let dot=friendsBtn.querySelector('.friends-req-dot');
-      if(count>0){if(!dot){dot=document.createElement('span');dot.className='friends-req-dot';dot.style.cssText='display:inline-block;width:8px;height:8px;background:var(--rd);border-radius:50%;margin-left:6px;vertical-align:middle';friendsBtn.appendChild(dot);}
-      }else{if(dot)dot.remove();}
-    }
-  }catch(e){}
-}
+ 
 async function init(){
   renderMarket();
   if(uid()){
     // Не блокируем UI — всё фоном
     api('/me').then(u=>{S.user=u;}).catch(()=>{});
-    checkUnread();
-    checkDmUnread();
-    checkFriendRequests();
+    checkNotifications();
   }
   setInterval(async()=>{if(!uid())return;try{S.user=await api('/me');}catch(e){}},60000);
-  setInterval(checkUnread,15000);
-  setInterval(checkDmUnread,20000);
-  setInterval(checkFriendRequests,15000);
+  setInterval(checkNotifications, 20000);
 }
 
 function history_back_userprofile(){
